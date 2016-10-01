@@ -1,0 +1,16 @@
+[package]
+name = "derivative"
+version = "0.1.0"
+authors = ["mcarton <cartonmartin+git@gmail.com>"]
+license = "MIT/Apache-2.0"
+
+[lib]
+rustc-macro = true
+
+[dependencies]
+quote = "^0.2"
+syn = "^0.8"
+syntex_syntax = "^0.44"
+
+[dev-dependencies]
+compiletest_rs = "^0.2"
