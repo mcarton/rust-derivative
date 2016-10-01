@@ -54,7 +54,7 @@ fn ignored_traits(attrs: &[syn::Attribute]) -> Vec<&str> {
     }).flat_map(|s| s).collect()
 }
 
-fn derive_debug(input: &syn::MacroInput) -> String {
+fn derive_debug(input: &syn::MacroInput) -> quote::Tokens {
     fn make_variant_data(
         variant_name: quote::Tokens,
         variant_name_as_str: &str,
@@ -131,17 +131,17 @@ fn derive_debug(input: &syn::MacroInput) -> String {
                 }
             }
         }
-    ).to_string()
+    )
 }
 
-fn derive_impl_from_name(input: &syn::MacroInput, attr: &str) -> String {
+fn derive_impl_from_name(input: &syn::MacroInput, attr: &str) -> quote::Tokens {
     match attr {
         "Debug" => derive_debug(input),
         _ => panic!("Unknown trait `{}`", attr),
     }
 }
 
-fn derive_impl(input: &syn::MacroInput, attr: syn::MetaItem) -> String {
+fn derive_impl(input: &syn::MacroInput, attr: syn::MetaItem) -> quote::Tokens {
     if let syn::MetaItem::Word(name) = attr {
         derive_impl_from_name(input, name.as_ref())
     } else {
@@ -149,20 +149,54 @@ fn derive_impl(input: &syn::MacroInput, attr: syn::MetaItem) -> String {
     }
 }
 
+fn remove_derivative_attrs(input: &mut syn::MacroInput) {
+    fn remove_from_vec(attrs: &mut Vec<syn::Attribute>) {
+        attrs.retain(|attr| derivative_attribute(&attr).is_none());
+    }
+
+    fn remove_from_variant_data(vd: &mut syn::VariantData) {
+        match *vd {
+            syn::VariantData::Struct(ref mut fields) | syn::VariantData::Tuple(ref mut fields) => {
+                for field in fields {
+                    remove_from_vec(&mut field.attrs);
+                }
+            }
+            syn::VariantData::Unit => (),
+        }
+    }
+
+    remove_from_vec(&mut input.attrs);
+
+    match input.body {
+        syn::Body::Enum(ref mut variants) => {
+            for variant in variants {
+                remove_from_vec(&mut variant.attrs);
+                remove_from_variant_data(&mut variant.data);
+            }
+        }
+        syn::Body::Struct(ref mut vd) => {
+            remove_from_variant_data(vd);
+        }
+    }
+}
+
 #[rustc_macro_derive(Derivative)]
 pub fn derivative(input: TokenStream) -> TokenStream {
     let input = syn::parse_macro_input(&input.to_string()).unwrap();
 
-    let (input, attrs) = collect_derive_attrs(input);
+    let (mut input, attrs) = collect_derive_attrs(input);
     println!("{:?}", input);
 
-    let mut output = quote!(#input).to_string();
+    let mut output = quote::Tokens::new();
 
-    output.extend(attrs.into_iter().map(|attr| {
+    output.append_separated(attrs.into_iter().map(|attr| {
         derive_impl(&input, attr)
-    }));
+    }), " ");
+
+    remove_derivative_attrs(&mut input);
+    output.append(&quote!(#input).to_string());
 
     println!("{:?}", output);
 
-    TokenStream::from_str(&output).unwrap()
+    TokenStream::from_str(&output.to_string()).unwrap()
 }
