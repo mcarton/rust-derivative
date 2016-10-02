@@ -70,12 +70,16 @@ fn derive_debug(input: &syn::MacroInput) -> quote::Tokens {
                     field_pats.append(&format!("{}: ref __arg_{},", name, n));
 
                     if !ignored_traits(&f.attrs).contains(&"Debug") {
-                        field_prints.append(&format!(".field(\"{}\", &__arg_{})", name, n));
+                        field_prints.append(&format!("let _ = builder.field(\"{}\", &__arg_{});", name, n));
                     }
                 }
 
                 quote!(
-                    #variant_name { #field_pats } => f.debug_struct(#variant_name_as_str) #field_prints .finish()
+                    #variant_name { #field_pats } => {
+                        let mut builder = f.debug_struct(#variant_name_as_str);
+                        #field_prints
+                        builder.finish()
+                    }
                 )
             }
             syn::VariantData::Tuple(ref fields) => {
@@ -86,13 +90,16 @@ fn derive_debug(input: &syn::MacroInput) -> quote::Tokens {
                     field_pats.append(&format!("ref __arg_{},", n));
 
                     if !ignored_traits(&f.attrs).contains(&"Debug") {
-                        field_prints.append(&format!(".field(&__arg_{})", n));
+                        field_prints.append(&format!("let _ = builder.field(&__arg_{});", n));
                     }
                 }
 
                 quote!(
-                    #variant_name( #field_pats ) =>
-                        f.debug_tuple(#variant_name_as_str) #field_prints .finish()
+                    #variant_name( #field_pats ) => {
+                        let mut builder = f.debug_tuple(#variant_name_as_str);
+                        #field_prints
+                        builder.finish()
+                    }
                 )
             }
             syn::VariantData::Unit => {
