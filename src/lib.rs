@@ -7,7 +7,6 @@ extern crate syn;
 extern crate quote;
 
 use rustc_macro::TokenStream;
-use std::str::FromStr;
 
 fn derivative_attribute(attr: &syn::Attribute) -> Option<&[syn::MetaItem]> {
     match attr.value {
@@ -216,5 +215,5 @@ pub fn derivative(input: TokenStream) -> TokenStream {
 
     println!("{:?}", output);
 
-    TokenStream::from_str(&output.to_string()).unwrap()
+    output.to_string().parse().unwrap()
 }
