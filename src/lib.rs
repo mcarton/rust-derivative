@@ -5,8 +5,6 @@ extern crate syn;
 
 #[macro_use]
 extern crate quote;
-#[macro_use]
-extern crate syntex_syntax as syntax;
 
 use rustc_macro::TokenStream;
 use std::str::FromStr;
@@ -130,8 +128,20 @@ fn derive_debug(input: &syn::MacroInput) -> quote::Tokens {
         }
     };
 
+    let debug_trait_path = syn::parse_path("::std::fmt::Debug").unwrap();
+    let impl_generics = syn::aster::from_generics(input.generics.clone())
+                                  .add_ty_param_bound(debug_trait_path.clone())
+                                  .build();
+    let where_clause = &impl_generics.where_clause;
+
+    let ty = syn::aster::ty().path()
+                             .segment(name.clone())
+                             .with_generics(impl_generics.clone())
+                             .build()
+                             .build();
+
     quote!(
-        impl ::std::fmt::Debug for #name {
+        impl #impl_generics #debug_trait_path for #ty #where_clause {
             fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
                 match *self {
                     #arms
@@ -191,6 +201,7 @@ fn remove_derivative_attrs(input: &mut syn::MacroInput) {
 pub fn derivative(input: TokenStream) -> TokenStream {
     let input = syn::parse_macro_input(&input.to_string()).unwrap();
 
+    println!("{:?}", input);
     let (mut input, attrs) = collect_derive_attrs(input);
     println!("{:?}", input);
 
