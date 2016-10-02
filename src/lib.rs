@@ -51,11 +51,12 @@ fn ignored_traits(attrs: &[syn::Attribute]) -> Vec<&str> {
     }).flat_map(|s| s).collect()
 }
 
-fn derive_debug(input: &syn::MacroInput) -> quote::Tokens {
+fn derive_debug(input: &syn::MacroInput, value: Option<syn::Lit>) -> quote::Tokens {
     fn make_variant_data(
         variant_name: quote::Tokens,
         variant_name_as_str: &str,
-        data: &syn::VariantData
+        data: &syn::VariantData,
+        transparent: bool,
     ) -> quote::Tokens {
         match *data {
             syn::VariantData::Struct(ref fields) => {
@@ -76,6 +77,13 @@ fn derive_debug(input: &syn::MacroInput) -> quote::Tokens {
                         let mut builder = f.debug_struct(#variant_name_as_str);
                         #field_prints
                         builder.finish()
+                    }
+                )
+            }
+            syn::VariantData::Tuple(_) if transparent => {
+                quote!(
+                    #variant_name( ref __arg_0 ) => {
+                        ::std::fmt::Debug::fmt(__arg_0, f)
                     }
                 )
             }
@@ -107,6 +115,12 @@ fn derive_debug(input: &syn::MacroInput) -> quote::Tokens {
         }
     }
 
+    let transparent = if let Some(syn::Lit::Str(s, _)) = value {
+        s == "transparent"
+    } else {
+        false
+    };
+
     let name = &input.ident;
 
     let arms = match input.body {
@@ -115,13 +129,13 @@ fn derive_debug(input: &syn::MacroInput) -> quote::Tokens {
                 let fname = &field.ident;
                 let fname_as_str = fname.as_ref();
 
-                make_variant_data(quote!(#name::#fname), fname_as_str, &field.data)
+                make_variant_data(quote!(#name::#fname), fname_as_str, &field.data, false)
             });
 
             quote!(#(arms),*)
         }
         syn::Body::Struct(ref vd) => {
-            let arms = make_variant_data(quote!(#name), name.as_ref(), vd);
+            let arms = make_variant_data(quote!(#name), name.as_ref(), vd, transparent);
 
             quote!(#arms)
         }
@@ -150,18 +164,18 @@ fn derive_debug(input: &syn::MacroInput) -> quote::Tokens {
     )
 }
 
-fn derive_impl_from_name(input: &syn::MacroInput, attr: &str) -> quote::Tokens {
+fn derive_impl_from_name(input: &syn::MacroInput, attr: &str, value: Option<syn::Lit>) -> quote::Tokens {
     match attr {
-        "Debug" => derive_debug(input),
+        "Debug" => derive_debug(input, value),
         _ => panic!("Unknown trait `{}`", attr),
     }
 }
 
 fn derive_impl(input: &syn::MacroInput, attr: syn::MetaItem) -> quote::Tokens {
-    if let syn::MetaItem::Word(name) = attr {
-        derive_impl_from_name(input, name.as_ref())
-    } else {
-        panic!("`#[derivative]` expected just a name");
+    match attr {
+        syn::MetaItem::Word(name) => derive_impl_from_name(input, name.as_ref(), None),
+        syn::MetaItem::NameValue(name, lit) => derive_impl_from_name(input, name.as_ref(), Some(lit)),
+        _ => panic!("unknown `#[derivative]` attribute"),
     }
 }
 
