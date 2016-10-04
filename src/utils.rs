@@ -1,20 +1,5 @@
 use syn;
 
-pub fn collect_derive_attrs(mut input: syn::MacroInput) -> (syn::MacroInput, Vec<syn::MetaItem>) {
-    let mut attrs = Vec::new();
-
-    input.attrs.retain(|attr| {
-        if let Some(mis) = derivative_attribute(&attr) {
-            attrs.extend_from_slice(mis);
-            false
-        } else {
-            true
-        }
-    });
-
-    (input, attrs)
-}
-
 pub fn derivative_attribute(attr: &syn::Attribute) -> Option<&[syn::MetaItem]> {
     match attr.value {
         syn::MetaItem::List(ref name, ref mis) if name == "derivative" => {
@@ -26,19 +11,33 @@ pub fn derivative_attribute(attr: &syn::Attribute) -> Option<&[syn::MetaItem]> {
     }
 }
 
-pub fn ignored_traits(attrs: &[syn::Attribute]) -> Vec<&str> {
-    attrs.iter().filter_map(derivative_attribute).flat_map(|a| a).map(|attr| {
-        match *attr {
-            syn::MetaItem::List(ref name, ref mis) if name == "ignore_for" => {
-                mis.iter().map(|mi| {
-                    if let syn::MetaItem::Word(ref name) = *mi {
-                        name.as_ref()
-                    } else {
-                        panic!()
-                    }
-                }).collect()
+pub fn remove_derivative_attrs(input: &mut syn::MacroInput) {
+    fn remove_from_vec(attrs: &mut Vec<syn::Attribute>) {
+        attrs.retain(|attr| derivative_attribute(&attr).is_none());
+     }
+ 
+    fn remove_from_variant_data(vd: &mut syn::VariantData) {
+        match *vd {
+            syn::VariantData::Struct(ref mut fields) | syn::VariantData::Tuple(ref mut fields) => {
+                for field in fields {
+                    remove_from_vec(&mut field.attrs);
+                }
             }
-            _ => Vec::new(),
+            syn::VariantData::Unit => (),
         }
-    }).flat_map(|s| s).collect()
-}
+    }
+
+    remove_from_vec(&mut input.attrs);
+
+    match input.body {
+        syn::Body::Enum(ref mut variants) => {
+            for variant in variants {
+                remove_from_vec(&mut variant.attrs);
+                remove_from_variant_data(&mut variant.data);
+            }
+        }
+        syn::Body::Struct(ref mut vd) => {
+            remove_from_variant_data(vd);
+        }
+    }
+ }

@@ -1,16 +1,19 @@
+use ast;
+use attr;
+use bound;
 use quote;
 use syn;
-use utils;
 
-pub fn derive(input: &syn::MacroInput, value: Option<syn::Lit>) -> quote::Tokens {
+pub fn derive(input: &ast::Input, debug: &attr::InputDebug) -> quote::Tokens {
     fn make_variant_data(
         variant_name: quote::Tokens,
         variant_name_as_str: &str,
-        data: &syn::VariantData,
+        style: ast::Style,
+        fields: &[ast::Field],
         transparent: bool,
     ) -> quote::Tokens {
-        match *data {
-            syn::VariantData::Struct(ref fields) => {
+        match style {
+            ast::Style::Struct => {
                 let mut field_pats = quote::Tokens::new();
                 let mut field_prints = quote::Tokens::new();
 
@@ -18,7 +21,7 @@ pub fn derive(input: &syn::MacroInput, value: Option<syn::Lit>) -> quote::Tokens
                     let name = f.ident.as_ref().unwrap();
                     field_pats.append(&format!("{}: ref __arg_{},", name, n));
 
-                    if !utils::ignored_traits(&f.attrs).contains(&"Debug") {
+                    if !f.attrs.debug.as_ref().map_or(false, |d| d.ignore) {
                         field_prints.append(&format!("let _ = builder.field(\"{}\", &__arg_{});", name, n));
                     }
                 }
@@ -31,21 +34,21 @@ pub fn derive(input: &syn::MacroInput, value: Option<syn::Lit>) -> quote::Tokens
                     }
                 )
             }
-            syn::VariantData::Tuple(_) if transparent => {
+            ast::Style::Tuple if transparent => {
                 quote!(
                     #variant_name( ref __arg_0 ) => {
                         ::std::fmt::Debug::fmt(__arg_0, f)
                     }
                 )
             }
-            syn::VariantData::Tuple(ref fields) => {
+            ast::Style::Tuple => {
                 let mut field_pats = quote::Tokens::new();
                 let mut field_prints = quote::Tokens::new();
 
                 for (n, f) in fields.iter().enumerate() {
                     field_pats.append(&format!("ref __arg_{},", n));
 
-                    if !utils::ignored_traits(&f.attrs).contains(&"Debug") {
+                    if !f.attrs.debug.as_ref().map_or(false, |d| d.ignore) {
                         field_prints.append(&format!("let _ = builder.field(&__arg_{});", n));
                     }
                 }
@@ -58,7 +61,7 @@ pub fn derive(input: &syn::MacroInput, value: Option<syn::Lit>) -> quote::Tokens
                     }
                 )
             }
-            syn::VariantData::Unit => {
+            ast::Style::Unit => {
                 quote!(
                     #variant_name => f.write_str(#variant_name_as_str)
                 )
@@ -66,27 +69,22 @@ pub fn derive(input: &syn::MacroInput, value: Option<syn::Lit>) -> quote::Tokens
         }
     }
 
-    let transparent = if let Some(syn::Lit::Str(s, _)) = value {
-        s == "transparent"
-    } else {
-        false
-    };
-
     let name = &input.ident;
 
     let arms = match input.body {
-        syn::Body::Enum(ref data) => {
-            let arms = data.iter().map(|field| {
-                let fname = &field.ident;
-                let fname_as_str = fname.as_ref();
+        ast::Body::Enum(ref data) => {
+            let arms = data.iter().map(|variant| {
+                let vname = &variant.ident;
+                let vname_as_str = vname.as_ref();
+                let transparent = variant.attrs.debug.as_ref().map_or(false, |debug| debug.transparent);
 
-                make_variant_data(quote!(#name::#fname), fname_as_str, &field.data, false)
+                make_variant_data(quote!(#name::#vname), vname_as_str, variant.style, &variant.fields, transparent)
             });
 
             quote!(#(arms),*)
         }
-        syn::Body::Struct(ref vd) => {
-            let arms = make_variant_data(quote!(#name), name.as_ref(), vd, transparent);
+        ast::Body::Struct(style, ref vd) => {
+            let arms = make_variant_data(quote!(#name), name.as_ref(), style, vd, debug.transparent);
 
             quote!(#arms)
         }
