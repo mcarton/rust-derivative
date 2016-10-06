@@ -62,6 +62,22 @@ impl<'a> Input<'a> {
     }
 }
 
+impl<'a> Body<'a> {
+    pub fn all_fields(&self) -> Vec<&Field> {
+        match *self {
+            Body::Enum(ref variants) => {
+                variants
+                    .iter()
+                    .flat_map(|variant| variant.fields.iter())
+                    .collect()
+            }
+            Body::Struct(_, ref fields) => {
+                fields.iter().collect()
+            }
+        }
+    }
+}
+
 fn enum_from_ast<'a>(cx: &Ctxt, variants: &'a [syn::Variant]) -> Vec<Variant<'a>> {
     variants
         .iter()

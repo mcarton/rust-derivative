@@ -2,7 +2,7 @@ use ast;
 use attr;
 use bound;
 use quote;
-use syn;
+use syn::{self, aster};
 
 pub fn derive(input: &ast::Input, debug: &attr::InputDebug) -> quote::Tokens {
     fn make_variant_data(
@@ -90,10 +90,8 @@ pub fn derive(input: &ast::Input, debug: &attr::InputDebug) -> quote::Tokens {
         }
     };
 
-    let debug_trait_path = syn::parse_path("::std::fmt::Debug").unwrap();
-    let impl_generics = syn::aster::from_generics(input.generics.clone())
-                                  .add_ty_param_bound(debug_trait_path.clone())
-                                  .build();
+    let debug_trait_path = debug_trait_path();
+    let impl_generics = build_impl_generics(input);
     let where_clause = &impl_generics.where_clause;
 
     let ty = syn::aster::ty().path()
@@ -111,4 +109,31 @@ pub fn derive(input: &ast::Input, debug: &attr::InputDebug) -> quote::Tokens {
             }
         }
     )
+}
+
+/// Make generic with all the generics in the input, plus a bound `T: Debug` for each generic field
+/// type that will be shown.
+fn build_impl_generics(item: &ast::Input) -> syn::Generics {
+    let generics = bound::without_defaults(&item.generics);
+    let generics = bound::with_where_predicates_from_fields(
+        item, &generics,
+        |attrs| attrs.debug_bound());
+
+    match item.attrs.debug_bound() {
+        Some(predicates) => {
+            bound::with_where_predicates(&generics, predicates)
+        }
+        None => {
+            bound::with_bound(item, &generics, needs_deserialize_bound, &debug_trait_path())
+        }
+    }
+}
+
+fn needs_deserialize_bound(attrs: &attr::Field) -> bool {
+    !attrs.ignore_debug() && attrs.debug_bound().is_none()
+}
+
+/// Return the path of the `Debug` trait, that is `::std::fmt::Debug`.
+fn debug_trait_path() -> syn::Path {
+    aster::path().global().ids(&["std", "fmt", "Debug"]).build()
 }

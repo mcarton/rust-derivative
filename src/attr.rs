@@ -14,13 +14,13 @@ pub struct Field {
 
 #[derive(Debug)]
 pub struct InputDebug {
-    bounds: Vec<syn::WherePredicate>,
+    bounds: Option<Vec<syn::WherePredicate>>,
     pub transparent: bool,
 }
 
 #[derive(Debug)]
 pub struct FieldDebug {
-    bounds: Vec<syn::WherePredicate>,
+    bounds: Option<Vec<syn::WherePredicate>>,
     pub ignore: bool,
 }
 
@@ -35,7 +35,7 @@ impl Input {
                     syn::MetaItem::Word(ref name) if name == "Debug" => {
                         input.debug = Some(
                             InputDebug {
-                                bounds: Vec::new(),
+                                bounds: None,
                                 transparent: false,
                             }
                         );
@@ -44,7 +44,7 @@ impl Input {
                     syn::MetaItem::NameValue(ref name, ref value) if name == "Debug" => {
                         input.debug = Some(
                             InputDebug {
-                                bounds: Vec::new(),
+                                bounds: None,
                                 transparent: true, // TODO: check the value
                             }
                         );
@@ -57,6 +57,10 @@ impl Input {
         }
 
         input
+    }
+
+    pub fn debug_bound(&self) -> Option<&[syn::WherePredicate]> {
+        self.debug.as_ref().map_or(None, |d| d.bounds.as_ref().map(Vec::as_slice))
     }
 }
 
@@ -71,7 +75,7 @@ impl Field {
                     syn::MetaItem::NameValue(ref name, ref value) if name == "Debug" => {
                         out.debug = Some(
                             FieldDebug {
-                                bounds: Vec::new(),
+                                bounds: None,
                                 ignore: true, // TODO: check the value
                             }
                         );
@@ -84,6 +88,14 @@ impl Field {
         }
 
         out
+    }
+
+    pub fn debug_bound(&self) -> Option<&[syn::WherePredicate]> {
+        self.debug.as_ref().map_or(None, |d| d.bounds.as_ref().map(Vec::as_slice))
+    }
+
+    pub fn ignore_debug(&self) -> bool {
+        self.debug.as_ref().map_or(false, |debug| debug.ignore)
     }
 }
 
