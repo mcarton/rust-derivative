@@ -54,7 +54,7 @@ impl<'a> Input<'a> {
         };
 
         Input {
-            attrs: attrs,
+            attrs: attrs.unwrap(),
             body: body,
             generics: &item.generics,
             ident: item.ident.clone(),
@@ -84,7 +84,7 @@ fn enum_from_ast<'a>(cx: &Ctxt, variants: &'a [syn::Variant]) -> Vec<Variant<'a>
         .map(|variant| {
             let (style, fields) = struct_from_ast(cx, &variant.data);
             Variant {
-                attrs: attr::Input::from_ast(cx, &variant.attrs),
+                attrs: attr::Input::from_ast(cx, &variant.attrs).unwrap(),
                 fields: fields,
                 ident: variant.ident.clone(),
                 style: style,
@@ -112,7 +112,7 @@ fn fields_from_ast<'a>(cx: &Ctxt, fields: &'a [syn::Field]) -> Vec<Field<'a>> {
         .iter()
         .map(|field| {
             Field {
-                attrs: attr::Field::from_ast(cx, field),
+                attrs: attr::Field::from_ast(cx, field).unwrap(),
                 ident: field.ident.clone(),
                 ty: &field.ty,
             }

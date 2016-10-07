@@ -33,11 +33,12 @@ pub struct FieldDefault {
 }
 
 impl Input {
-    pub fn from_ast(cx: &Ctxt, attrs: &[syn::Attribute]) -> Input {
+    pub fn from_ast(cx: &Ctxt, attrs: &[syn::Attribute]) -> Result<Input, String> {
         let mut input = Input::default();
 
         for meta_items in attrs.iter().filter_map(derivative_attribute) {
-            for MetaItem(name, values) in meta_items.iter().map(read_items) {
+            for metaitem in meta_items.iter().map(read_items) {
+                let MetaItem(name, values) = try!(metaitem);
                 match name {
                     "Debug" => {
                         let mut debug = input.debug.take().unwrap_or_default();
@@ -46,20 +47,13 @@ impl Input {
                             match name {
                                 "bound" => {
                                     let mut bounds = debug.bounds.take().unwrap_or_default();
-
-                                    let clause = syn::parse_where_clause(&format!("where {}", value.unwrap()));
-                                    bounds.append(&mut clause.unwrap().predicates);
-
+                                    try!(parse_bound(&mut bounds, value));
                                     debug.bounds = Some(bounds);
                                 }
                                 "transparent" => {
-                                    debug.transparent = match value {
-                                        Some("true") | None => true,
-                                        Some("false") => false,
-                                        Some(_) => panic!(),
-                                    };
+                                    debug.transparent = try!(parse_boolean_meta_item(&value, true, "transparent"));
                                 }
-                                _ => panic!(),
+                                _ => return Err(format!("unknown attribute `{}`", name)),
                             }
                         }
 
@@ -68,12 +62,12 @@ impl Input {
                     "Default" => {
                         input.default = true;
                     }
-                    _ => panic!(),
+                    _ => return Err(format!("unknown trait `{}`", name)),
                 }
             }
         }
 
-        input
+        Ok(input)
     }
 
     pub fn debug_bound(&self) -> Option<&[syn::WherePredicate]> {
@@ -82,11 +76,12 @@ impl Input {
 }
 
 impl Field {
-    pub fn from_ast(cx: &Ctxt, field: &syn::Field) -> Field {
+    pub fn from_ast(cx: &Ctxt, field: &syn::Field) -> Result<Field, String> {
         let mut out = Field::default();
 
         for meta_items in field.attrs.iter().filter_map(derivative_attribute) {
-            for MetaItem(name, values) in meta_items.iter().map(read_items) {
+            for metaitem in meta_items.iter().map(read_items) {
+                let MetaItem(name, values) = try!(metaitem);
                 match name {
                     "Debug" => {
                         let mut debug = out.debug.take().unwrap_or_default();
@@ -95,23 +90,17 @@ impl Field {
                             match name {
                                 "bound" => {
                                     let mut bounds = debug.bounds.take().unwrap_or_default();
-
-                                    let clause = syn::parse_where_clause(&format!("where {}", value.unwrap()));
-                                    bounds.append(&mut clause.unwrap().predicates);
-
+                                    try!(parse_bound(&mut bounds, value));
                                     debug.bounds = Some(bounds);
                                 }
                                 "format_with" => {
-                                    debug.format_with = Some(syn::parse_path(value.unwrap()).unwrap());
+                                    let path = try!(value.ok_or_else(|| "`format_with` needs a value".to_string()));
+                                    debug.format_with = Some(try!(syn::parse_path(path)));
                                 }
                                 "ignore" => {
-                                    debug.ignore = match value {
-                                        Some("true") | None => true,
-                                        Some("false") => false,
-                                        Some(_) => panic!(),
-                                    };
+                                    debug.ignore = try!(parse_boolean_meta_item(&value, true, "ignore"));
                                 }
-                                _ => panic!(),
+                                _ => return Err(format!("unknown attribute `{}`", name)),
                             }
                         }
 
@@ -123,20 +112,21 @@ impl Field {
                         for (name, value) in values {
                             match name {
                                 "value" => {
-                                    default.value = Some(syn::parse_expr(value.unwrap()).unwrap());
+                                    let value = try!(value.ok_or_else(|| "`value` needs a value".to_string()));
+                                    default.value = Some(try!(syn::parse_expr(value)));
                                 }
-                                _ => panic!(),
+                                _ => return Err(format!("unknown attribute `{}`", name)),
                             }
                         }
 
                         out.default = Some(default);
                     }
-                    _ => panic!(),
+                    _ => return Err(format!("unknown trait `{}`", name)),
                 }
             }
         }
 
-        out
+        Ok(out)
     }
 
     pub fn debug_bound(&self) -> Option<&[syn::WherePredicate]> {
@@ -165,38 +155,34 @@ impl Field {
 /// * `#[derivative(Debug(foo="bar")]` is represented as `("Debug", [("foo", Some("bar"))])`.
 struct MetaItem<'a>(&'a str, Vec<(&'a str, Option<&'a str>)>);
 
-fn read_items(item: &syn::MetaItem) -> MetaItem {
+fn read_items(item: &syn::MetaItem) -> Result<MetaItem, String> {
     match *item {
-        syn::MetaItem::Word(ref name) => MetaItem(name.as_ref(), Vec::new()),
+        syn::MetaItem::Word(ref name) => Ok(MetaItem(name.as_ref(), Vec::new())),
         syn::MetaItem::List(ref name, ref values) => {
-            let values = values
+            let values = try!(
+                values
                 .iter()
                 .map(|value| {
                     match *value {
-                        syn::MetaItem::Word(..) | syn::MetaItem::List(..) => panic!(),
+                        syn::MetaItem::Word(..) | syn::MetaItem::List(..) => {
+                            Err(format!("Expected named value"))
+                        }
                         syn::MetaItem::NameValue(ref name, ref value) => {
-                            let value = if let syn::Lit::Str(ref value, _) = *value {
-                                value.as_str()
-                            } else {
-                                panic!();
-                            };
+                            let value = try!(str_or_err(value));
 
-                            (name.as_ref(), Some(value))
+                            Ok((name.as_ref(), Some(value)))
                         }
                     }
                 })
-                .collect();
+                .collect()
+            );
 
-            MetaItem(name.as_ref(), values)
+            Ok(MetaItem(name.as_ref(), values))
         }
         syn::MetaItem::NameValue(ref name, ref value) => {
-            let value = if let syn::Lit::Str(ref value, _) = *value {
-                value.as_str()
-            } else {
-                panic!();
-            };
+            let value = try!(str_or_err(value));
 
-            MetaItem(name.as_ref(), vec![(value, None)])
+            Ok(MetaItem(name.as_ref(), vec![(value, None)]))
         }
     }
 }
@@ -209,5 +195,30 @@ fn derivative_attribute(attr: &syn::Attribute) -> Option<&[syn::MetaItem]> {
         syn::MetaItem::Word(..) |
         syn::MetaItem::NameValue(..) |
         syn::MetaItem::List(..) => None,
+    }
+}
+
+fn parse_boolean_meta_item(item: &Option<&str>, default: bool, name: &str) -> Result<bool, String> {
+    match *item {
+        Some("true") => Ok(true),
+        Some("false") => Ok(false),
+        Some(_) => Err(format!("Invalid value for `{}`", name)),
+        None => Ok(default),
+    }
+}
+
+fn parse_bound(bounds: &mut Vec<syn::WherePredicate>, value: Option<&str>) -> Result<(), String> {
+    let bound = try!(value.ok_or_else(|| "`bound` needs a value".to_string()));
+    let where_clause = syn::parse_where_clause(&format!("where {}", bound));
+    let mut predicates = try!(where_clause).predicates;
+    bounds.append(&mut predicates);
+    Ok(())
+}
+
+fn str_or_err(lit: &syn::Lit) -> Result<&str, String> {
+    if let syn::Lit::Str(ref value, _) = *lit {
+        Ok(value.as_str())
+    } else {
+        Err(format!("Expected string"))
     }
 }
