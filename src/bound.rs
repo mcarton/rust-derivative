@@ -1,5 +1,14 @@
-// This is mostly copied from serde.
-// TODO: proper licence stuffs
+/* This file incorporates work covered by the following copyright and
+ * permission notice:
+ *   Copyright 2016 The serde Developers. See
+ *   https://github.com/serde-rs/serde/blob/3f28a9324042950afa80354722aeeee1a55cbfa3/README.md#license.
+ *
+ *   Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
+ *   http://www.apache.org/licenses/LICENSE-2.0> or the MIT license
+ *   <LICENSE-MIT or http://opensource.org/licenses/MIT>, at your
+ *   option. This file may not be copied, modified, or distributed
+ *   except according to those terms.
+ */
 
 use ast;
 use attr;
