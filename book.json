@@ -1,11 +1,11 @@
 {
-    "root": "src",
+    "root": "doc",
     "title": "Derivative",
     "language": "en",
     "plugins": ["-search", "-sharing", "codeblock-filename", "edit-link"],
     "pluginsConfig": {
         "edit-link": {
-            "base": "https://github.com/mcarton/rust-derivative/tree/doc/src",
+            "base": "https://github.com/mcarton/rust-derivative/tree/master/src",
             "label": "Edit"
         }
     }

@@ -1,4 +1,4 @@
-publish:
+publish_doc:
 	gitbook build
 	rm -fr /tmp/_book
 	git clone --branch gh-pages --single-branch git@github.com:mcarton/rust-derivative.git /tmp/_book
