@@ -16,9 +16,9 @@ pub fn derivative_attribute(attr: &syn::Attribute) -> Option<&[syn::MetaItem]> {
 
 pub fn remove_derivative_attrs(input: &mut syn::MacroInput) {
     fn remove_from_vec(attrs: &mut Vec<syn::Attribute>) {
-        attrs.retain(|attr| derivative_attribute(&attr).is_none());
+        attrs.retain(|attr| derivative_attribute(attr).is_none());
      }
- 
+
     fn remove_from_variant_data(vd: &mut syn::VariantData) {
         match *vd {
             syn::VariantData::Struct(ref mut fields) | syn::VariantData::Tuple(ref mut fields) => {
@@ -58,7 +58,7 @@ pub fn build_impl_generics<F, G, H>(
           G: Fn(&attr::Field) -> Option<&[syn::WherePredicate]>,
           H: Fn(&attr::Input) -> Option<&[syn::WherePredicate]>,
 {
-    let generics = bound::without_defaults(&item.generics);
+    let generics = bound::without_defaults(item.generics);
     let generics = bound::with_where_predicates_from_fields(
         item, &generics, field_bound
     );

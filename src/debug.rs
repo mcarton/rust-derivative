@@ -99,13 +99,13 @@ pub fn derive(input: &ast::Input, debug: &attr::InputDebug) -> quote::Tokens {
                 let vname_as_str = vname.as_ref();
                 let transparent = variant.attrs.debug.as_ref().map_or(false, |debug| debug.transparent);
 
-                make_variant_data(quote!(#name::#vname), vname_as_str, variant.style, &variant.fields, transparent, &input.generics)
+                make_variant_data(quote!(#name::#vname), vname_as_str, variant.style, &variant.fields, transparent, input.generics)
             });
 
             quote!(#(arms),*)
         }
         ast::Body::Struct(style, ref vd) => {
-            let arms = make_variant_data(quote!(#name), name.as_ref(), style, vd, debug.transparent, &input.generics);
+            let arms = make_variant_data(quote!(#name), name.as_ref(), style, vd, debug.transparent, input.generics);
 
             quote!(#arms)
         }

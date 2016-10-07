@@ -163,7 +163,7 @@ fn read_items(item: &syn::MetaItem) -> Result<MetaItem, String> {
                 .map(|value| {
                     match *value {
                         syn::MetaItem::Word(..) | syn::MetaItem::List(..) => {
-                            Err(format!("Expected named value"))
+                            Err("Expected named value".to_string())
                         }
                         syn::MetaItem::NameValue(ref name, ref value) => {
                             let value = try!(str_or_err(value));
@@ -217,6 +217,6 @@ fn str_or_err(lit: &syn::Lit) -> Result<&str, String> {
     if let syn::Lit::Str(ref value, _) = *lit {
         Ok(value.as_str())
     } else {
-        Err(format!("Expected string"))
+        Err("Expected string".to_string())
     }
 }
