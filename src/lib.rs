@@ -28,7 +28,7 @@ fn derive_impls(input: &ast::Input) -> Result<quote::Tokens, String> {
     Ok(tokens)
 }
 
-#[rustc_macro_derive(Derivative)]
+#[cfg_attr(not(test), rustc_macro_derive(Derivative))]
 pub fn derivative(input: TokenStream) -> TokenStream {
     fn detail(input: TokenStream) -> Result<TokenStream, String> {
         let mut input = try!(syn::parse_macro_input(&input.to_string()));
