@@ -138,6 +138,32 @@
             
         </li>
     
+        <li class="chapter " data-level="1.2.3" data-path="Debug.html">
+            
+                <a href="Debug.html#format-with">
+            
+                    
+                    Alternative format function
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.2.4" data-path="Debug.html">
+            
+                <a href="Debug.html#custom-bound">
+            
+                    
+                    Custom bound
+            
+                </a>
+            
+
+            
+        </li>
+    
 
             </ul>
             
@@ -269,6 +295,46 @@ variants with only one field:</p>
 <span class="hljs-comment">// But:</span>
 <span class="hljs-built_in">println!</span>(<span class="hljs-string">&quot;{:?}&quot;</span>, C::Foo(<span class="hljs-number">42</span>)); <span class="hljs-comment">// Foo(42)</span>
 </code></pre>
+<h1 id="format-with">Format with</h1>
+<p>You can pass a field to a format function:</p>
+<pre><code class="lang-rust"><span class="hljs-meta">#[derive(Derivative)]</span>
+<span class="hljs-meta">#[derivative(Debug)]</span>
+<span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">Foo</span></span> {
+    foo: <span class="hljs-keyword">u32</span>,
+    <span class="hljs-meta">#[derivative(Debug(format_with=<span class="hljs-meta-string">&quot;path::to::my_fmt_fn&quot;</span>))]</span>
+    bar: SomeTypeThatMightNotBeDebug,
+}
+</code></pre>
+<p>The field <code>bar</code> will be displayed with <code>path::to::my_fmt_fn(&amp;bar, &amp;mut fmt)</code>
+where <code>fmt</code> is the current <a href="https://doc.rust-lang.org/std/fmt/struct.Formatter.html" target="_blank"><code>Formatter</code></a>.</p>
+<p>The function must the following prototype:</p>
+<pre><code class="lang-rust"><span class="hljs-function"><span class="hljs-keyword">fn</span> <span class="hljs-title">fmt</span></span>(&amp;T, &amp;<span class="hljs-keyword">mut</span> std::fmt::Formatter) -&gt; <span class="hljs-built_in">Result</span>&lt;(), std::fmt::Error&gt;;
+</code></pre>
+<h1 id="custom-bound">Custom bound</h1>
+<p>Usually, <em>derivative</em> will add a <code>T: Debug</code> bound for each type parameter <code>T</code>
+of the current type. If you do not want that, you can specify an explicit bound:</p>
+<ul>
+<li>Either on the type. This replaces all bounds:</li>
+</ul>
+<pre><code class="lang-rust"><span class="hljs-meta">#[derive(Derivative)]</span>
+<span class="hljs-meta">#[derivative(Debug(bound=<span class="hljs-meta-string">&quot;T: Debug, U:MyDebug&quot;</span>)]</span>
+<span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">Foo</span></span>&lt;T, U&gt; {
+    foo: T,
+    <span class="hljs-meta">#[derivative(Debug(format_with=<span class="hljs-meta-string">&quot;MyDebug::my_fmt&quot;</span>))]</span>
+    bar: U,
+}
+</code></pre>
+<ul>
+<li>Or on a field. This replaces the bound <em>derivative</em> guessed for that field. The example below is equivalent to the above:</li>
+</ul>
+<pre><code class="lang-rust"><span class="hljs-meta">#[derive(Derivative)]</span>
+<span class="hljs-meta">#[derivative(Debug)]</span>
+<span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">Foo</span></span>&lt;T, U&gt; {
+    foo: T,
+    <span class="hljs-meta">#[derivative(Debug(format_with=<span class="hljs-meta-string">&quot;MyDebug::my_fmt&quot;</span>, bound=<span class="hljs-meta-string">&quot;U: MyDebug&quot;</span>))]</span>
+    bar: U,
+}
+</code></pre>
 
                                 
                                 </section>
@@ -296,7 +362,7 @@ variants with only one field:</p>
     <script>
         var gitbook = gitbook || [];
         gitbook.push(function() {
-            gitbook.page.hasChanged({"page":{"title":"Debug trait","level":"1.2","depth":1,"next":{"title":"Hiding fields","level":"1.2.1","depth":2,"anchor":"#ignoring-a-field","path":"Debug.md","ref":"Debug.md#ignoring-a-field","articles":[]},"previous":{"title":"Overview","level":"1.1","depth":1,"path":"README.md","ref":"README.md","articles":[]},"dir":"ltr"},"config":{"plugins":["-search","-sharing","codeblock-filename","edit-link"],"root":"src","styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"pluginsConfig":{"edit-link":{"label":"Edit","base":"https://github.com/mcarton/rust-derivative/tree/doc/src"},"codeblock-filename":{},"highlight":{},"lunr":{"maxIndexSize":1000000,"ignoreSpecialCharacters":false},"fontsettings":{"theme":"white","family":"sans","size":2},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false}},"theme":"default","pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"variables":{},"title":"Derivative","language":"en","gitbook":"*"},"file":{"path":"Debug.md","mtime":"2016-10-07T19:37:49.212Z","type":"markdown"},"gitbook":{"version":"3.2.2","time":"2016-10-07T19:58:38.299Z"},"basePath":".","book":{"language":""}});
+            gitbook.page.hasChanged({"page":{"title":"Debug trait","level":"1.2","depth":1,"next":{"title":"Hiding fields","level":"1.2.1","depth":2,"anchor":"#ignoring-a-field","path":"Debug.md","ref":"Debug.md#ignoring-a-field","articles":[]},"previous":{"title":"Overview","level":"1.1","depth":1,"path":"README.md","ref":"README.md","articles":[]},"dir":"ltr"},"config":{"plugins":["-search","-sharing","codeblock-filename","edit-link"],"root":"doc","styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"pluginsConfig":{"edit-link":{"label":"Edit","base":"https://github.com/mcarton/rust-derivative/tree/master/src"},"codeblock-filename":{},"highlight":{},"lunr":{"maxIndexSize":1000000,"ignoreSpecialCharacters":false},"fontsettings":{"theme":"white","family":"sans","size":2},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false}},"theme":"default","pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"variables":{},"title":"Derivative","language":"en","gitbook":"*"},"file":{"path":"Debug.md","mtime":"2016-10-07T22:57:50.659Z","type":"markdown"},"gitbook":{"version":"3.2.2","time":"2016-10-07T22:59:39.652Z"},"basePath":".","book":{"language":""}});
         });
     </script>
 </div>
