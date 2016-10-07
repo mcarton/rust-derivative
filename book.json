@@ -1,0 +1,12 @@
+{
+    "root": "src",
+    "title": "Derivative",
+    "language": "en",
+    "plugins": ["-search", "-sharing", "codeblock-filename"],
+    "pluginsConfig": {
+        "edit-link": {
+            "base": "https://github.com/mcarton/rust-derivative/tree/gh-pages",
+            "label": "Edit"
+        }
+    }
+}
