@@ -14,10 +14,26 @@ struct Foo<T, U> {
 }
 
 #[derive(Derivative)]
+#[derivative(Debug(bound="T: std::fmt::Debug, U:MyDebug"))]
+struct Foo2<T, U> {
+    foo: T,
+    #[derivative(Debug(format_with="MyDebug::my_fmt"))]
+    bar: U,
+}
+
+#[derive(Derivative)]
 #[derivative(Debug)]
 struct Bar<T, U> (
     T,
     #[derivative(Debug(format_with="MyDebug::my_fmt", bound="U: MyDebug"))]
+    U,
+);
+
+#[derive(Derivative)]
+#[derivative(Debug(bound="T: std::fmt::Debug, U:MyDebug"))]
+struct Bar2<T, U> (
+    T,
+    #[derivative(Debug(format_with="MyDebug::my_fmt"))]
     U,
 );
 
@@ -43,5 +59,7 @@ impl<T: std::fmt::Debug> ToDebug for T {
 
 fn main() {
     assert_eq!(Foo { foo: 42, bar: 0 }.to_show(), "Foo { foo: 42, bar: MyDebug }".to_string());
+    assert_eq!(Foo2 { foo: 42, bar: 0 }.to_show(), "Foo2 { foo: 42, bar: MyDebug }".to_string());
     assert_eq!(Bar(42, 0).to_show(), "Bar(42, MyDebug)".to_string());
+    assert_eq!(Bar2(42, 0).to_show(), "Bar2(42, MyDebug)".to_string());
 }
