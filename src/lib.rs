@@ -10,6 +10,7 @@ mod ast;
 mod attr;
 mod bound;
 mod debug;
+mod default;
 mod utils;
 
 use rustc_macro::TokenStream;
@@ -19,6 +20,9 @@ fn derive_impls(input: &ast::Input) -> quote::Tokens {
 
     if let Some(ref debug) = input.attrs.debug {
         tokens.append(&debug::derive(input, debug).to_string());
+    }
+    if input.attrs.default {
+        tokens.append(&default::derive(input).to_string());
     }
 
     tokens

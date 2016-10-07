@@ -5,11 +5,13 @@ type Ctxt = ();
 #[derive(Debug, Default)]
 pub struct Input {
     pub debug: Option<InputDebug>,
+    pub default: bool,
 }
 
 #[derive(Debug, Default)]
 pub struct Field {
     pub debug: Option<FieldDebug>,
+    pub default: Option<FieldDefault>,
 }
 
 #[derive(Debug, Default)]
@@ -23,6 +25,11 @@ pub struct FieldDebug {
     bounds: Option<Vec<syn::WherePredicate>>,
     format_with: Option<syn::Path>,
     ignore: bool,
+}
+
+#[derive(Debug, Default)]
+pub struct FieldDefault {
+    pub value: Option<syn::Expr>,
 }
 
 impl Input {
@@ -57,6 +64,9 @@ impl Input {
                         }
 
                         input.debug = Some(debug);
+                    }
+                    "Default" => {
+                        input.default = true;
                     }
                     _ => panic!(),
                 }
@@ -107,6 +117,20 @@ impl Field {
 
                         out.debug = Some(debug);
                     }
+                    "Default" => {
+                        let mut default = out.default.take().unwrap_or_default();
+
+                        for (name, value) in values {
+                            match name {
+                                "value" => {
+                                    default.value = Some(syn::parse_expr(value.unwrap()).unwrap());
+                                }
+                                _ => panic!(),
+                            }
+                        }
+
+                        out.default = Some(default);
+                    }
                     _ => panic!(),
                 }
             }
@@ -125,6 +149,10 @@ impl Field {
 
     pub fn ignore_debug(&self) -> bool {
         self.debug.as_ref().map_or(false, |debug| debug.ignore)
+    }
+
+    pub fn default_value(&self) -> Option<&syn::Expr> {
+        self.default.as_ref().map_or(None, |d| d.value.as_ref())
     }
 }
 

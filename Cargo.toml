@@ -9,7 +9,7 @@ rustc-macro = true
 
 [dependencies]
 quote = "^0.2"
-syn = { version = "0.8", features = ["aster", "visit"] }
+syn = { version = "0.8", features = ["aster", "full", "visit"] }
 
 [dev-dependencies]
 compiletest_rs = "^0.2"
