@@ -1,19 +1,19 @@
 This crate provides a set of alternative `#[derive]` attribute.
 
-# Stability
+## Stability
 
 This crate is not stable yet and the attributes might change at any time.
 
 For now the crate only works on *nightly* but it uses *rustc*'s Macros 1.1 and
 is meant to be usable on *stable* as soon as it is possible.
 
-# Implemented traits
+## Implemented traits
 
 For now only `Debug` is supported.
 
-## `#[derivative(Debug)]`
+### `#[derivative(Debug)]`
 
-### Ignoring a field
+#### Ignoring a field
 
 ```rust
 #[derive(Derivative)]
@@ -27,7 +27,7 @@ struct Foo {
 println!("{:?}", Foo { foo: 42, bar: 1 }); // Foo { foo: 42 }
 ```
 
-### Don't show new-types
+#### Don't show new-types
 
 ```rust
 #[derive(Derivative)]
@@ -51,7 +51,7 @@ println!("{:?}", C::Foo(42)); // Foo(42)
 
 This only works when the structure or variant only has one field.
 
-# License
+## License
 
 Licensed under either of
  * Apache License, Version 2.0 ([LICENSE-APACHE](LICENSE-APACHE) or
@@ -60,7 +60,7 @@ Licensed under either of
 
 at your option.
 
-# Contribution
+## Contribution
 
 Unless you explicitly state otherwise, any contribution intentionally submitted
 for inclusion in the work by you, as defined in the Apache-2.0 license, shall
