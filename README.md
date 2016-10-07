@@ -49,7 +49,7 @@ println!("{:?}", C::Foo(42)); // Foo(42)
 
 This only works when the structure or variant only has one field.
 
-### `#[derivative(Debug)]`
+### `#[derivative(Default)]`
 
 ```rust
 #[derive(Debug, Derivative)]
