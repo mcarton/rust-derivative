@@ -1,5 +1,7 @@
-The `Debug` trait supports two attributes:
+The `Debug` trait supports four attributes:
 
+* [`bound`](#custom-bound)
+* [`format_with`](#format-with)
 * [`ignore`](#ignoring-a-field)
 * [`transparent`](#hiding-newtypes)
 
