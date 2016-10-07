@@ -1,6 +1,6 @@
 # Derivative
 
-This crate provides a set of alternative `#[derive]` attribute for Rust.
+This crate provides a set of alternative `#[derive]` attributes for Rust.
 
 ## Stability
 
