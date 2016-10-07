@@ -9,8 +9,6 @@ is meant to be usable on *stable* as soon as it is possible.
 
 ## Implemented traits
 
-For now only `Debug` is supported.
-
 ### `#[derivative(Debug)]`
 
 #### Ignoring a field
@@ -50,6 +48,20 @@ println!("{:?}", C::Foo(42)); // Foo(42)
 ```
 
 This only works when the structure or variant only has one field.
+
+### `#[derivative(Debug)]`
+
+```rust
+#[derive(Debug, Derivative)]
+#[derivative(Default)]
+struct Foo {
+    foo: u8,
+    #[derivative(Default(value="42"))]
+    bar: u8,
+}
+
+println!("{:?}", Foo::default()); // Foo { foo: 0, bar: 42 }
+```
 
 ## License
 
