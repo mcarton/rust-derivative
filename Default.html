@@ -1,0 +1,315 @@
+
+<!DOCTYPE HTML>
+<html lang="en" >
+    <head>
+        <meta charset="UTF-8">
+        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+        <title>Default trait · Derivative</title>
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="description" content="">
+        <meta name="generator" content="GitBook 3.2.2">
+        
+        
+        
+    
+    <link rel="stylesheet" href="gitbook/style.css">
+
+    
+            
+                
+                <link rel="stylesheet" href="gitbook/gitbook-plugin-codeblock-filename/block.css">
+                
+            
+                
+                <link rel="stylesheet" href="gitbook/gitbook-plugin-highlight/website.css">
+                
+            
+                
+                <link rel="stylesheet" href="gitbook/gitbook-plugin-fontsettings/website.css">
+                
+            
+        
+
+    
+
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+
+        
+    
+    
+    <meta name="HandheldFriendly" content="true"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <link rel="apple-touch-icon-precomposed" sizes="152x152" href="gitbook/images/apple-touch-icon-precomposed-152.png">
+    <link rel="shortcut icon" href="gitbook/images/favicon.ico" type="image/x-icon">
+
+    
+    <link rel="next" href="Debug.html" />
+    
+    
+    <link rel="prev" href="Debug.html" />
+    
+
+    </head>
+    <body>
+        
+<div class="book">
+    <div class="book-summary">
+        
+            
+            
+                <nav role="navigation">
+                
+
+
+<ul class="summary">
+    
+    
+
+    
+
+    
+        
+        
+    
+        <li class="chapter " data-level="1.1" data-path="./">
+            
+                <a href="./">
+            
+                    
+                    Overview
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.2" data-path="Debug.html">
+            
+                <a href="Debug.html">
+            
+                    
+                    Debug trait
+            
+                </a>
+            
+
+            
+            <ul class="articles">
+                
+    
+        <li class="chapter " data-level="1.2.1" data-path="Debug.html">
+            
+                <a href="Debug.html#ignoring-a-field">
+            
+                    
+                    Hiding fields
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.2.2" data-path="Debug.html">
+            
+                <a href="Debug.html#hiding-newtypes">
+            
+                    
+                    Hiding newtypes
+            
+                </a>
+            
+
+            
+        </li>
+    
+
+            </ul>
+            
+        </li>
+    
+        <li class="chapter active" data-level="1.3" data-path="Default.html">
+            
+                <a href="Default.html">
+            
+                    
+                    Default trait
+            
+                </a>
+            
+
+            
+            <ul class="articles">
+                
+    
+        <li class="chapter " data-level="1.3.1" data-path="Debug.html">
+            
+                <a href="Debug.html#setting-the-value-of-a-field">
+            
+                    
+                    Setting the value of a field
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.3.2" data-path="Debug.html">
+            
+                <a href="Debug.html#default enumeration">
+            
+                    
+                    Default enumeration
+            
+                </a>
+            
+
+            
+        </li>
+    
+
+            </ul>
+            
+        </li>
+    
+
+    
+
+    <li class="divider"></li>
+
+    <li>
+        <a href="https://www.gitbook.com" target="blank" class="gitbook-link">
+            Published with GitBook
+        </a>
+    </li>
+</ul>
+
+
+                </nav>
+            
+        
+    </div>
+
+    <div class="book-body">
+        
+            <div class="body-inner">
+                
+                    
+
+<div class="book-header" role="navigation">
+    
+
+    <!-- Title -->
+    <h1>
+        <i class="fa fa-circle-o-notch fa-spin"></i>
+        <a href="." >Default trait</a>
+    </h1>
+</div>
+
+
+
+
+                    <div class="page-wrapper" tabindex="-1" role="main">
+                        <div class="page-inner">
+                            
+                                <section class="normal markdown-section">
+                                
+                                <p>The <code>Default</code> trait supports one attribute:</p>
+<ul>
+<li><a href="#ignoring-a-field"><code>value</code></a></li>
+</ul>
+<h1 id="setting-the-value-of-a-field">Setting the value of a field</h1>
+<p>You can use <em>derivative</em> to change the default value of a field in a <code>Default</code>
+implementation:</p>
+<pre><code class="lang-rust"><span class="hljs-meta">#[derive(Debug, Derivative)]</span>
+<span class="hljs-meta">#[derivative(Default)]</span>
+<span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">Foo</span></span> {
+    foo: <span class="hljs-keyword">u8</span>,
+    <span class="hljs-meta">#[derivative(Default(value=<span class="hljs-meta-string">&quot;42&quot;</span>))]</span>
+    bar: <span class="hljs-keyword">u8</span>,
+}
+
+<span class="hljs-built_in">println!</span>(<span class="hljs-string">&quot;{:?}&quot;</span>, Foo::default()); <span class="hljs-comment">// Foo { foo: 0, bar: 42 }</span>
+</code></pre>
+<h1 id="default-enumeration">Default enumeration</h1>
+<p>You can use <em>derivative</em> to derive a default implementation on enumerations!
+This does not work with <em>rustc</em>&apos;s <code>#[derive(Default)]</code>.
+All you need is to specify what variant is the default value:</p>
+<pre><code class="lang-rust"><span class="hljs-meta">#[derive(Debug, Derivative)]</span>
+<span class="hljs-meta">#[derivative(Default)]</span>
+<span class="hljs-class"><span class="hljs-keyword">enum</span> <span class="hljs-title">Enum</span></span> {
+    A,
+    <span class="hljs-meta">#[derivative(Default)]</span>
+    B,
+}
+
+<span class="hljs-built_in">println!</span>(<span class="hljs-string">&quot;{:?}&quot;</span>, Enum::default()); <span class="hljs-comment">// B</span>
+</code></pre>
+
+                                
+                                </section>
+                            
+                        </div>
+                    </div>
+                
+            </div>
+
+            
+                
+                <a href="Debug.html#hiding-newtypes" class="navigation navigation-prev " aria-label="Previous page: Hiding newtypes">
+                    <i class="fa fa-angle-left"></i>
+                </a>
+                
+                
+                <a href="Debug.html#setting-the-value-of-a-field" class="navigation navigation-next " aria-label="Next page: Setting the value of a field">
+                    <i class="fa fa-angle-right"></i>
+                </a>
+                
+            
+        
+    </div>
+
+    <script>
+        var gitbook = gitbook || [];
+        gitbook.push(function() {
+            gitbook.page.hasChanged({"page":{"title":"Default trait","level":"1.3","depth":1,"next":{"title":"Setting the value of a field","level":"1.3.1","depth":2,"anchor":"#setting-the-value-of-a-field","path":"Debug.md","ref":"Debug.md#setting-the-value-of-a-field","articles":[]},"previous":{"title":"Hiding newtypes","level":"1.2.2","depth":2,"anchor":"#hiding-newtypes","path":"Debug.md","ref":"Debug.md#hiding-newtypes","articles":[]},"dir":"ltr"},"config":{"plugins":["-search","-sharing","codeblock-filename"],"root":"src","styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"pluginsConfig":{"edit-link":{"base":"https://github.com/mcarton/rust-derivative/tree/gh-pages","label":"Edit"},"codeblock-filename":{},"highlight":{},"lunr":{"maxIndexSize":1000000,"ignoreSpecialCharacters":false},"fontsettings":{"theme":"white","family":"sans","size":2},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false}},"theme":"default","pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"variables":{},"title":"Derivative","language":"en","gitbook":"*"},"file":{"path":"Default.md","mtime":"2016-10-07T18:37:08.797Z","type":"markdown"},"gitbook":{"version":"3.2.2","time":"2016-10-07T19:27:38.609Z"},"basePath":".","book":{"language":""}});
+        });
+    </script>
+</div>
+
+        
+    <script src="gitbook/gitbook.js"></script>
+    <script src="gitbook/theme.js"></script>
+    
+        
+        <script src="gitbook/gitbook-plugin-lunr/lunr.min.js"></script>
+        
+    
+        
+        <script src="gitbook/gitbook-plugin-lunr/search-lunr.js"></script>
+        
+    
+        
+        <script src="gitbook/gitbook-plugin-fontsettings/fontsettings.js"></script>
+        
+    
+
+    </body>
+</html>
+
