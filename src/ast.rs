@@ -1,8 +1,6 @@
 use attr;
 use syn;
 
-type Ctxt = ();
-
 #[derive(Debug)]
 pub struct Input<'a> {
     pub attrs: attr::Input,
@@ -40,15 +38,15 @@ pub enum Style {
 }
 
 impl<'a> Input<'a> {
-    pub fn from_ast(cx: &Ctxt, item: &'a syn::MacroInput) -> Result<Input<'a>, String> {
-        let attrs = try!(attr::Input::from_ast(cx, &item.attrs));
+    pub fn from_ast(item: &'a syn::MacroInput) -> Result<Input<'a>, String> {
+        let attrs = try!(attr::Input::from_ast(&item.attrs));
 
         let body = match item.body {
             syn::Body::Enum(ref variants) => {
-                Body::Enum(try!(enum_from_ast(cx, variants)))
+                Body::Enum(try!(enum_from_ast(variants)))
             }
             syn::Body::Struct(ref variant_data) => {
-                let (style, fields) = try!(struct_from_ast(cx, variant_data));
+                let (style, fields) = try!(struct_from_ast(variant_data));
                 Body::Struct(style, fields)
             }
         };
@@ -78,13 +76,13 @@ impl<'a> Body<'a> {
     }
 }
 
-fn enum_from_ast<'a>(cx: &Ctxt, variants: &'a [syn::Variant]) -> Result<Vec<Variant<'a>>, String> {
+fn enum_from_ast<'a>(variants: &'a [syn::Variant]) -> Result<Vec<Variant<'a>>, String> {
     variants
         .iter()
         .map(|variant| {
-            let (style, fields) = try!(struct_from_ast(cx, &variant.data));
+            let (style, fields) = try!(struct_from_ast(&variant.data));
             Ok(Variant {
-                attrs: try!(attr::Input::from_ast(cx, &variant.attrs)),
+                attrs: try!(attr::Input::from_ast(&variant.attrs)),
                 fields: fields,
                 ident: variant.ident.clone(),
                 style: style,
@@ -93,13 +91,13 @@ fn enum_from_ast<'a>(cx: &Ctxt, variants: &'a [syn::Variant]) -> Result<Vec<Vari
         .collect()
 }
 
-fn struct_from_ast<'a>(cx: &Ctxt, data: &'a syn::VariantData) -> Result<(Style, Vec<Field<'a>>), String> {
+fn struct_from_ast<'a>(data: &'a syn::VariantData) -> Result<(Style, Vec<Field<'a>>), String> {
     match *data {
         syn::VariantData::Struct(ref fields) => {
-            Ok((Style::Struct, try!(fields_from_ast(cx, fields))))
+            Ok((Style::Struct, try!(fields_from_ast(fields))))
         }
         syn::VariantData::Tuple(ref fields) => {
-            Ok((Style::Tuple, try!(fields_from_ast(cx, fields))))
+            Ok((Style::Tuple, try!(fields_from_ast(fields))))
         }
         syn::VariantData::Unit => {
             Ok((Style::Unit, Vec::new()))
@@ -107,12 +105,12 @@ fn struct_from_ast<'a>(cx: &Ctxt, data: &'a syn::VariantData) -> Result<(Style, 
     }
 }
 
-fn fields_from_ast<'a>(cx: &Ctxt, fields: &'a [syn::Field]) -> Result<Vec<Field<'a>>, String> {
+fn fields_from_ast<'a>(fields: &'a [syn::Field]) -> Result<Vec<Field<'a>>, String> {
     fields
         .iter()
         .map(|field| {
             Ok(Field {
-                attrs: try!(attr::Field::from_ast(cx, field)),
+                attrs: try!(attr::Field::from_ast(field)),
                 ident: field.ident.clone(),
                 ty: &field.ty,
             })

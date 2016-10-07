@@ -1,6 +1,5 @@
 use ast;
 use attr;
-use bound;
 use quote;
 use syn::{self, aster};
 use utils;

@@ -33,7 +33,7 @@ pub fn derivative(input: TokenStream) -> TokenStream {
     fn detail(input: TokenStream) -> Result<TokenStream, String> {
         let mut input = try!(syn::parse_macro_input(&input.to_string()));
         let mut output = {
-            let parsed = try!(ast::Input::from_ast(&(), &input));
+            let parsed = try!(ast::Input::from_ast(&input));
 
             try!(derive_impls(&parsed))
         };

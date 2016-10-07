@@ -1,6 +1,5 @@
 use ast;
 use attr;
-use bound;
 use quote;
 use syn::{self, aster};
 use utils;
@@ -67,7 +66,6 @@ pub fn derive(input: &ast::Input) -> quote::Tokens {
             let arms = data.iter().filter_map(|variant| {
                 if variant.attrs.default {
                     let vname = &variant.ident;
-                    let vname_as_str = vname.as_ref();
 
                     Some(make_variant_data(quote!(#name::#vname), variant.style, &variant.fields))
                 } else {
@@ -96,6 +94,6 @@ fn default_trait_path() -> syn::Path {
     aster::path().global().ids(&["std", "default", "Default"]).build()
 }
 
-fn needs_default(attrs: &attr::Field) -> bool {
+fn needs_default(_: &attr::Field) -> bool {
     true
 }

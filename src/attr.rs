@@ -1,7 +1,5 @@
 use syn;
 
-type Ctxt = ();
-
 #[derive(Debug, Default)]
 pub struct Input {
     pub debug: Option<InputDebug>,
@@ -33,7 +31,7 @@ pub struct FieldDefault {
 }
 
 impl Input {
-    pub fn from_ast(cx: &Ctxt, attrs: &[syn::Attribute]) -> Result<Input, String> {
+    pub fn from_ast(attrs: &[syn::Attribute]) -> Result<Input, String> {
         let mut input = Input::default();
 
         for meta_items in attrs.iter().filter_map(derivative_attribute) {
@@ -76,7 +74,7 @@ impl Input {
 }
 
 impl Field {
-    pub fn from_ast(cx: &Ctxt, field: &syn::Field) -> Result<Field, String> {
+    pub fn from_ast(field: &syn::Field) -> Result<Field, String> {
         let mut out = Field::default();
 
         for meta_items in field.attrs.iter().filter_map(derivative_attribute) {
