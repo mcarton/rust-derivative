@@ -20,41 +20,16 @@ pub fn derive(input: &ast::Input, debug: &attr::InputDebug) -> quote::Tokens {
 
                 for (n, f) in fields.iter().enumerate() {
                     let name = f.ident.as_ref().expect("A structure field must have a name");
-                    let mut arg_n = quote::Tokens::new();
-                    arg_n.append(&format!("__arg_{}", n));
+                    let arg_n = syn::Ident::new(format!("__arg_{}", n));
 
                     field_pats.push(quote!(#name: ref #arg_n));
 
                     let name = name.as_ref();
 
                     if let Some(format_fn) = f.attrs.debug_format_with() {
-                        let debug_trait_path = debug_trait_path();
-
-                        let mut generics = generics.clone();
-                        generics.where_clause.predicates.extend(f.attrs.debug_bound().unwrap_or(&[]).iter().cloned());
-
-                        let (mut impl_generics, mut ty_generics, where_clause) = generics.split_for_impl();
-
-                        let dummy_generics = ty_generics.clone();
-                        impl_generics.lifetimes.push(syn::LifetimeDef::new("'_derivative"));
-                        ty_generics.lifetimes.push(syn::LifetimeDef::new("'_derivative"));
-
-                        let ty = f.ty;
-
-                        let phantom = &ty_generics.ty_params;
-
+                        let dummy_debug = format_with(f, &arg_n, format_fn, generics.clone());
                         field_prints.push(quote!(
-                            let #arg_n = {
-                                struct Dummy #ty_generics (&'_derivative #ty, ::std::marker::PhantomData <(#(phantom),*)>);
-
-                                impl #impl_generics #debug_trait_path for Dummy #ty_generics #where_clause {
-                                    fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
-                                        #format_fn(&self.0, f)
-                                    }
-                                }
-
-                                Dummy:: #dummy_generics (#arg_n, ::std::marker::PhantomData)
-                            };
+                            #dummy_debug
                             let _ = builder.field(#name, &#arg_n);
                         ));
                     }
@@ -83,27 +58,15 @@ pub fn derive(input: &ast::Input, debug: &attr::InputDebug) -> quote::Tokens {
                 let mut field_prints = Vec::new();
 
                 for (n, f) in fields.iter().enumerate() {
-                    let mut arg_n = quote::Tokens::new();
-                    arg_n.append(&format!("__arg_{}", n));
+                    let arg_n = syn::Ident::new(format!("__arg_{}", n));
 
                     field_pats.push(quote!(ref #arg_n));
 
                     if let Some(format_fn) = f.attrs.debug_format_with() {
-                        let debug_trait_path = debug_trait_path();
-
+                        let dummy_debug = format_with(f, &arg_n, format_fn, generics.clone());
                         field_prints.push(quote!(
-                                let #arg_n = {
-                                    struct Dummy<T>(T);
-
-                                    impl<T> #debug_trait_path for Dummy<T> {
-                                        fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
-                                            #format_fn(&self.0)
-                                        }
-                                    }
-
-                                    Dummy(#arg_n)
-                                };
-                                let _ = builder.field(&#arg_n);
+                            #dummy_debug
+                            let _ = builder.field(&#arg_n);
                         ));
                     }
                     else if !f.attrs.ignore_debug() {
@@ -182,4 +145,49 @@ fn needs_debug_bound(attrs: &attr::Field) -> bool {
 /// Return the path of the `Debug` trait, that is `::std::fmt::Debug`.
 fn debug_trait_path() -> syn::Path {
     aster::path().global().ids(&["std", "fmt", "Debug"]).build()
+}
+
+fn format_with(
+    f: &ast::Field,
+    arg_n: &syn::Ident,
+    format_fn: &syn::Path,
+    mut generics: syn::Generics,
+) -> quote::Tokens {
+    let debug_trait_path = debug_trait_path();
+
+    generics.where_clause.predicates.extend(f.attrs.debug_bound().unwrap_or(&[]).iter().cloned());
+
+    let (_, ctor_generics, _) = generics.split_for_impl();
+
+    generics.lifetimes.push(syn::LifetimeDef::new("'_derivative"));
+    for ty in &generics.ty_params {
+        let path = aster::path::PathBuilder::new().id(&ty.ident).build();
+        generics.where_clause.predicates.push(syn::WherePredicate::BoundPredicate(
+            syn::WhereBoundPredicate {
+                bound_lifetimes: vec![],
+                bounded_ty: syn::Ty::Path(None, path),
+                bounds: vec![syn::TyParamBound::Region(syn::Lifetime::new("'_derivative"))],
+            }
+        ));
+    }
+
+    let (impl_generics, ty_generics, where_clause) = generics.split_for_impl();
+
+    let ty = f.ty;
+
+    let phantom = &ty_generics.ty_params;
+
+    quote!(
+        let #arg_n = {
+            struct Dummy #ty_generics (&'_derivative #ty, ::std::marker::PhantomData <(#(phantom),*)>) #where_clause;
+
+            impl #impl_generics #debug_trait_path for Dummy #ty_generics #where_clause {
+                fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
+                    #format_fn(&self.0, f)
+                }
+            }
+
+            Dummy:: #ctor_generics (#arg_n, ::std::marker::PhantomData)
+        };
+    )
 }
