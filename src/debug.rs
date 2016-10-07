@@ -11,25 +11,62 @@ pub fn derive(input: &ast::Input, debug: &attr::InputDebug) -> quote::Tokens {
         style: ast::Style,
         fields: &[ast::Field],
         transparent: bool,
+        generics: &syn::Generics,
     ) -> quote::Tokens {
         match style {
             ast::Style::Struct => {
-                let mut field_pats = quote::Tokens::new();
-                let mut field_prints = quote::Tokens::new();
+                let mut field_pats = Vec::new();
+                let mut field_prints = Vec::new();
 
                 for (n, f) in fields.iter().enumerate() {
                     let name = f.ident.as_ref().unwrap();
-                    field_pats.append(&format!("{}: ref __arg_{},", name, n));
+                    let mut arg_n = quote::Tokens::new();
+                    arg_n.append(&format!("__arg_{}", n));
 
-                    if !f.attrs.debug.as_ref().map_or(false, |d| d.ignore) {
-                        field_prints.append(&format!("let _ = builder.field(\"{}\", &__arg_{});", name, n));
+                    field_pats.push(quote!(#name: ref #arg_n));
+
+                    let name = name.as_ref();
+
+                    if let Some(format_fn) = f.attrs.debug_format_with() {
+                        let debug_trait_path = debug_trait_path();
+
+                        let mut generics = generics.clone();
+                        generics.where_clause.predicates.extend(f.attrs.debug_bound().unwrap_or(&[]).iter().cloned());
+
+                        let (mut impl_generics, mut ty_generics, where_clause) = generics.split_for_impl();
+
+                        let dummy_generics = ty_generics.clone();
+                        impl_generics.lifetimes.push(syn::LifetimeDef::new("'_derivative"));
+                        ty_generics.lifetimes.push(syn::LifetimeDef::new("'_derivative"));
+
+                        let ty = f.ty;
+
+                        let phantom = &ty_generics.ty_params;
+
+                        field_prints.push(quote!(
+                            let #arg_n = {
+                                struct Dummy #ty_generics (&'_derivative #ty, ::std::marker::PhantomData <(#(phantom),*)>);
+
+                                impl #impl_generics #debug_trait_path for Dummy #ty_generics #where_clause {
+                                    fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
+                                        #format_fn(&self.0, f)
+                                    }
+                                }
+
+                                Dummy:: #dummy_generics (#arg_n, ::std::marker::PhantomData)
+                            };
+                            let _ = builder.field(#name, &#arg_n);
+                        ));
+                    }
+                    else if !f.attrs.ignore_debug() {
+                        field_prints.push(quote!(let _ = builder.field(#name, &#arg_n);));
                     }
                 }
 
                 quote!(
-                    #variant_name { #field_pats } => {
+                    #variant_name { #(field_pats),* } => {
                         let mut builder = f.debug_struct(#variant_name_as_str);
-                        #field_prints
+                        #(field_prints)*
                         builder.finish()
                     }
                 )
@@ -42,21 +79,42 @@ pub fn derive(input: &ast::Input, debug: &attr::InputDebug) -> quote::Tokens {
                 )
             }
             ast::Style::Tuple => {
-                let mut field_pats = quote::Tokens::new();
-                let mut field_prints = quote::Tokens::new();
+                let mut field_pats = Vec::new();
+                let mut field_prints = Vec::new();
 
                 for (n, f) in fields.iter().enumerate() {
-                    field_pats.append(&format!("ref __arg_{},", n));
+                    let mut arg_n = quote::Tokens::new();
+                    arg_n.append(&format!("__arg_{}", n));
 
-                    if !f.attrs.debug.as_ref().map_or(false, |d| d.ignore) {
-                        field_prints.append(&format!("let _ = builder.field(&__arg_{});", n));
+                    field_pats.push(quote!(ref #arg_n));
+
+                    if let Some(format_fn) = f.attrs.debug_format_with() {
+                        let debug_trait_path = debug_trait_path();
+
+                        field_prints.push(quote!(
+                                let #arg_n = {
+                                    struct Dummy<T>(T);
+
+                                    impl<T> #debug_trait_path for Dummy<T> {
+                                        fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
+                                            #format_fn(&self.0)
+                                        }
+                                    }
+
+                                    Dummy(#arg_n)
+                                };
+                                let _ = builder.field(&#arg_n);
+                        ));
+                    }
+                    else if !f.attrs.ignore_debug() {
+                        field_prints.push(quote!(let _ = builder.field(&#arg_n);));
                     }
                 }
 
                 quote!(
-                    #variant_name( #field_pats ) => {
+                    #variant_name( #(field_pats),* ) => {
                         let mut builder = f.debug_tuple(#variant_name_as_str);
-                        #field_prints
+                        #(field_prints)*
                         builder.finish()
                     }
                 )
@@ -78,13 +136,13 @@ pub fn derive(input: &ast::Input, debug: &attr::InputDebug) -> quote::Tokens {
                 let vname_as_str = vname.as_ref();
                 let transparent = variant.attrs.debug.as_ref().map_or(false, |debug| debug.transparent);
 
-                make_variant_data(quote!(#name::#vname), vname_as_str, variant.style, &variant.fields, transparent)
+                make_variant_data(quote!(#name::#vname), vname_as_str, variant.style, &variant.fields, transparent, &input.generics)
             });
 
             quote!(#(arms),*)
         }
         ast::Body::Struct(style, ref vd) => {
-            let arms = make_variant_data(quote!(#name), name.as_ref(), style, vd, debug.transparent);
+            let arms = make_variant_data(quote!(#name), name.as_ref(), style, vd, debug.transparent, &input.generics);
 
             quote!(#arms)
         }

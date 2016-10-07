@@ -27,7 +27,6 @@ enum C {
     C3(String),
 }
 
-/*
 #[derive(Derivative)]
 #[derivative(Debug)]
 enum D {
@@ -36,7 +35,6 @@ enum D {
         a: isize
     }
 }
-*/
 
 #[derive(Derivative)]
 #[derivative(Debug)]
@@ -67,7 +65,7 @@ fn main() {
     assert_eq!(Bar(42, 1).to_show(), "Bar(42)".to_string());
     assert_eq!(C::C1(12).to_show(), "C1(12)".to_string());
     assert_eq!(C::C2(12).to_show(), "C2".to_string());
-    //assert_eq!(D::D1 { a: 42 }.to_show(), "D1".to_string());
+    assert_eq!(D::D1 { a: 42 }.to_show(), "D1".to_string());
     assert_eq!(F(42).to_show(), "F".to_string());
     assert_eq!(G(42, 0).to_show(), "G(42)".to_string());
     assert_eq!(J(NoDebug).to_show(), "J".to_string());
