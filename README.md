@@ -63,6 +63,20 @@ struct Foo {
 println!("{:?}", Foo::default()); // Foo { foo: 0, bar: 42 }
 ```
 
+This works on enumerations too! Just mark what the default value is:
+
+```rust
+#[derive(Debug, Derivative)]
+#[derivative(Default)]
+enum Enum {
+    A,
+    #[derivative(Default)]
+    B,
+}
+
+println!("{:?}", Enum::default()); // B
+```
+
 ## License
 
 Licensed under either of
