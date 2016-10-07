@@ -20,7 +20,7 @@ pub fn derive(input: &ast::Input, debug: &attr::InputDebug) -> quote::Tokens {
                 let mut field_prints = Vec::new();
 
                 for (n, f) in fields.iter().enumerate() {
-                    let name = f.ident.as_ref().unwrap();
+                    let name = f.ident.as_ref().expect("A structure field must have a name");
                     let mut arg_n = quote::Tokens::new();
                     arg_n.append(&format!("__arg_{}", n));
 

@@ -16,7 +16,7 @@ pub fn derive(input: &ast::Input) -> quote::Tokens {
                 let mut defaults = Vec::new();
 
                 for f in fields {
-                    let name = f.ident.as_ref().unwrap();
+                    let name = f.ident.as_ref().expect("A structure field must have a name");
                     let default = f.attrs.default_value().map_or_else(
                         || quote!(::std::default::Default::default()),
                         |v| quote!(#v),

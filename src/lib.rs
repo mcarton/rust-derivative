@@ -15,7 +15,7 @@ mod utils;
 
 use rustc_macro::TokenStream;
 
-fn derive_impls(input: &ast::Input) -> quote::Tokens {
+fn derive_impls(input: &ast::Input) -> Result<quote::Tokens, String> {
     let mut tokens = quote::Tokens::new();
 
     if let Some(ref debug) = input.attrs.debug {
@@ -25,20 +25,24 @@ fn derive_impls(input: &ast::Input) -> quote::Tokens {
         tokens.append(&default::derive(input).to_string());
     }
 
-    tokens
+    Ok(tokens)
 }
 
 #[rustc_macro_derive(Derivative)]
 pub fn derivative(input: TokenStream) -> TokenStream {
-    let mut input = syn::parse_macro_input(&input.to_string()).unwrap();
-    let mut output = {
-        let parsed = ast::Input::from_ast(&(), &input);
+    fn detail(input: TokenStream) -> Result<TokenStream, String> {
+        let mut input = try!(syn::parse_macro_input(&input.to_string()));
+        let mut output = {
+            let parsed = try!(ast::Input::from_ast(&(), &input));
 
-        derive_impls(&parsed)
-    };
+            try!(derive_impls(&parsed))
+        };
 
-    utils::remove_derivative_attrs(&mut input);
-    output.append(&quote!(#input).to_string());
+        utils::remove_derivative_attrs(&mut input);
+        output.append(&quote!(#input).to_string());
 
-    output.to_string().parse().unwrap()
+        Ok(output.to_string().parse().unwrap())
+    }
+
+    detail(input).unwrap()
 }
