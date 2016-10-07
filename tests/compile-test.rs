@@ -22,5 +22,4 @@ fn run_mode(dir: &'static str, mode: &'static str) {
 #[test]
 fn compile_test() {
     run_mode("run-pass", "run-pass");
-    run_mode("compile-fail", "compile-fail");
 }
