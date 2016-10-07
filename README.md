@@ -35,10 +35,19 @@ Licensed under either of
 
 at your option.
 
+## Acknowledgements
+
+This is inspired from how [`serde`] wonderfully handles attributes.
+This also takes some code and ideas from `serde` itself.
+
+Some tests are directly adapted from `rustc`'s tests.
+
 ## Contribution
 
 Unless you explicitly state otherwise, any contribution intentionally submitted
 for inclusion in the work by you, as defined in the Apache-2.0 license, shall
 be dual licensed as above, without any additional terms or conditions.
 
+[`serde`]: https://crates.io/crates/serde
 [documentation]: https://mcarton.github.io/rust-derivative/
+[rustc]: https://github.com/rust-lang/rust
