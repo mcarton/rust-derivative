@@ -1,5 +1,6 @@
-This crate provides a set of alternative `#[derive]` attribute.
+This crate provides a set of alternative `#[derive]` attributes for Rust.
 
+## [Documentation][documentation]
 ## Stability
 
 This crate is not stable yet and the attributes might change at any time.
@@ -7,11 +8,7 @@ This crate is not stable yet and the attributes might change at any time.
 For now the crate only works on *nightly* but it uses *rustc*'s Macros 1.1 and
 is meant to be usable on *stable* as soon as it is possible.
 
-## Implemented traits
-
-### `#[derivative(Debug)]`
-
-#### Ignoring a field
+## What it does
 
 ```rust
 #[derive(Derivative)]
@@ -25,57 +22,7 @@ struct Foo {
 println!("{:?}", Foo { foo: 42, bar: 1 }); // Foo { foo: 42 }
 ```
 
-#### Don't show new-types
-
-```rust
-#[derive(Derivative)]
-#[derivative(Debug="transparent")]
-struct A(isize);
-
-#[derive(Derivative)]
-#[derivative(Debug)]
-enum C {
-    Foo(u8),
-    #[derivative(Debug="transparent")]
-    Bar(u8),
-}
-
-println!("{:?}", A(42)); // 42
-println!("{:?}", C::Bar(42)); // 42
-
-// But:
-println!("{:?}", C::Foo(42)); // Foo(42)
-```
-
-This only works when the structure or variant only has one field.
-
-### `#[derivative(Default)]`
-
-```rust
-#[derive(Debug, Derivative)]
-#[derivative(Default)]
-struct Foo {
-    foo: u8,
-    #[derivative(Default(value="42"))]
-    bar: u8,
-}
-
-println!("{:?}", Foo::default()); // Foo { foo: 0, bar: 42 }
-```
-
-This works on enumerations too! Just mark what the default value is:
-
-```rust
-#[derive(Debug, Derivative)]
-#[derivative(Default)]
-enum Enum {
-    A,
-    #[derivative(Default)]
-    B,
-}
-
-println!("{:?}", Enum::default()); // B
-```
+Check the [documentation] for more!
 
 ## License
 
@@ -91,3 +38,5 @@ at your option.
 Unless you explicitly state otherwise, any contribution intentionally submitted
 for inclusion in the work by you, as defined in the Apache-2.0 license, shall
 be dual licensed as above, without any additional terms or conditions.
+
+[documentation]: https://mcarton.github.io/rust-derivative/
