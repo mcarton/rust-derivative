@@ -64,19 +64,21 @@ pub fn derive(input: &ast::Input) -> quote::Tokens {
 
     let body = match input.body {
         ast::Body::Enum(ref data) => {
-            let arms = data.iter().map(|variant| {
-                let vname = &variant.ident;
-                let vname_as_str = vname.as_ref();
-                let transparent = variant.attrs.debug.as_ref().map_or(false, |debug| debug.transparent);
+            let arms = data.iter().filter_map(|variant| {
+                if variant.attrs.default {
+                    let vname = &variant.ident;
+                    let vname_as_str = vname.as_ref();
 
-                make_variant_data(quote!(#name::#vname), variant.style, &variant.fields)
+                    Some(make_variant_data(quote!(#name::#vname), variant.style, &variant.fields))
+                } else {
+                    None
+                }
             });
 
             quote!(#(arms),*)
         }
         ast::Body::Struct(style, ref vd) => {
             make_variant_data(quote!(#name), style, vd)
-
         }
     };
 
