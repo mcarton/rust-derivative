@@ -39,9 +39,9 @@ pub fn derive(input: &ast::Input, debug: &attr::InputDebug) -> quote::Tokens {
                 }
 
                 quote!(
-                    #variant_name { #(field_pats),* } => {
+                    #variant_name { #(#field_pats),* } => {
                         let mut builder = f.debug_struct(#variant_name_as_str);
-                        #(field_prints)*
+                        #(#field_prints)*
                         builder.finish()
                     }
                 )
@@ -75,9 +75,9 @@ pub fn derive(input: &ast::Input, debug: &attr::InputDebug) -> quote::Tokens {
                 }
 
                 quote!(
-                    #variant_name( #(field_pats),* ) => {
+                    #variant_name( #(#field_pats),* ) => {
                         let mut builder = f.debug_tuple(#variant_name_as_str);
-                        #(field_prints)*
+                        #(#field_prints)*
                         builder.finish()
                     }
                 )
@@ -102,7 +102,7 @@ pub fn derive(input: &ast::Input, debug: &attr::InputDebug) -> quote::Tokens {
                 make_variant_data(quote!(#name::#vname), vname_as_str, variant.style, &variant.fields, transparent, input.generics)
             });
 
-            quote!(#(arms),*)
+            quote!(#(#arms),*)
         }
         ast::Body::Struct(style, ref vd) => {
             let arms = make_variant_data(quote!(#name), name.as_ref(), style, vd, debug.transparent, input.generics);
@@ -179,7 +179,7 @@ fn format_with(
 
     quote!(
         let #arg_n = {
-            struct Dummy #ty_generics (&'_derivative #ty, ::std::marker::PhantomData <(#(phantom),*)>) #where_clause;
+            struct Dummy #ty_generics (&'_derivative #ty, ::std::marker::PhantomData <(#(#phantom),*)>) #where_clause;
 
             impl #impl_generics #debug_trait_path for Dummy #ty_generics #where_clause {
                 fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {

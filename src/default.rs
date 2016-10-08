@@ -25,7 +25,7 @@ pub fn derive(input: &ast::Input, default: &attr::InputDefault) -> quote::Tokens
                     defaults.push(quote!(#name: #default));
                 }
 
-                quote!(#variant_name { #(defaults),* })
+                quote!(#variant_name { #(#defaults),* })
             }
             ast::Style::Tuple => {
                 let mut defaults = Vec::new();
@@ -39,7 +39,7 @@ pub fn derive(input: &ast::Input, default: &attr::InputDefault) -> quote::Tokens
                     defaults.push(default);
                 }
 
-                quote!(#variant_name ( #(defaults),* ))
+                quote!(#variant_name ( #(#defaults),* ))
             }
             ast::Style::Unit => quote!(#variant_name),
         }
@@ -74,7 +74,7 @@ pub fn derive(input: &ast::Input, default: &attr::InputDefault) -> quote::Tokens
                 }
             });
 
-            quote!(#(arms),*)
+            quote!(#(#arms),*)
         }
         ast::Body::Struct(style, ref vd) => {
             make_variant_data(quote!(#name), style, vd)

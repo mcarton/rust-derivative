@@ -9,11 +9,11 @@ description = "A set of alternative `derive` attributes for Rust"
 keywords = ["derive", "macro", "macro1-1", "plugin"]
 
 [lib]
-rustc-macro = true
+proc-macro = true
 
 [dependencies]
-quote = "^0.2"
-syn = { version = "0.8", features = ["aster", "full", "visit"] }
+quote = "^0.3"
+syn = { version = "0.9", features = ["aster", "full", "visit"] }
 
 [dev-dependencies]
 compiletest_rs = "^0.2"

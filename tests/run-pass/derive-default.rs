@@ -1,10 +1,10 @@
-#![feature(rustc_macro)]
+#![feature(proc_macro)]
 
 #[macro_use]
 extern crate derivative;
 
 #[derive(Debug, Derivative, PartialEq)]
-#[derivative(Default(new="true"))]
+#[derivative(Default="new")]
 struct Foo {
     foo: u8,
     #[derivative(Default(value="42"))]
