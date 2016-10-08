@@ -8,8 +8,8 @@ pub struct Input {
 
 #[derive(Debug, Default)]
 pub struct Field {
-    pub debug: Option<FieldDebug>,
-    pub default: Option<FieldDefault>,
+    debug: Option<FieldDebug>,
+    default: Option<FieldDefault>,
 }
 
 #[derive(Debug, Default)]
@@ -70,6 +70,10 @@ impl Input {
 
     pub fn debug_bound(&self) -> Option<&[syn::WherePredicate]> {
         self.debug.as_ref().map_or(None, |d| d.bounds.as_ref().map(Vec::as_slice))
+    }
+
+    pub fn debug_transparent(&self) -> bool {
+        self.debug.as_ref().map_or(false, |d| d.transparent)
     }
 }
 

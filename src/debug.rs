@@ -97,7 +97,7 @@ pub fn derive(input: &ast::Input, debug: &attr::InputDebug) -> quote::Tokens {
             let arms = data.iter().map(|variant| {
                 let vname = &variant.ident;
                 let vname_as_str = vname.as_ref();
-                let transparent = variant.attrs.debug.as_ref().map_or(false, |debug| debug.transparent);
+                let transparent = variant.attrs.debug_transparent();
 
                 make_variant_data(quote!(#name::#vname), vname_as_str, variant.style, &variant.fields, transparent, input.generics)
             });
