@@ -12,10 +12,10 @@ pub struct Input {
 #[derive(Debug, Default)]
 /// Represent the `derivative` attributes on a field.
 pub struct Field {
-    /// Whether `Debug` is present and its specific attributes.
-    debug: Option<FieldDebug>,
-    /// Whether `Default` is present and its specific attributes.
-    default: Option<FieldDefault>,
+    /// The parameters for `Debug`.
+    debug: FieldDebug,
+    /// The parameters for `Default`.
+    default: FieldDefault,
 }
 
 #[derive(Debug, Default)]
@@ -103,42 +103,34 @@ impl Field {
                 let MetaItem(name, values) = try!(metaitem);
                 match name {
                     "Debug" => {
-                        let mut debug = out.debug.take().unwrap_or_default();
-
                         for (name, value) in values {
                             match name {
                                 "bound" => {
-                                    let mut bounds = debug.bounds.take().unwrap_or_default();
+                                    let mut bounds = out.debug.bounds.take().unwrap_or_default();
                                     try!(parse_bound(&mut bounds, value));
-                                    debug.bounds = Some(bounds);
+                                    out.debug.bounds = Some(bounds);
                                 }
                                 "format_with" => {
                                     let path = try!(value.ok_or_else(|| "`format_with` needs a value".to_string()));
-                                    debug.format_with = Some(try!(syn::parse_path(path)));
+                                    out.debug.format_with = Some(try!(syn::parse_path(path)));
                                 }
                                 "ignore" => {
-                                    debug.ignore = try!(parse_boolean_meta_item(&value, true, "ignore"));
+                                    out.debug.ignore = try!(parse_boolean_meta_item(&value, true, "ignore"));
                                 }
                                 _ => return Err(format!("unknown attribute `{}`", name)),
                             }
                         }
-
-                        out.debug = Some(debug);
                     }
                     "Default" => {
-                        let mut default = out.default.take().unwrap_or_default();
-
                         for (name, value) in values {
                             match name {
                                 "value" => {
                                     let value = try!(value.ok_or_else(|| "`value` needs a value".to_string()));
-                                    default.value = Some(try!(syn::parse_expr(value)));
+                                    out.default.value = Some(try!(syn::parse_expr(value)));
                                 }
                                 _ => return Err(format!("unknown attribute `{}`", name)),
                             }
                         }
-
-                        out.default = Some(default);
                     }
                     _ => return Err(format!("unknown trait `{}`", name)),
                 }
@@ -149,19 +141,19 @@ impl Field {
     }
 
     pub fn debug_bound(&self) -> Option<&[syn::WherePredicate]> {
-        self.debug.as_ref().map_or(None, |d| d.bounds.as_ref().map(Vec::as_slice))
+        self.debug.bounds.as_ref().map(Vec::as_slice)
     }
 
     pub fn debug_format_with(&self) -> Option<&syn::Path> {
-        self.debug.as_ref().map_or(None, |d| d.format_with.as_ref())
+        self.debug.format_with.as_ref()
     }
 
     pub fn ignore_debug(&self) -> bool {
-        self.debug.as_ref().map_or(false, |debug| debug.ignore)
+        self.debug.ignore
     }
 
     pub fn default_value(&self) -> Option<&syn::Expr> {
-        self.default.as_ref().map_or(None, |d| d.value.as_ref())
+        self.default.value.as_ref()
     }
 }
 
