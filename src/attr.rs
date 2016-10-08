@@ -227,9 +227,13 @@ fn parse_boolean_meta_item(item: &Option<&str>, default: bool, name: &str) -> Re
 /// Parse a `bound` item.
 fn parse_bound(bounds: &mut Vec<syn::WherePredicate>, value: Option<&str>) -> Result<(), String> {
     let bound = try!(value.ok_or_else(|| "`bound` needs a value".to_string()));
-    let where_clause = syn::parse_where_clause(&format!("where {}", bound));
-    let mut predicates = try!(where_clause).predicates;
-    bounds.append(&mut predicates);
+
+    if !bound.is_empty() {
+        let where_clause = syn::parse_where_clause(&format!("where {}", bound));
+        let mut predicates = try!(where_clause).predicates;
+        bounds.append(&mut predicates);
+    }
+
     Ok(())
 }
 

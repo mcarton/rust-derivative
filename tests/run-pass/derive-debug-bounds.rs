@@ -37,6 +37,21 @@ struct Bar2<T, U> (
     U,
 );
 
+struct NoDebug;
+
+struct GenericNeedsNoDebug<T>(T);
+impl<T> std::fmt::Debug for GenericNeedsNoDebug<T> {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> FmtResult {
+        f.write_str("GenericNeedsNoDebug")
+    }
+}
+
+#[derive(Derivative)]
+#[derivative(Debug)]
+struct TestUnneededBound<T>( // Test that we don't add T: Debug
+    #[derivative(Debug(bound=""))] GenericNeedsNoDebug<T>,
+);
+
 trait MyDebug {
     fn my_fmt(&self, f: &mut Formatter) -> FmtResult {
         f.write_str("MyDebug")
@@ -62,4 +77,5 @@ fn main() {
     assert_eq!(Foo2 { foo: 42, bar: 0 }.to_show(), "Foo2 { foo: 42, bar: MyDebug }".to_string());
     assert_eq!(Bar(42, 0).to_show(), "Bar(42, MyDebug)".to_string());
     assert_eq!(Bar2(42, 0).to_show(), "Bar2(42, MyDebug)".to_string());
+    assert_eq!(TestUnneededBound(GenericNeedsNoDebug(NoDebug)).to_show(), "TestUnneededBound(GenericNeedsNoDebug)".to_string());
 }

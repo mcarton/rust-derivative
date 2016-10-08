@@ -99,4 +99,7 @@ struct Foo<T, U> {
 }
 ```
 
+With `bound=""` it is possible to remove any bound for the type. This is useful
+if your type contains a `Foo<T>` that is `Debug` even if `T` is not.
+
 [`Formatter`]: https://doc.rust-lang.org/std/fmt/struct.Formatter.html
