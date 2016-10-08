@@ -1,7 +1,14 @@
-The `Default` trait supports one attribute:
+# Custom attributes
+The `Default` trait supports the following attributes:
 
-* [`value`](#ignoring-a-field)
-* [`new`](#new-function)
+## Container attributes
+* [`Default="new"`](#new-function)
+
+## Variant attributes
+* [`Default`](#default-enumeration)
+
+## Field attributes
+* [`Default(value="<expr>")`](#ignoring-a-field)
 
 # Default enumeration
 

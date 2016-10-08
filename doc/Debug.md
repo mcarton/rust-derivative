@@ -1,9 +1,17 @@
-The `Debug` trait supports four attributes:
+# Custom attributes
+The `Debug` trait supports the following attributes:
 
-* [`bound`](#custom-bound)
-* [`format_with`](#format-with)
-* [`ignore`](#ignoring-a-field)
-* [`transparent`](#hiding-newtypes)
+## Container attributes
+* [`Debug(bound="<where-clause or empty>")`](#custom-bound)
+* [`Debug="transparent"`](#hiding-newtypes)
+
+## Variant attributes
+* [`Debug="transparent"`](#hiding-newtypes)
+
+## Field attributes
+* [`Debug(bound="<where-clause or empty>")`](#custom-bound)
+* [`Debug(format_with="<path>")`](#format-with)
+* [`Debug="ignore"`](#ignoring-a-field)
 
 # Ignoring a field
 
