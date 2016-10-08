@@ -4,7 +4,8 @@ use quote;
 use syn::{self, aster};
 use utils;
 
-pub fn derive(input: &ast::Input) -> quote::Tokens {
+/// Derive `Default` for `input`.
+pub fn derive(input: &ast::Input, default: &attr::InputDefault) -> quote::Tokens {
     fn make_variant_data(
         variant_name: quote::Tokens,
         style: ast::Style,
@@ -64,7 +65,7 @@ pub fn derive(input: &ast::Input) -> quote::Tokens {
     let body = match input.body {
         ast::Body::Enum(ref data) => {
             let arms = data.iter().filter_map(|variant| {
-                if variant.attrs.default {
+                if variant.attrs.default.is_some() {
                     let vname = &variant.ident;
 
                     Some(make_variant_data(quote!(#name::#vname), variant.style, &variant.fields))
@@ -80,7 +81,23 @@ pub fn derive(input: &ast::Input) -> quote::Tokens {
         }
     };
 
+    let new_fn = if default.new {
+        Some(quote!(
+            impl #impl_generics #ty #where_clause {
+                /// Creates a default value for this type.
+                #[inline]
+                pub fn new() -> Self {
+                    #default_trait_path::default()
+                }
+            }
+        ))
+    } else {
+        None
+    };
+
     quote!(
+        #new_fn
+
         impl #impl_generics #default_trait_path for #ty #where_clause {
             fn default() -> Self {
                 #body

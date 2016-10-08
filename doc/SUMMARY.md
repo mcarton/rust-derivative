@@ -7,5 +7,6 @@
     * [Alternative format function](Debug.md#format-with)
     * [Custom bound](Debug.md#custom-bound)
 * [Default trait](Default.md)
-    * [Setting the value of a field](Default.md#setting-the-value-of-a-field)
     * [Default enumeration](Default.md#default-enumeration)
+    * [Setting the value of a field](Default.md#setting-the-value-of-a-field)
+    * [`new` function](Default.md#new-function)

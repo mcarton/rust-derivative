@@ -21,8 +21,8 @@ fn derive_impls(input: &ast::Input) -> Result<quote::Tokens, String> {
     if let Some(ref debug) = input.attrs.debug {
         tokens.append(&debug::derive(input, debug).to_string());
     }
-    if input.attrs.default {
-        tokens.append(&default::derive(input).to_string());
+    if let Some(ref default) = input.attrs.default {
+        tokens.append(&default::derive(input, default).to_string());
     }
 
     Ok(tokens)

@@ -5,8 +5,8 @@ use syn;
 pub struct Input {
     /// Whether `Debug` is present and its specific attributes.
     pub debug: Option<InputDebug>,
-    /// Whether `Default` is present.
-    pub default: bool,
+    /// Whether `Default` is present and its specitif attributes.
+    pub default: Option<InputDefault>,
 }
 
 #[derive(Debug, Default)]
@@ -25,6 +25,13 @@ pub struct InputDebug {
     bounds: Option<Vec<syn::WherePredicate>>,
     /// Whether the type is marked `transparent`.
     pub transparent: bool,
+}
+
+#[derive(Debug, Default)]
+/// Represent the `derivative(Default(…))` attributes on an input.
+pub struct InputDefault {
+    /// Whether the type is marked with `new`.
+    pub new: bool,
 }
 
 #[derive(Debug, Default)]
@@ -74,7 +81,18 @@ impl Input {
                         input.debug = Some(debug);
                     }
                     "Default" => {
-                        input.default = true;
+                        let mut default = input.default.take().unwrap_or_default();
+
+                        for (name, value) in values {
+                            match name {
+                                "new" => {
+                                    default.new = try!(parse_boolean_meta_item(&value, true, "new"));
+                                }
+                                _ => return Err(format!("unknown attribute `{}`", name)),
+                            }
+                        }
+
+                        input.default = Some(default);
                     }
                     _ => return Err(format!("unknown trait `{}`", name)),
                 }
