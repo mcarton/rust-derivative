@@ -21,6 +21,10 @@
                 
             
                 
+                <link rel="stylesheet" href="gitbook/gitbook-plugin-anchors/plugin.css">
+                
+            
+                
                 <link rel="stylesheet" href="gitbook/gitbook-plugin-highlight/website.css">
                 
             
@@ -269,14 +273,24 @@
                             
                                 <section class="normal markdown-section">
                                 
-                                <p>The <code>Debug</code> trait supports four attributes:</p>
+                                <h1 id="custom-attributes"><a name="custom-attributes" class="plugin-anchor" href="#custom-attributes"><i class="fa fa-link" aria-hidden="true"></i></a>Custom attributes</h1>
+<p>The <code>Debug</code> trait supports the following attributes:</p>
+<h2 id="container-attributes"><a name="container-attributes" class="plugin-anchor" href="#container-attributes"><i class="fa fa-link" aria-hidden="true"></i></a>Container attributes</h2>
 <ul>
-<li><a href="#custom-bound"><code>bound</code></a></li>
-<li><a href="#format-with"><code>format_with</code></a></li>
-<li><a href="#ignoring-a-field"><code>ignore</code></a></li>
-<li><a href="#hiding-newtypes"><code>transparent</code></a></li>
+<li><a href="#custom-bound"><code>Debug(bound=&quot;&lt;where-clause or empty&gt;&quot;)</code></a></li>
+<li><a href="#hiding-newtypes"><code>Debug=&quot;transparent&quot;</code></a></li>
 </ul>
-<h1 id="ignoring-a-field">Ignoring a field</h1>
+<h2 id="variant-attributes"><a name="variant-attributes" class="plugin-anchor" href="#variant-attributes"><i class="fa fa-link" aria-hidden="true"></i></a>Variant attributes</h2>
+<ul>
+<li><a href="#hiding-newtypes"><code>Debug=&quot;transparent&quot;</code></a></li>
+</ul>
+<h2 id="field-attributes"><a name="field-attributes" class="plugin-anchor" href="#field-attributes"><i class="fa fa-link" aria-hidden="true"></i></a>Field attributes</h2>
+<ul>
+<li><a href="#custom-bound"><code>Debug(bound=&quot;&lt;where-clause or empty&gt;&quot;)</code></a></li>
+<li><a href="#format-with"><code>Debug(format_with=&quot;&lt;path&gt;&quot;)</code></a></li>
+<li><a href="#ignoring-a-field"><code>Debug=&quot;ignore&quot;</code></a></li>
+</ul>
+<h1 id="ignoring-a-field"><a name="ignoring-a-field" class="plugin-anchor" href="#ignoring-a-field"><i class="fa fa-link" aria-hidden="true"></i></a>Ignoring a field</h1>
 <p>You can use <em>derivative</em> to hide fields from a structure or enumeration <code>Debug</code>
 implementation:</p>
 <pre><code class="lang-rust"><span class="hljs-meta">#[derive(Derivative)]</span>
@@ -289,7 +303,7 @@ implementation:</p>
 
 <span class="hljs-built_in">println!</span>(<span class="hljs-string">&quot;{:?}&quot;</span>, Foo { foo: <span class="hljs-number">42</span>, bar: <span class="hljs-number">1</span> }); <span class="hljs-comment">// Foo { foo: 42 }</span>
 </code></pre>
-<h1 id="hiding-newtypes">Hiding newtypes</h1>
+<h1 id="hiding-newtypes"><a name="hiding-newtypes" class="plugin-anchor" href="#hiding-newtypes"><i class="fa fa-link" aria-hidden="true"></i></a>Hiding newtypes</h1>
 <p>You can use <em>derivative</em> to automatically unwrap newtypes and enumeration
 variants with only one field:</p>
 <pre><code class="lang-rust"><span class="hljs-meta">#[derive(Derivative)]</span>
@@ -310,7 +324,7 @@ variants with only one field:</p>
 <span class="hljs-comment">// But:</span>
 <span class="hljs-built_in">println!</span>(<span class="hljs-string">&quot;{:?}&quot;</span>, C::Foo(<span class="hljs-number">42</span>)); <span class="hljs-comment">// Foo(42)</span>
 </code></pre>
-<h1 id="format-with">Format with</h1>
+<h1 id="format-with"><a name="format-with" class="plugin-anchor" href="#format-with"><i class="fa fa-link" aria-hidden="true"></i></a>Format with</h1>
 <p>You can pass a field to a format function:</p>
 <pre><code class="lang-rust"><span class="hljs-meta">#[derive(Derivative)]</span>
 <span class="hljs-meta">#[derivative(Debug)]</span>
@@ -325,7 +339,7 @@ where <code>fmt</code> is the current <a href="https://doc.rust-lang.org/std/fmt
 <p>The function must the following prototype:</p>
 <pre><code class="lang-rust"><span class="hljs-function"><span class="hljs-keyword">fn</span> <span class="hljs-title">fmt</span></span>(&amp;T, &amp;<span class="hljs-keyword">mut</span> std::fmt::Formatter) -&gt; <span class="hljs-built_in">Result</span>&lt;(), std::fmt::Error&gt;;
 </code></pre>
-<h1 id="custom-bound">Custom bound</h1>
+<h1 id="custom-bound"><a name="custom-bound" class="plugin-anchor" href="#custom-bound"><i class="fa fa-link" aria-hidden="true"></i></a>Custom bound</h1>
 <p>Usually, <em>derivative</em> will add a <code>T: Debug</code> bound for each type parameter <code>T</code>
 of the current type. If you do not want that, you can specify an explicit bound:</p>
 <ul>
@@ -379,7 +393,7 @@ if your type contains a <code>Foo&lt;T&gt;</code> that is <code>Debug</code> eve
     <script>
         var gitbook = gitbook || [];
         gitbook.push(function() {
-            gitbook.page.hasChanged({"page":{"title":"Debug trait","level":"1.2","depth":1,"next":{"title":"Hiding fields","level":"1.2.1","depth":2,"anchor":"#ignoring-a-field","path":"Debug.md","ref":"Debug.md#ignoring-a-field","articles":[]},"previous":{"title":"Overview","level":"1.1","depth":1,"path":"README.md","ref":"README.md","articles":[]},"dir":"ltr"},"config":{"plugins":["-search","-sharing","codeblock-filename","edit-link"],"root":"doc","styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"pluginsConfig":{"edit-link":{"label":"Edit","base":"https://github.com/mcarton/rust-derivative/tree/master/doc"},"codeblock-filename":{},"highlight":{},"lunr":{"maxIndexSize":1000000,"ignoreSpecialCharacters":false},"fontsettings":{"theme":"white","family":"sans","size":2},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false}},"theme":"default","pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"variables":{},"title":"Derivative","language":"en","gitbook":"*"},"file":{"path":"Debug.md","mtime":"2016-10-08T11:03:18.686Z","type":"markdown"},"gitbook":{"version":"3.2.2","time":"2016-10-08T13:28:22.326Z"},"basePath":".","book":{"language":""}});
+            gitbook.page.hasChanged({"page":{"title":"Debug trait","level":"1.2","depth":1,"next":{"title":"Hiding fields","level":"1.2.1","depth":2,"anchor":"#ignoring-a-field","path":"Debug.md","ref":"Debug.md#ignoring-a-field","articles":[]},"previous":{"title":"Overview","level":"1.1","depth":1,"path":"README.md","ref":"README.md","articles":[]},"dir":"ltr"},"config":{"plugins":["-search","-sharing","codeblock-filename","edit-link","anchors"],"root":"doc","styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"pluginsConfig":{"edit-link":{"label":"Edit","base":"https://github.com/mcarton/rust-derivative/tree/master/doc"},"codeblock-filename":{},"anchors":{},"highlight":{},"lunr":{"maxIndexSize":1000000,"ignoreSpecialCharacters":false},"fontsettings":{"theme":"white","family":"sans","size":2},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false}},"theme":"default","pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"variables":{},"title":"Derivative","language":"en","gitbook":"*"},"file":{"path":"Debug.md","mtime":"2016-10-08T15:51:19.010Z","type":"markdown"},"gitbook":{"version":"3.2.2","time":"2016-10-08T23:21:33.443Z"},"basePath":".","book":{"language":""}});
         });
     </script>
 </div>
