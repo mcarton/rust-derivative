@@ -9,6 +9,7 @@ extern crate quote;
 mod ast;
 mod attr;
 mod bound;
+mod cmp;
 mod debug;
 mod default;
 mod utils;
@@ -23,6 +24,9 @@ fn derive_impls(input: &ast::Input) -> Result<quote::Tokens, String> {
     }
     if let Some(ref default) = input.attrs.default {
         tokens.append(&default::derive(input, default).to_string());
+    }
+    if let Some(ref eq) = input.attrs.eq {
+        tokens.append(&cmp::derive_eq(input, eq).to_string());
     }
 
     Ok(tokens)

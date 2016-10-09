@@ -7,6 +7,8 @@ pub struct Input {
     pub debug: Option<InputDebug>,
     /// Whether `Default` is present and its specitif attributes.
     pub default: Option<InputDefault>,
+    /// Whether `Eq` is present and its specitif attributes.
+    pub eq: Option<InputEq>,
 }
 
 #[derive(Debug, Default)]
@@ -16,6 +18,8 @@ pub struct Field {
     debug: FieldDebug,
     /// The parameters for `Default`.
     default: FieldDefault,
+    /// The parameters for `Eq`.
+    eq_bound: Option<Vec<syn::WherePredicate>>,
 }
 
 #[derive(Debug, Default)]
@@ -37,6 +41,13 @@ pub struct InputDefault {
 }
 
 #[derive(Debug, Default)]
+/// Represent the `derivative(Eq(…))` attributes on an input.
+pub struct InputEq {
+    /// The `bound` attribute if present and the corresponding bounds.
+    bounds: Option<Vec<syn::WherePredicate>>,
+}
+
+#[derive(Debug, Default)]
 /// Represents the `derivarive(Debug(…))` attributes on a field.
 pub struct FieldDebug {
     /// The `bound` attribute if present and the corresponding bounds.
@@ -54,6 +65,13 @@ pub struct FieldDefault {
     bounds: Option<Vec<syn::WherePredicate>>,
     /// The default value for the field if present.
     pub value: Option<syn::Expr>,
+}
+
+#[derive(Debug, Default)]
+/// Represent the `derivarive(Eq(…))` attributes on a field.
+pub struct FieldEq {
+    /// The `bound` attribute if present and the corresponding bounds.
+    bounds: Option<Vec<syn::WherePredicate>>,
 }
 
 impl Input {
@@ -95,6 +113,18 @@ impl Input {
 
                         input.default = Some(default);
                     }
+                    "Eq" => {
+                        let mut eq = input.eq.take().unwrap_or_default();
+
+                        for (name, value) in values {
+                            match name {
+                                "bound" => try!(parse_bound(&mut eq.bounds, value)),
+                                _ => return Err(format!("unknown attribute `{}`", name)),
+                            }
+                        }
+
+                        input.eq = Some(eq);
+                    }
                     _ => return Err(format!("unknown trait `{}`", name)),
                 }
             }
@@ -113,6 +143,10 @@ impl Input {
 
     pub fn default_bound(&self) -> Option<&[syn::WherePredicate]> {
         self.default.as_ref().map_or(None, |d| d.bounds.as_ref().map(Vec::as_slice))
+    }
+
+    pub fn eq_bound(&self) -> Option<&[syn::WherePredicate]> {
+        self.eq.as_ref().map_or(None, |d| d.bounds.as_ref().map(Vec::as_slice))
     }
 }
 
@@ -152,6 +186,14 @@ impl Field {
                             }
                         }
                     }
+                    "Eq" => {
+                        for (name, value) in values {
+                            match name {
+                                "bound" => try!(parse_bound(&mut out.eq_bound, value)),
+                                _ => return Err(format!("unknown attribute `{}`", name)),
+                            }
+                        }
+                    }
                     _ => return Err(format!("unknown trait `{}`", name)),
                 }
             }
@@ -162,6 +204,10 @@ impl Field {
 
     pub fn debug_bound(&self) -> Option<&[syn::WherePredicate]> {
         self.debug.bounds.as_ref().map(Vec::as_slice)
+    }
+
+    pub fn eq_bound(&self) -> Option<&[syn::WherePredicate]> {
+        self.eq_bound.as_ref().map(Vec::as_slice)
     }
 
     pub fn debug_format_with(&self) -> Option<&syn::Path> {
