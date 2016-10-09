@@ -1,13 +1,12 @@
 // https://github.com/rust-lang/rust/issues/13101
 
 use ast;
-use attr;
 use quote;
 use syn::{self, aster};
 use utils;
 
 /// Derive `Eq` for `input`.
-pub fn derive_eq(input: &ast::Input, debug: &attr::InputEq) -> quote::Tokens {
+pub fn derive_eq(input: &ast::Input) -> quote::Tokens {
     let name = &input.ident;
 
     let eq_trait_path = eq_trait_path();

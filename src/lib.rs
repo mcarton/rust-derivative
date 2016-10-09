@@ -25,8 +25,8 @@ fn derive_impls(input: &ast::Input) -> Result<quote::Tokens, String> {
     if let Some(ref default) = input.attrs.default {
         tokens.append(&default::derive(input, default).to_string());
     }
-    if let Some(ref eq) = input.attrs.eq {
-        tokens.append(&cmp::derive_eq(input, eq).to_string());
+    if input.attrs.eq.is_some() {
+        tokens.append(&cmp::derive_eq(input).to_string());
     }
 
     Ok(tokens)
