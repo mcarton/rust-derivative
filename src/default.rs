@@ -50,9 +50,9 @@ pub fn derive(input: &ast::Input, default: &attr::InputDefault) -> quote::Tokens
     let impl_generics = utils::build_impl_generics(
         input,
         &default_trait_path,
-        needs_default,
-        |_| Some(&[]),
-        |_| Some(&[]),
+        |attrs| attrs.default_bound().is_none(),
+        |field| field.default_bound(),
+        |input| input.default_bound(),
     );
     let where_clause = &impl_generics.where_clause;
 
@@ -109,8 +109,4 @@ pub fn derive(input: &ast::Input, default: &attr::InputDefault) -> quote::Tokens
 /// Return the path of the `Default` trait, that is `::std::default::Default`.
 fn default_trait_path() -> syn::Path {
     aster::path().global().ids(&["std", "default", "Default"]).build()
-}
-
-fn needs_default(_: &attr::Field) -> bool {
-    true
 }

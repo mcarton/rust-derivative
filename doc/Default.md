@@ -2,12 +2,14 @@
 The `Default` trait supports the following attributes:
 
 ## Container attributes
+* [`Default(bound="<where-clause or empty>")`](#custom-bound)
 * [`Default="new"`](#new-function)
 
 ## Variant attributes
 * [`Default`](#default-enumeration)
 
 ## Field attributes
+* [`Default(bound="<where-clause or empty>")`](#custom-bound)
 * [`Default(value="<expr>")`](#ignoring-a-field)
 
 # Default enumeration
@@ -59,4 +61,38 @@ struct Foo {
 }
 
 println!("{:?}", Foo::new()); // Foo { foo: 0, bar: 0 }
+```
+
+# Custom bound
+
+The following does now work because `derive` adds a `T: Default` bound on the
+`impl Default for Foo<T>`:
+
+```rust
+#[derive(Default)]
+struct Foo<T> {
+    foo: Option<T>,
+}
+
+struct NonDefault;
+
+Foo::<NonDefault>::default() // gives:
+// error: no associated item named `default` found for type `Foo<NonDefault>` in the current scope
+//  = note: the method `default` exists but the following trait bounds were not satisfied: `NonDefault : std::default::Default`
+```
+
+That bound however is useless as `Option<T>: Default` for any `T`.
+`derivative` allows you to explicitly specify a bound if the infered one is not
+correct:
+
+```rust
+#[derive(Derivative)]
+#[derivative(Default(bound=""))] // don't need any bound
+struct Foo<T> {
+    foo: Option<T>,
+}
+
+struct NonDefault;
+
+Foo::<NonDefault>::default() // works!
 ```

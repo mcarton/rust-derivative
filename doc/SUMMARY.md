@@ -10,3 +10,4 @@
     * [Default enumeration](Default.md#default-enumeration)
     * [Setting the value of a field](Default.md#setting-the-value-of-a-field)
     * [`new` function](Default.md#new-function)
+    * [Custom bound](Default.md#custom-bound)

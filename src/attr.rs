@@ -30,6 +30,8 @@ pub struct InputDebug {
 #[derive(Debug, Default)]
 /// Represent the `derivative(Default(…))` attributes on an input.
 pub struct InputDefault {
+    /// The `bound` attribute if present and the corresponding bounds.
+    bounds: Option<Vec<syn::WherePredicate>>,
     /// Whether the type is marked with `new`.
     pub new: bool,
 }
@@ -48,6 +50,8 @@ pub struct FieldDebug {
 #[derive(Debug, Default)]
 /// Represent the `derivarive(Default(…))` attributes on a field.
 pub struct FieldDefault {
+    /// The `bound` attribute if present and the corresponding bounds.
+    bounds: Option<Vec<syn::WherePredicate>>,
     /// The default value for the field if present.
     pub value: Option<syn::Expr>,
 }
@@ -66,11 +70,7 @@ impl Input {
 
                         for (name, value) in values {
                             match name {
-                                "bound" => {
-                                    let mut bounds = debug.bounds.take().unwrap_or_default();
-                                    try!(parse_bound(&mut bounds, value));
-                                    debug.bounds = Some(bounds);
-                                }
+                                "bound" => try!(parse_bound(&mut debug.bounds, value)),
                                 "transparent" => {
                                     debug.transparent = try!(parse_boolean_meta_item(&value, true, "transparent"));
                                 }
@@ -85,6 +85,7 @@ impl Input {
 
                         for (name, value) in values {
                             match name {
+                                "bound" => try!(parse_bound(&mut default.bounds, value)),
                                 "new" => {
                                     default.new = try!(parse_boolean_meta_item(&value, true, "new"));
                                 }
@@ -109,6 +110,10 @@ impl Input {
     pub fn debug_transparent(&self) -> bool {
         self.debug.as_ref().map_or(false, |d| d.transparent)
     }
+
+    pub fn default_bound(&self) -> Option<&[syn::WherePredicate]> {
+        self.default.as_ref().map_or(None, |d| d.bounds.as_ref().map(Vec::as_slice))
+    }
 }
 
 impl Field {
@@ -123,11 +128,7 @@ impl Field {
                     "Debug" => {
                         for (name, value) in values {
                             match name {
-                                "bound" => {
-                                    let mut bounds = out.debug.bounds.take().unwrap_or_default();
-                                    try!(parse_bound(&mut bounds, value));
-                                    out.debug.bounds = Some(bounds);
-                                }
+                                "bound" => try!(parse_bound(&mut out.debug.bounds, value)),
                                 "format_with" => {
                                     let path = try!(value.ok_or_else(|| "`format_with` needs a value".to_string()));
                                     out.debug.format_with = Some(try!(syn::parse_path(path)));
@@ -142,6 +143,7 @@ impl Field {
                     "Default" => {
                         for (name, value) in values {
                             match name {
+                                "bound" => try!(parse_bound(&mut out.default.bounds, value)),
                                 "value" => {
                                     let value = try!(value.ok_or_else(|| "`value` needs a value".to_string()));
                                     out.default.value = Some(try!(syn::parse_expr(value)));
@@ -168,6 +170,10 @@ impl Field {
 
     pub fn ignore_debug(&self) -> bool {
         self.debug.ignore
+    }
+
+    pub fn default_bound(&self) -> Option<&[syn::WherePredicate]> {
+        self.default.bounds.as_ref().map(Vec::as_slice)
     }
 
     pub fn default_value(&self) -> Option<&syn::Expr> {
@@ -243,7 +249,11 @@ fn parse_boolean_meta_item(item: &Option<&str>, default: bool, name: &str) -> Re
 }
 
 /// Parse a `bound` item.
-fn parse_bound(bounds: &mut Vec<syn::WherePredicate>, value: Option<&str>) -> Result<(), String> {
+fn parse_bound(
+    opt_bounds: &mut Option<Vec<syn::WherePredicate>>,
+    value: Option<&str>
+) -> Result<(), String> {
+    let mut bounds = opt_bounds.take().unwrap_or_default();
     let bound = try!(value.ok_or_else(|| "`bound` needs a value".to_string()));
 
     if !bound.is_empty() {
@@ -251,6 +261,8 @@ fn parse_bound(bounds: &mut Vec<syn::WherePredicate>, value: Option<&str>) -> Re
         let mut predicates = try!(where_clause).predicates;
         bounds.append(&mut predicates);
     }
+
+    *opt_bounds = Some(bounds);
 
     Ok(())
 }
