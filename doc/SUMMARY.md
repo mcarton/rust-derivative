@@ -11,3 +11,5 @@
     * [Setting the value of a field](Default.md#setting-the-value-of-a-field)
     * [`new` function](Default.md#new-function)
     * [Custom bound](Default.md#custom-bound)
+* [Comparison traits](cmp.md)
+    * [Custom bound](cmp.md#custom-bound)
