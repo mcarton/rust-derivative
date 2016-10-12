@@ -12,4 +12,5 @@
     * [`new` function](Default.md#new-function)
     * [Custom bound](Default.md#custom-bound)
 * [Comparison traits](cmp.md)
+    * [Ignoring fields](cmp.md#ignoring-a-field)
     * [Custom bound](cmp.md#custom-bound)
