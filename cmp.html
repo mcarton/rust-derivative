@@ -342,10 +342,22 @@
 <li><a href="#custom-bound"><code>Trait(bound=&quot;&lt;where-clause or empty&gt;&quot;)</code></a></li>
 </ul>
 <p>The <code>Partial</code> trait also supports the following attributes:</p>
+<h2 id="container-attributes"><a name="container-attributes" class="plugin-anchor" href="#container-attributes"><i class="fa fa-link" aria-hidden="true"></i></a>Container attributes</h2>
+<ul>
+<li><a href="#enumerations"><code>PartialEq=&quot;feature_allow_slow_enum&quot;</code></a></li>
+</ul>
 <h2 id="field-attributes"><a name="field-attributes" class="plugin-anchor" href="#field-attributes"><i class="fa fa-link" aria-hidden="true"></i></a>Field attributes</h2>
 <ul>
 <li><a href="#ignoring-a-field"><code>PartialEq=&quot;ignore&quot;</code></a></li>
 </ul>
+<h1 id="enumerations"><a name="enumerations" class="plugin-anchor" href="#enumerations"><i class="fa fa-link" aria-hidden="true"></i></a>Enumerations</h1>
+<p>Unfortunatelly, there is no way for derivative to derive <code>PartialEq</code> on
+enumerations as efficiently as the built-in <code>derive(PartialEq)</code>
+<a href="https://github.com/rust-lang/rfcs/pull/1696" target="_blank">yet</a>.</p>
+<p>If you want to use derivative on enumerations anyway, you can add</p>
+<pre><code class="lang-rust"><span class="hljs-meta">#[derivative(PartialEq=<span class="hljs-meta-string">&quot;feature_allow_slow_enum&quot;</span>)]</span>
+</code></pre>
+<p>to your enumeration. This acts as a &#x201C;feature-gate&#x201D;.</p>
 <h1 id="ignoring-a-field"><a name="ignoring-a-field" class="plugin-anchor" href="#ignoring-a-field"><i class="fa fa-link" aria-hidden="true"></i></a>Ignoring a field</h1>
 <p>You can use <em>derivative</em> to ignore a field when comparing:</p>
 <pre><code class="lang-rust"><span class="hljs-meta">#[derive(Derivative)]</span>
@@ -399,7 +411,7 @@ use:</p>
     <script>
         var gitbook = gitbook || [];
         gitbook.push(function() {
-            gitbook.page.hasChanged({"page":{"title":"Comparison traits","level":"1.4","depth":1,"next":{"title":"Ignoring fields","level":"1.4.1","depth":2,"anchor":"#ignoring-a-field","path":"cmp.md","ref":"cmp.md#ignoring-a-field","articles":[]},"previous":{"title":"Custom bound","level":"1.3.4","depth":2,"anchor":"#custom-bound","path":"Default.md","ref":"Default.md#custom-bound","articles":[]},"dir":"ltr"},"config":{"plugins":["-search","-sharing","codeblock-filename","edit-link","anchors"],"root":"doc","styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"pluginsConfig":{"edit-link":{"label":"Edit","base":"https://github.com/mcarton/rust-derivative/tree/master/doc"},"codeblock-filename":{},"anchors":{},"highlight":{},"lunr":{"maxIndexSize":1000000,"ignoreSpecialCharacters":false},"fontsettings":{"theme":"white","family":"sans","size":2},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false}},"theme":"default","pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"variables":{},"title":"Derivative","language":"en","gitbook":"*"},"file":{"path":"cmp.md","mtime":"2016-10-12T17:57:03.936Z","type":"markdown"},"gitbook":{"version":"3.2.2","time":"2016-10-12T17:59:50.909Z"},"basePath":".","book":{"language":""}});
+            gitbook.page.hasChanged({"page":{"title":"Comparison traits","level":"1.4","depth":1,"next":{"title":"Ignoring fields","level":"1.4.1","depth":2,"anchor":"#ignoring-a-field","path":"cmp.md","ref":"cmp.md#ignoring-a-field","articles":[]},"previous":{"title":"Custom bound","level":"1.3.4","depth":2,"anchor":"#custom-bound","path":"Default.md","ref":"Default.md#custom-bound","articles":[]},"dir":"ltr"},"config":{"plugins":["-search","-sharing","codeblock-filename","edit-link","anchors"],"root":"doc","styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"pluginsConfig":{"edit-link":{"label":"Edit","base":"https://github.com/mcarton/rust-derivative/tree/master/doc"},"codeblock-filename":{},"anchors":{},"highlight":{},"lunr":{"maxIndexSize":1000000,"ignoreSpecialCharacters":false},"fontsettings":{"theme":"white","family":"sans","size":2},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false}},"theme":"default","pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"variables":{},"title":"Derivative","language":"en","gitbook":"*"},"file":{"path":"cmp.md","mtime":"2016-10-12T18:56:56.632Z","type":"markdown"},"gitbook":{"version":"3.2.2","time":"2016-10-12T19:49:02.757Z"},"basePath":".","book":{"language":""}});
         });
     </script>
 </div>
