@@ -1,115 +1,70 @@
 use ast;
 use attr;
+use matcher;
 use quote;
 use syn::{self, aster};
 use utils;
 
-pub fn derive(input: &ast::Input, debug: &attr::InputDebug) -> quote::Tokens {
-    fn make_variant_data(
-        variant_name: quote::Tokens,
-        variant_name_as_str: &str,
-        style: ast::Style,
-        fields: &[ast::Field],
-        transparent: bool,
-        generics: &syn::Generics,
-    ) -> quote::Tokens {
-        match style {
-            ast::Style::Struct => {
-                let mut field_pats = Vec::new();
-                let mut field_prints = Vec::new();
-
-                for (n, f) in fields.iter().enumerate() {
-                    let name = f.ident.as_ref().expect("A structure field must have a name");
-                    let arg_n = syn::Ident::new(format!("__arg_{}", n));
-
-                    field_pats.push(quote!(#name: ref #arg_n));
-
-                    let name = name.as_ref();
-
-                    if let Some(format_fn) = f.attrs.debug_format_with() {
-                        let dummy_debug = format_with(f, &arg_n, format_fn, generics.clone());
-                        field_prints.push(quote!(
-                            #dummy_debug
-                            let _ = builder.field(#name, &#arg_n);
-                        ));
-                    }
-                    else if !f.attrs.ignore_debug() {
-                        field_prints.push(quote!(let _ = builder.field(#name, &#arg_n);));
-                    }
+pub fn derive(input: &ast::Input) -> quote::Tokens {
+    let body = matcher::Matcher::new(matcher::BindingStyle::Ref)
+        .build_arms(input, |arm_name, style, attrs, bis| {
+            let field_prints = bis.iter().filter_map(|bi| {
+                if bi.field.attrs.ignore_debug() {
+                    return None;
                 }
 
-                quote!(
-                    #variant_name { #(#field_pats),* } => {
-                        let mut builder = f.debug_struct(#variant_name_as_str);
-                        #(#field_prints)*
-                        builder.finish()
-                    }
-                )
-            }
-            ast::Style::Tuple if transparent => {
-                quote!(
-                    #variant_name( ref __arg_0 ) => {
+                if attrs.debug_transparent() {
+                    return Some(quote!{
                         ::std::fmt::Debug::fmt(__arg_0, f)
-                    }
-                )
-            }
-            ast::Style::Tuple => {
-                let mut field_pats = Vec::new();
-                let mut field_prints = Vec::new();
-
-                for (n, f) in fields.iter().enumerate() {
-                    let arg_n = syn::Ident::new(format!("__arg_{}", n));
-
-                    field_pats.push(quote!(ref #arg_n));
-
-                    if let Some(format_fn) = f.attrs.debug_format_with() {
-                        let dummy_debug = format_with(f, &arg_n, format_fn, generics.clone());
-                        field_prints.push(quote!(
-                            #dummy_debug
-                            let _ = builder.field(&#arg_n);
-                        ));
-                    }
-                    else if !f.attrs.ignore_debug() {
-                        field_prints.push(quote!(let _ = builder.field(&#arg_n);));
-                    }
+                    });
                 }
 
-                quote!(
-                    #variant_name( #(#field_pats),* ) => {
-                        let mut builder = f.debug_tuple(#variant_name_as_str);
-                        #(#field_prints)*
-                        builder.finish()
+                let arg = &bi.ident;
+
+                let dummy_debug = bi.field.attrs.debug_format_with().map(|format_fn| {
+                    format_with(bi.field, &arg, format_fn, input.generics.clone())
+                });
+
+                let builder = if let Some(ref name) = bi.field.ident {
+                    let name = name.as_ref();
+                    quote! {
+                        #dummy_debug
+                        let _ = builder.field(#name, &#arg);
                     }
-                )
-            }
-            ast::Style::Unit => {
-                quote!(
-                    #variant_name => f.write_str(#variant_name_as_str)
-                )
-            }
-        }
-    }
+                } else {
+                    quote! {
+                        #dummy_debug
+                        let _ = builder.field(&#arg);
+                    }
+                };
 
-    let name = &input.ident;
-
-    let arms = match input.body {
-        ast::Body::Enum(ref data) => {
-            let arms = data.iter().map(|variant| {
-                let vname = &variant.ident;
-                let vname_as_str = vname.as_ref();
-                let transparent = variant.attrs.debug_transparent();
-
-                make_variant_data(quote!(#name::#vname), vname_as_str, variant.style, &variant.fields, transparent, input.generics)
+                Some(builder)
             });
 
-            quote!(#(#arms),*)
-        }
-        ast::Body::Struct(style, ref vd) => {
-            let arms = make_variant_data(quote!(#name), name.as_ref(), style, vd, debug.transparent, input.generics);
+            let method = match style {
+                ast::Style::Struct => "debug_struct",
+                ast::Style::Tuple | ast::Style::Unit => "debug_tuple",
+            };
+            let method = syn::Ident::new(method);
 
-            quote!(#arms)
+            let name = syn::parse_path(&arm_name.to_string().trim());
+            let name = name.unwrap().segments.last().unwrap().ident.to_string();
+
+            if attrs.debug_transparent() {
+                quote! {
+                    #(#field_prints)*
+                }
+            } else {
+                quote! {
+                    let mut builder = f.#method(#name);
+                    #(#field_prints)*
+                    builder.finish()
+                }
+            }
         }
-    };
+    );
+
+    let name = &input.ident;
 
     let debug_trait_path = debug_trait_path();
     let impl_generics = utils::build_impl_generics(
@@ -127,15 +82,15 @@ pub fn derive(input: &ast::Input, debug: &attr::InputDebug) -> quote::Tokens {
                              .build()
                              .build();
 
-    quote!(
+    quote! {
         impl #impl_generics #debug_trait_path for #ty #where_clause {
             fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
                 match *self {
-                    #arms
+                    #body
                 }
             }
         }
-    )
+    }
 }
 
 fn needs_debug_bound(attrs: &attr::Field) -> bool {

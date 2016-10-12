@@ -12,6 +12,7 @@ mod bound;
 mod cmp;
 mod debug;
 mod default;
+mod matcher;
 mod utils;
 
 use proc_macro::TokenStream;
@@ -19,8 +20,8 @@ use proc_macro::TokenStream;
 fn derive_impls(input: &ast::Input) -> Result<quote::Tokens, String> {
     let mut tokens = quote::Tokens::new();
 
-    if let Some(ref debug) = input.attrs.debug {
-        tokens.append(&debug::derive(input, debug).to_string());
+    if input.attrs.debug.is_some() {
+        tokens.append(&debug::derive(input).to_string());
     }
     if let Some(ref default) = input.attrs.default {
         tokens.append(&default::derive(input, default).to_string());
