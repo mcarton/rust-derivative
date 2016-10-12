@@ -83,6 +83,7 @@ pub fn derive(input: &ast::Input, default: &attr::InputDefault) -> quote::Tokens
 
     let new_fn = if default.new {
         Some(quote!(
+            #[allow(unused_qualifications)]
             impl #impl_generics #ty #where_clause {
                 /// Creates a default value for this type.
                 #[inline]
@@ -98,6 +99,7 @@ pub fn derive(input: &ast::Input, default: &attr::InputDefault) -> quote::Tokens
     quote!(
         #new_fn
 
+        #[allow(unused_qualifications)]
         impl #impl_generics #default_trait_path for #ty #where_clause {
             fn default() -> Self {
                 #body

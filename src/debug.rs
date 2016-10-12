@@ -83,6 +83,7 @@ pub fn derive(input: &ast::Input) -> quote::Tokens {
                              .build();
 
     quote! {
+        #[allow(unused_qualifications)]
         impl #impl_generics #debug_trait_path for #ty #where_clause {
             fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
                 match *self {

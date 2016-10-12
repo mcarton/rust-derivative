@@ -27,6 +27,7 @@ pub fn derive_eq(input: &ast::Input) -> quote::Tokens {
                              .build();
 
     quote! {
+        #[allow(unused_qualifications)]
         impl #impl_generics #eq_trait_path for #ty #where_clause {}
     }
 }
@@ -94,6 +95,7 @@ pub fn derive_partial_eq(input: &ast::Input) -> Result<quote::Tokens, String> {
                              .build();
 
     Ok(quote! {
+        #[allow(unused_qualifications)]
         impl #impl_generics #partial_eq_trait_path for #ty #where_clause {
             fn eq(&self, other: &Self) -> bool {
                 match *self {
