@@ -65,7 +65,7 @@ pub struct FieldDebug {
     bounds: Option<Vec<syn::WherePredicate>>,
     /// The `format_with` attribute if present and the path to the formatting function.
     format_with: Option<syn::Path>,
-    /// Whether the field is to be ignore from output.
+    /// Whether the field is to be ignored from output.
     ignore: bool,
 }
 
@@ -83,6 +83,8 @@ pub struct FieldDefault {
 pub struct FieldPartialEq {
     /// The `bound` attribute if present and the corresponding bounds.
     bounds: Option<Vec<syn::WherePredicate>>,
+    /// Whether the field is to be ignored when comparing.
+    ignore: bool,
 }
 
 impl Input {
@@ -225,6 +227,9 @@ impl Field {
                         for (name, value) in values {
                             match name {
                                 "bound" => try!(parse_bound(&mut out.partial_eq.bounds, value)),
+                                "ignore" => {
+                                    out.partial_eq.ignore = try!(parse_boolean_meta_item(&value, true, "ignore"));
+                                }
                                 _ => return Err(format!("unknown attribute `{}`", name)),
                             }
                         }
@@ -263,6 +268,10 @@ impl Field {
 
     pub fn partial_eq_bound(&self) -> Option<&[syn::WherePredicate]> {
         self.partial_eq.bounds.as_ref().map(Vec::as_slice)
+    }
+
+    pub fn ignore_partial_eq(&self) -> bool {
+        self.partial_eq.ignore
     }
 }
 

@@ -36,16 +36,18 @@ pub fn derive_partial_eq(input: &ast::Input) -> quote::Tokens {
     let body = matcher::Matcher::new(matcher::BindingStyle::Ref)
         .with_name("__self".into())
         .build_arms(input, |_arm_name, _style, _attrs, outer_bis| {
-            println!("{:?}", outer_bis);
             let body = matcher::Matcher::new(matcher::BindingStyle::Ref)
                 .with_name("__other".into())
                 .build_arms(input, |_arm_name, _style, _attrs, inner_bis| {
-                    println!("{:?}", inner_bis);
                     let cmp = outer_bis.iter().zip(inner_bis).map(|(o, i)| {
                         let outer_name = &o.ident;
                         let inner_name = &i.ident;
 
-                        quote!(&& #outer_name == #inner_name)
+                        if o.field.attrs.ignore_partial_eq() {
+                            None
+                        } else {
+                            Some(quote!(&& #outer_name == #inner_name))
+                        }
                     });
 
                     quote!(true #(#cmp)*)

@@ -16,6 +16,25 @@ struct WithPtr<T: ?Sized> {
     foo: *const T
 }
 
+#[derive(Derivative)]
+#[derivative(PartialEq)]
+struct Empty;
+
+#[derive(Derivative)]
+#[derivative(PartialEq)]
+struct AllIgnored {
+    #[derivative(PartialEq="ignore")]
+    foo: u8,
+}
+
+#[derive(Derivative)]
+#[derivative(PartialEq)]
+struct OneIgnored {
+    #[derivative(PartialEq="ignore")]
+    foo: u8,
+    bar: u8,
+}
+
 trait SomeTrait {}
 struct SomeType {
     foo: u8
@@ -30,4 +49,9 @@ fn main() {
     let ptr2: *const SomeTrait = &SomeType { foo: 1 };
     assert!(WithPtr { foo: ptr1 } == WithPtr { foo: ptr1 });
     assert!(WithPtr { foo: ptr1 } != WithPtr { foo: ptr2 });
+
+    assert!(Empty == Empty);
+    assert!(AllIgnored { foo: 0 } == AllIgnored { foo: 42 });
+    assert!(OneIgnored { foo: 0, bar: 6 } == OneIgnored { foo: 42, bar: 6 });
+    assert!(OneIgnored { foo: 0, bar: 6 } != OneIgnored { foo: 42, bar: 7 });
 }
