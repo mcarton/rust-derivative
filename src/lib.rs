@@ -29,6 +29,9 @@ fn derive_impls(input: &ast::Input) -> Result<quote::Tokens, String> {
     if input.attrs.eq.is_some() {
         tokens.append(&cmp::derive_eq(input).to_string());
     }
+    if input.attrs.partial_eq.is_some() {
+        tokens.append(&cmp::derive_partial_eq(input).to_string());
+    }
 
     Ok(tokens)
 }

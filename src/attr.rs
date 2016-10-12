@@ -9,6 +9,8 @@ pub struct Input {
     pub default: Option<InputDefault>,
     /// Whether `Eq` is present and its specitif attributes.
     pub eq: Option<InputEq>,
+    /// Whether `Eq` is present and its specitif attributes.
+    pub partial_eq: Option<InputPartialEq>,
 }
 
 #[derive(Debug, Default)]
@@ -20,6 +22,8 @@ pub struct Field {
     default: FieldDefault,
     /// The parameters for `Eq`.
     eq_bound: Option<Vec<syn::WherePredicate>>,
+    /// The parameters for `Eq`.
+    partial_eq: FieldPartialEq,
 }
 
 #[derive(Debug, Default)]
@@ -48,6 +52,13 @@ pub struct InputEq {
 }
 
 #[derive(Debug, Default)]
+/// Represent the `derivative(PartialEq(…))` attributes on an input.
+pub struct InputPartialEq {
+    /// The `bound` attribute if present and the corresponding bounds.
+    bounds: Option<Vec<syn::WherePredicate>>,
+}
+
+#[derive(Debug, Default)]
 /// Represents the `derivarive(Debug(…))` attributes on a field.
 pub struct FieldDebug {
     /// The `bound` attribute if present and the corresponding bounds.
@@ -68,8 +79,8 @@ pub struct FieldDefault {
 }
 
 #[derive(Debug, Default)]
-/// Represent the `derivarive(Eq(…))` attributes on a field.
-pub struct FieldEq {
+/// Represent the `derivarive(PartialEq(…))` attributes on a field.
+pub struct FieldPartialEq {
     /// The `bound` attribute if present and the corresponding bounds.
     bounds: Option<Vec<syn::WherePredicate>>,
 }
@@ -125,6 +136,18 @@ impl Input {
 
                         input.eq = Some(eq);
                     }
+                    "PartialEq" => {
+                        let mut partial_eq = input.partial_eq.take().unwrap_or_default();
+
+                        for (name, value) in values {
+                            match name {
+                                "bound" => try!(parse_bound(&mut partial_eq.bounds, value)),
+                                _ => return Err(format!("unknown attribute `{}`", name)),
+                            }
+                        }
+
+                        input.partial_eq = Some(partial_eq);
+                    }
                     _ => return Err(format!("unknown trait `{}`", name)),
                 }
             }
@@ -147,6 +170,10 @@ impl Input {
 
     pub fn eq_bound(&self) -> Option<&[syn::WherePredicate]> {
         self.eq.as_ref().map_or(None, |d| d.bounds.as_ref().map(Vec::as_slice))
+    }
+
+    pub fn partial_eq_bound(&self) -> Option<&[syn::WherePredicate]> {
+        self.partial_eq.as_ref().map_or(None, |d| d.bounds.as_ref().map(Vec::as_slice))
     }
 }
 
@@ -194,6 +221,14 @@ impl Field {
                             }
                         }
                     }
+                    "PartialEq" => {
+                        for (name, value) in values {
+                            match name {
+                                "bound" => try!(parse_bound(&mut out.partial_eq.bounds, value)),
+                                _ => return Err(format!("unknown attribute `{}`", name)),
+                            }
+                        }
+                    }
                     _ => return Err(format!("unknown trait `{}`", name)),
                 }
             }
@@ -204,10 +239,6 @@ impl Field {
 
     pub fn debug_bound(&self) -> Option<&[syn::WherePredicate]> {
         self.debug.bounds.as_ref().map(Vec::as_slice)
-    }
-
-    pub fn eq_bound(&self) -> Option<&[syn::WherePredicate]> {
-        self.eq_bound.as_ref().map(Vec::as_slice)
     }
 
     pub fn debug_format_with(&self) -> Option<&syn::Path> {
@@ -224,6 +255,14 @@ impl Field {
 
     pub fn default_value(&self) -> Option<&syn::Expr> {
         self.default.value.as_ref()
+    }
+
+    pub fn eq_bound(&self) -> Option<&[syn::WherePredicate]> {
+        self.eq_bound.as_ref().map(Vec::as_slice)
+    }
+
+    pub fn partial_eq_bound(&self) -> Option<&[syn::WherePredicate]> {
+        self.partial_eq.bounds.as_ref().map(Vec::as_slice)
     }
 }
 
