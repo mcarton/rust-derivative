@@ -32,25 +32,38 @@ pub fn derive_eq(input: &ast::Input) -> quote::Tokens {
 }
 
 /// Derive `PartialEq` for `input`.
-pub fn derive_partial_eq(input: &ast::Input) -> quote::Tokens {
+pub fn derive_partial_eq(input: &ast::Input) -> Result<quote::Tokens, String> {
+    if let ast::Body::Enum(_) = input.body {
+        if !input.attrs.partial_eq_on_enum() {
+            return Err(
+                "can't use `#[derivative(PartialEq)]` on an enumeration without \
+                `feature_allow_slow_enum`; see the documentation for more details".into()
+            );
+        }
+    }
+
     let body = matcher::Matcher::new(matcher::BindingStyle::Ref)
         .with_name("__self".into())
-        .build_arms(input, |_arm_name, _style, _attrs, outer_bis| {
+        .build_arms(input, |outer_arm_name, _style, _attrs, outer_bis| {
             let body = matcher::Matcher::new(matcher::BindingStyle::Ref)
                 .with_name("__other".into())
-                .build_arms(input, |_arm_name, _style, _attrs, inner_bis| {
-                    let cmp = outer_bis.iter().zip(inner_bis).map(|(o, i)| {
-                        let outer_name = &o.ident;
-                        let inner_name = &i.ident;
+                .build_arms(input, |inner_arm_name, _style, _attrs, inner_bis| {
+                    if outer_arm_name == inner_arm_name {
+                        let cmp = outer_bis.iter().zip(inner_bis).map(|(o, i)| {
+                            let outer_name = &o.ident;
+                            let inner_name = &i.ident;
 
-                        if o.field.attrs.ignore_partial_eq() {
-                            None
-                        } else {
-                            Some(quote!(&& #outer_name == #inner_name))
-                        }
-                    });
+                            if o.field.attrs.ignore_partial_eq() {
+                                None
+                            } else {
+                                Some(quote!(&& #outer_name == #inner_name))
+                            }
+                        });
 
-                    quote!(true #(#cmp)*)
+                        quote!(true #(#cmp)*)
+                    } else {
+                        quote!(false)
+                    }
                 }
             );
 
@@ -80,7 +93,7 @@ pub fn derive_partial_eq(input: &ast::Input) -> quote::Tokens {
                              .build()
                              .build();
 
-    quote! {
+    Ok(quote! {
         impl #impl_generics #partial_eq_trait_path for #ty #where_clause {
             fn eq(&self, other: &Self) -> bool {
                 match *self {
@@ -88,7 +101,7 @@ pub fn derive_partial_eq(input: &ast::Input) -> quote::Tokens {
                 }
             }
         }
-    }
+    })
 }
 
 /// Return the path of the `Eq` trait, that is `::std::cmp::Eq`.

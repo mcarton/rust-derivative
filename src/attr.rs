@@ -56,6 +56,8 @@ pub struct InputEq {
 pub struct InputPartialEq {
     /// The `bound` attribute if present and the corresponding bounds.
     bounds: Option<Vec<syn::WherePredicate>>,
+    /// Allow `derivative(PartialEq)` on enums:
+    on_enum: bool,
 }
 
 #[derive(Debug, Default)]
@@ -144,6 +146,9 @@ impl Input {
                         for (name, value) in values {
                             match name {
                                 "bound" => try!(parse_bound(&mut partial_eq.bounds, value)),
+                                "feature_allow_slow_enum" => {
+                                    partial_eq.on_enum = try!(parse_boolean_meta_item(&value, true, "feature_allow_slow_enum"));
+                                }
                                 _ => return Err(format!("unknown attribute `{}`", name)),
                             }
                         }
@@ -176,6 +181,10 @@ impl Input {
 
     pub fn partial_eq_bound(&self) -> Option<&[syn::WherePredicate]> {
         self.partial_eq.as_ref().map_or(None, |d| d.bounds.as_ref().map(Vec::as_slice))
+    }
+
+    pub fn partial_eq_on_enum(&self) -> bool {
+        self.partial_eq.as_ref().map_or(false, |d| d.on_enum)
     }
 }
 

@@ -10,6 +10,13 @@ struct Foo {
 }
 
 #[derive(Derivative)]
+#[derivative(PartialEq="feature_allow_slow_enum")]
+enum Option<T> {
+    Some(T),
+    None,
+}
+
+#[derive(Derivative)]
 #[derivative(PartialEq)]
 struct WithPtr<T: ?Sized> {
     #[derivative(PartialEq(bound=""))]
@@ -54,4 +61,10 @@ fn main() {
     assert!(AllIgnored { foo: 0 } == AllIgnored { foo: 42 });
     assert!(OneIgnored { foo: 0, bar: 6 } == OneIgnored { foo: 42, bar: 6 });
     assert!(OneIgnored { foo: 0, bar: 6 } != OneIgnored { foo: 42, bar: 7 });
+
+    assert!(Option::Some(42) == Option::Some(42));
+    assert!(Option::Some(0) != Option::Some(42));
+    assert!(Option::Some(42) != Option::None);
+    assert!(Option::None != Option::Some(42));
+    assert!(Option::None::<u8> == Option::None::<u8>);
 }

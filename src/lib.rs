@@ -30,7 +30,7 @@ fn derive_impls(input: &ast::Input) -> Result<quote::Tokens, String> {
         tokens.append(&cmp::derive_eq(input).to_string());
     }
     if input.attrs.partial_eq.is_some() {
-        tokens.append(&cmp::derive_partial_eq(input).to_string());
+        tokens.append(&try!(cmp::derive_partial_eq(input)).to_string());
     }
 
     Ok(tokens)
@@ -52,5 +52,8 @@ pub fn derivative(input: TokenStream) -> TokenStream {
         Ok(output.to_string().parse().unwrap())
     }
 
-    detail(input).unwrap()
+    match detail(input) {
+        Ok(output) => output,
+        Err(e) => panic!(e),
+    }
 }

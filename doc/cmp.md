@@ -9,8 +9,25 @@ The `Eq` and `PartialEq` traits support the following attributes:
 
 The `Partial` trait also supports the following attributes:
 
+## Container attributes
+* [`PartialEq="feature_allow_slow_enum"`](#enumerations)
+
 ## Field attributes
 * [`PartialEq="ignore"`](#ignoring-a-field)
+
+# Enumerations
+
+Unfortunatelly, there is no way for derivative to derive `PartialEq` on
+enumerations as efficiently as the built-in `derive(PartialEq)`
+[yet][discriminant].
+
+If you want to use derivative on enumerations anyway, you can add
+
+```rust
+#[derivative(PartialEq="feature_allow_slow_enum")]
+```
+
+to your enumeration. This acts as a “feature-gate”.
 
 # Ignoring a field
 
@@ -47,3 +64,5 @@ struct WithPtr<T: ?Sized> {
 ```
 
 See [`Default`'s documentation](./Default.md#custom-bound) for more details.
+
+[discriminant]: https://github.com/rust-lang/rfcs/pull/1696
