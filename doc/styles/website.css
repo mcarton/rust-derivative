@@ -1,7 +1,11 @@
-.hljs-meta {
+code .hljs-meta {
   color: #969896
 }
 
-.hljs-meta-string {
+code .hljs-meta-string {
   color: #183691
+}
+
+code .hljs-title {
+  color: #a71d5d !important
 }
