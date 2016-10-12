@@ -7,5 +7,5 @@ code .hljs-meta-string {
 }
 
 code .hljs-title {
-  color: #a71d5d
+  color: #a71d5d !important
 }
