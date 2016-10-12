@@ -42,6 +42,28 @@ struct OneIgnored {
     bar: u8,
 }
 
+#[derive(Derivative)]
+#[derivative(PartialEq)]
+struct Parity(
+    #[derivative(PartialEq(compare_with="same_parity"))]
+    u8,
+);
+
+fn same_parity(lhs: &u8, rhs: &u8) -> bool {
+    lhs % 2 == rhs % 2
+}
+
+#[derive(Derivative)]
+#[derivative(PartialEq)]
+struct Generic<T>(
+    #[derivative(PartialEq(compare_with="dummy_cmp", bound=""))]
+    T,
+);
+
+fn dummy_cmp<T>(lhs: &T, rhs: &T) -> bool {
+    true
+}
+
 trait SomeTrait {}
 struct SomeType {
     foo: u8
@@ -67,4 +89,11 @@ fn main() {
     assert!(Option::Some(42) != Option::None);
     assert!(Option::None != Option::Some(42));
     assert!(Option::None::<u8> == Option::None::<u8>);
+
+    assert!(Parity(3) == Parity(7));
+    assert!(Parity(2) == Parity(42));
+    assert!(Parity(3) != Parity(42));
+    assert!(Parity(2) != Parity(7));
+
+    assert!(Generic(SomeType { foo: 0 }) == Generic(SomeType{ foo: 0 }));
 }

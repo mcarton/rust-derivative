@@ -56,6 +56,8 @@ pub fn derive_partial_eq(input: &ast::Input) -> Result<quote::Tokens, String> {
 
                             if o.field.attrs.ignore_partial_eq() {
                                 None
+                            } else if let Some(compare_fn) = o.field.attrs.partial_eq_compare_with() {
+                                Some(quote!(&& #compare_fn(#outer_name, #inner_name)))
                             } else {
                                 Some(quote!(&& #outer_name == #inner_name))
                             }

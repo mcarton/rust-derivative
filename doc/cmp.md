@@ -14,6 +14,7 @@ The `Partial` trait also supports the following attributes:
 
 ## Field attributes
 * [`PartialEq="ignore"`](#ignoring-a-field)
+* [`PartialEq(compare_with="<path>")`](#compare-with)
 
 # Enumerations
 
@@ -44,6 +45,28 @@ struct Foo {
 
 assert!(Foo { foo: 0, bar: 42 } == Foo { foo: 0, bar: 7});
 assert!(Foo { foo: 42, bar: 0 } != Foo { foo: 7, bar: 0});
+```
+
+# Compare with
+
+Usually fields are compared using `==`. You can use an alternative comparison
+function if you like:
+
+```rust
+#[derive(Derivative)]
+#[derivative(PartialEq)]
+struct Foo {
+    foo: u32,
+    #[derivative(PartialEq(compare_with="path::to::my_cmp_fn"))]
+    bar: SomeTypeThatMightNotBePartialEq,
+}
+```
+
+`foo` will be compared with `==` and `bar` will be compared with
+`path::to::my_cmp_fn` which must have the following prototype:
+
+```rust
+fn my_cmp_fn(&T, &T) -> bool;
 ```
 
 # Custom bound

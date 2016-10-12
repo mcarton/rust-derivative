@@ -85,6 +85,8 @@ pub struct FieldDefault {
 pub struct FieldPartialEq {
     /// The `bound` attribute if present and the corresponding bounds.
     bounds: Option<Vec<syn::WherePredicate>>,
+    /// The `compare_with` attribute if present and the path to the formatting function.
+    compare_with: Option<syn::Path>,
     /// Whether the field is to be ignored when comparing.
     ignore: bool,
 }
@@ -236,6 +238,10 @@ impl Field {
                         for (name, value) in values {
                             match name {
                                 "bound" => try!(parse_bound(&mut out.partial_eq.bounds, value)),
+                                "compare_with" => {
+                                    let path = try!(value.ok_or_else(|| "`compare_with` needs a value".to_string()));
+                                    out.partial_eq.compare_with = Some(try!(syn::parse_path(path)));
+                                }
                                 "ignore" => {
                                     out.partial_eq.ignore = try!(parse_boolean_meta_item(&value, true, "ignore"));
                                 }
@@ -277,6 +283,10 @@ impl Field {
 
     pub fn partial_eq_bound(&self) -> Option<&[syn::WherePredicate]> {
         self.partial_eq.bounds.as_ref().map(Vec::as_slice)
+    }
+
+    pub fn partial_eq_compare_with(&self) -> Option<&syn::Path> {
+        self.partial_eq.compare_with.as_ref()
     }
 
     pub fn ignore_partial_eq(&self) -> bool {
