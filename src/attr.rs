@@ -91,73 +91,84 @@ pub struct FieldPartialEq {
     ignore: bool,
 }
 
+macro_rules! for_all_attr {
+    (for ($name:ident, $value:ident) in $attrs:expr; $($body:tt)*) => {
+        for meta_items in $attrs.iter().filter_map(derivative_attribute) {
+            for metaitem in meta_items.iter().map(read_items) {
+                let MetaItem($name, $value) = try!(metaitem);
+                match $name {
+                    $($body)*
+                    _ => return Err(format!("unknown trait `{}`", $name)),
+                }
+            }
+        }
+    };
+}
+
+macro_rules! match_attributes {
+    (let Some($name:ident) = $unwraped:expr; for $value:ident in $values:expr; $($body:tt)* ) => {
+        let mut $name = $unwraped.take().unwrap_or_default();
+
+        match_attributes! {
+            for $value in $values;
+            $($body)*
+        }
+
+        $unwraped = Some($name);
+    };
+
+    (for $value:ident in $values:expr; $($body:tt)* ) => {
+        for (name, $value) in $values {
+            match name {
+                $($body)*
+                _ => return Err(format!("unknown attribute `{}`", name)),
+            }
+        }
+    };
+}
+
 impl Input {
     /// Parse the `derivative` attributes on a type.
     pub fn from_ast(attrs: &[syn::Attribute]) -> Result<Input, String> {
         let mut input = Input::default();
 
-        for meta_items in attrs.iter().filter_map(derivative_attribute) {
-            for metaitem in meta_items.iter().map(read_items) {
-                let MetaItem(name, values) = try!(metaitem);
-                match name {
-                    "Debug" => {
-                        let mut debug = input.debug.take().unwrap_or_default();
-
-                        for (name, value) in values {
-                            match name {
-                                "bound" => try!(parse_bound(&mut debug.bounds, value)),
-                                "transparent" => {
-                                    debug.transparent = try!(parse_boolean_meta_item(&value, true, "transparent"));
-                                }
-                                _ => return Err(format!("unknown attribute `{}`", name)),
-                            }
-                        }
-
-                        input.debug = Some(debug);
+        for_all_attr! {
+            for (name, values) in attrs;
+            "Debug" => {
+                match_attributes! {
+                    let Some(debug) = input.debug;
+                    for value in values;
+                    "bound" => try!(parse_bound(&mut debug.bounds, value)),
+                    "transparent" => {
+                        debug.transparent = try!(parse_boolean_meta_item(&value, true, "transparent"));
                     }
-                    "Default" => {
-                        let mut default = input.default.take().unwrap_or_default();
-
-                        for (name, value) in values {
-                            match name {
-                                "bound" => try!(parse_bound(&mut default.bounds, value)),
-                                "new" => {
-                                    default.new = try!(parse_boolean_meta_item(&value, true, "new"));
-                                }
-                                _ => return Err(format!("unknown attribute `{}`", name)),
-                            }
-                        }
-
-                        input.default = Some(default);
+                }
+            }
+            "Default" => {
+                match_attributes! {
+                    let Some(default) = input.default;
+                    for value in values;
+                    "bound" => try!(parse_bound(&mut default.bounds, value)),
+                    "new" => {
+                        default.new = try!(parse_boolean_meta_item(&value, true, "new"));
                     }
-                    "Eq" => {
-                        let mut eq = input.eq.take().unwrap_or_default();
-
-                        for (name, value) in values {
-                            match name {
-                                "bound" => try!(parse_bound(&mut eq.bounds, value)),
-                                _ => return Err(format!("unknown attribute `{}`", name)),
-                            }
-                        }
-
-                        input.eq = Some(eq);
+                }
+            }
+            "Eq" => {
+                match_attributes! {
+                    let Some(eq) = input.eq;
+                    for value in values;
+                    "bound" => try!(parse_bound(&mut eq.bounds, value)),
+                }
+            }
+            "PartialEq" => {
+                match_attributes! {
+                    let Some(partial_eq) = input.partial_eq;
+                    for value in values;
+                    "bound" => try!(parse_bound(&mut partial_eq.bounds, value)),
+                    "feature_allow_slow_enum" => {
+                        partial_eq.on_enum = try!(parse_boolean_meta_item(&value, true, "feature_allow_slow_enum"));
                     }
-                    "PartialEq" => {
-                        let mut partial_eq = input.partial_eq.take().unwrap_or_default();
-
-                        for (name, value) in values {
-                            match name {
-                                "bound" => try!(parse_bound(&mut partial_eq.bounds, value)),
-                                "feature_allow_slow_enum" => {
-                                    partial_eq.on_enum = try!(parse_boolean_meta_item(&value, true, "feature_allow_slow_enum"));
-                                }
-                                _ => return Err(format!("unknown attribute `{}`", name)),
-                            }
-                        }
-
-                        input.partial_eq = Some(partial_eq);
-                    }
-                    _ => return Err(format!("unknown trait `{}`", name)),
                 }
             }
         }
@@ -195,61 +206,48 @@ impl Field {
     pub fn from_ast(field: &syn::Field) -> Result<Field, String> {
         let mut out = Field::default();
 
-        for meta_items in field.attrs.iter().filter_map(derivative_attribute) {
-            for metaitem in meta_items.iter().map(read_items) {
-                let MetaItem(name, values) = try!(metaitem);
-                match name {
-                    "Debug" => {
-                        for (name, value) in values {
-                            match name {
-                                "bound" => try!(parse_bound(&mut out.debug.bounds, value)),
-                                "format_with" => {
-                                    let path = try!(value.ok_or_else(|| "`format_with` needs a value".to_string()));
-                                    out.debug.format_with = Some(try!(syn::parse_path(path)));
-                                }
-                                "ignore" => {
-                                    out.debug.ignore = try!(parse_boolean_meta_item(&value, true, "ignore"));
-                                }
-                                _ => return Err(format!("unknown attribute `{}`", name)),
-                            }
-                        }
+        for_all_attr! {
+            for (name, values) in field.attrs;
+            "Debug" => {
+                match_attributes! {
+                    for value in values;
+                    "bound" => try!(parse_bound(&mut out.debug.bounds, value)),
+                    "format_with" => {
+                        let path = try!(value.ok_or_else(|| "`format_with` needs a value".to_string()));
+                        out.debug.format_with = Some(try!(syn::parse_path(path)));
                     }
-                    "Default" => {
-                        for (name, value) in values {
-                            match name {
-                                "bound" => try!(parse_bound(&mut out.default.bounds, value)),
-                                "value" => {
-                                    let value = try!(value.ok_or_else(|| "`value` needs a value".to_string()));
-                                    out.default.value = Some(try!(syn::parse_expr(value)));
-                                }
-                                _ => return Err(format!("unknown attribute `{}`", name)),
-                            }
-                        }
+                    "ignore" => {
+                        out.debug.ignore = try!(parse_boolean_meta_item(&value, true, "ignore"));
                     }
-                    "Eq" => {
-                        for (name, value) in values {
-                            match name {
-                                "bound" => try!(parse_bound(&mut out.eq_bound, value)),
-                                _ => return Err(format!("unknown attribute `{}`", name)),
-                            }
-                        }
+                }
+            }
+            "Default" => {
+                match_attributes! {
+                    for value in values;
+                    "bound" => try!(parse_bound(&mut out.default.bounds, value)),
+                    "value" => {
+                        let value = try!(value.ok_or_else(|| "`value` needs a value".to_string()));
+                        out.default.value = Some(try!(syn::parse_expr(value)));
                     }
-                    "PartialEq" => {
-                        for (name, value) in values {
-                            match name {
-                                "bound" => try!(parse_bound(&mut out.partial_eq.bounds, value)),
-                                "compare_with" => {
-                                    let path = try!(value.ok_or_else(|| "`compare_with` needs a value".to_string()));
-                                    out.partial_eq.compare_with = Some(try!(syn::parse_path(path)));
-                                }
-                                "ignore" => {
-                                    out.partial_eq.ignore = try!(parse_boolean_meta_item(&value, true, "ignore"));
-                                }
-                                _ => return Err(format!("unknown attribute `{}`", name)),
-                            }
-                        }
+                }
+            }
+            "Eq" => {
+                match_attributes! {
+                    for value in values;
+                    "bound" => try!(parse_bound(&mut out.eq_bound, value)),
+                }
+            }
+            "PartialEq" => {
+                match_attributes! {
+                    for value in values;
+                    "bound" => try!(parse_bound(&mut out.partial_eq.bounds, value)),
+                    "compare_with" => {
+                        let path = try!(value.ok_or_else(|| "`compare_with` needs a value".to_string()));
+                        out.partial_eq.compare_with = Some(try!(syn::parse_path(path)));
                     }
-                    _ => return Err(format!("unknown trait `{}`", name)),
+                    "ignore" => {
+                        out.partial_eq.ignore = try!(parse_boolean_meta_item(&value, true, "ignore"));
+                    }
                 }
             }
         }
