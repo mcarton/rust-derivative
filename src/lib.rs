@@ -25,7 +25,7 @@ fn derive_impls(input: &ast::Input) -> Result<quote::Tokens, String> {
         tokens.append(&clone::derive_clone(input).to_string());
     }
     if input.attrs.copy.is_some() {
-        tokens.append(&clone::derive_copy(input).to_string());
+        tokens.append(&try!(clone::derive_copy(input)).to_string());
     }
     if input.attrs.debug.is_some() {
         tokens.append(&debug::derive(input).to_string());

@@ -6,8 +6,12 @@ use syn::{self, aster};
 use utils;
 
 /// Derive `Copy` for `input`.
-pub fn derive_copy(input: &ast::Input) -> quote::Tokens {
+pub fn derive_copy(input: &ast::Input) -> Result<quote::Tokens, String> {
     let name = &input.ident;
+
+    if input.attrs.derives_clone() {
+        return Err("`#[derivative(Copy)]` can't be used with `#[derive(Clone)]`".into());
+    }
 
     let copy_trait_path = copy_trait_path();
     let impl_generics = utils::build_impl_generics(
@@ -25,10 +29,10 @@ pub fn derive_copy(input: &ast::Input) -> quote::Tokens {
                              .build()
                              .build();
 
-    quote! {
+    Ok(quote! {
         #[allow(unused_qualifications)]
         impl #impl_generics #copy_trait_path for #ty #where_clause {}
-    }
+    })
 }
 
 /// Derive `Clone` for `input`.
@@ -51,7 +55,8 @@ pub fn derive_clone(input: &ast::Input) -> quote::Tokens {
                              .build()
                              .build();
 
-    if input.attrs.copy.is_some() && input.generics.ty_params.is_empty() {
+    let is_copy = input.attrs.rustc_copy_clone_marker() || input.attrs.copy.is_some();
+    if is_copy && input.generics.ty_params.is_empty() {
         quote! {
             #[allow(unused_qualifications)]
             impl #impl_generics #clone_trait_path for #ty #where_clause {
