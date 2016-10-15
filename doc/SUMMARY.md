@@ -1,12 +1,14 @@
 # Summary
 
 * [Overview](README.md)
-* [Debug trait](Debug.md)
+* [`Copy` and `Clone` traits](Clone.md)
+    * [Custom bound](Clone.md#custom-bound)
+* [`Debug` trait](Debug.md)
     * [Hiding fields](Debug.md#ignoring-a-field)
     * [Hiding newtypes](Debug.md#hiding-newtypes)
     * [Alternative format function](Debug.md#format-with)
     * [Custom bound](Debug.md#custom-bound)
-* [Default trait](Default.md)
+* [`Default` trait](Default.md)
     * [Default enumeration](Default.md#default-enumeration)
     * [Setting the value of a field](Default.md#setting-the-value-of-a-field)
     * [`new` function](Default.md#new-function)
