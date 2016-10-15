@@ -7,7 +7,7 @@ use utils;
 
 pub fn derive(input: &ast::Input) -> quote::Tokens {
     let body = matcher::Matcher::new(matcher::BindingStyle::Ref)
-        .build_arms(input, |arm_name, style, attrs, bis| {
+        .build_arms(input, |_, arm_name, style, attrs, bis| {
             let field_prints = bis.iter().filter_map(|bi| {
                 if bi.field.attrs.ignore_debug() {
                     return None;
@@ -47,8 +47,7 @@ pub fn derive(input: &ast::Input) -> quote::Tokens {
             };
             let method = syn::Ident::new(method);
 
-            let name = syn::parse_path(&arm_name.to_string().trim());
-            let name = name.unwrap().segments.last().unwrap().ident.to_string();
+            let name = arm_name.as_ref();
 
             if attrs.debug_transparent() {
                 quote! {

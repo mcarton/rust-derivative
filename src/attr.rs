@@ -3,6 +3,10 @@ use syn;
 /// Represent the `derivative` attributes on the input type (`struct`/`enum`).
 #[derive(Debug, Default)]
 pub struct Input {
+    /// Whether `Clone` is present and its specific attributes.
+    pub clone: Option<InputClone>,
+    /// Whether `Copy` is present and its specific attributes.
+    pub copy: Option<InputCopy>,
     /// Whether `Debug` is present and its specific attributes.
     pub debug: Option<InputDebug>,
     /// Whether `Default` is present and its specitif attributes.
@@ -16,6 +20,10 @@ pub struct Input {
 #[derive(Debug, Default)]
 /// Represent the `derivative` attributes on a field.
 pub struct Field {
+    /// The parameters for `Clone`.
+    clone: FieldClone,
+    /// The parameters for `Copy`.
+    copy_bound: Option<Vec<syn::WherePredicate>>,
     /// The parameters for `Debug`.
     debug: FieldDebug,
     /// The parameters for `Default`.
@@ -24,6 +32,22 @@ pub struct Field {
     eq_bound: Option<Vec<syn::WherePredicate>>,
     /// The parameters for `Eq`.
     partial_eq: FieldPartialEq,
+}
+
+#[derive(Debug, Default)]
+/// Represent the `derivative(Clone(…))` attributes on an input.
+pub struct InputClone {
+    /// The `bound` attribute if present and the corresponding bounds.
+    bounds: Option<Vec<syn::WherePredicate>>,
+    /// Whether the implementation should have an explicit `clone_from`.
+    pub clone_from: bool,
+}
+
+#[derive(Debug, Default)]
+/// Represent the `derivative(Clone(…))` attributes on an input.
+pub struct InputCopy {
+    /// The `bound` attribute if present and the corresponding bounds.
+    bounds: Option<Vec<syn::WherePredicate>>,
 }
 
 #[derive(Debug, Default)]
@@ -58,6 +82,13 @@ pub struct InputPartialEq {
     bounds: Option<Vec<syn::WherePredicate>>,
     /// Allow `derivative(PartialEq)` on enums:
     on_enum: bool,
+}
+
+#[derive(Debug, Default)]
+/// Represents the `derivarive(Clone(…))` attributes on a field.
+pub struct FieldClone {
+    /// The `bound` attribute if present and the corresponding bounds.
+    bounds: Option<Vec<syn::WherePredicate>>,
 }
 
 #[derive(Debug, Default)]
@@ -134,6 +165,23 @@ impl Input {
 
         for_all_attr! {
             for (name, values) in attrs;
+            "Clone" => {
+                match_attributes! {
+                    let Some(clone) = input.clone;
+                    for value in values;
+                    "bound" => try!(parse_bound(&mut clone.bounds, value)),
+                    "clone_from" => {
+                        clone.clone_from = try!(parse_boolean_meta_item(&value, true, "clone_from"));
+                    }
+                }
+            }
+            "Copy" => {
+                match_attributes! {
+                    let Some(copy) = input.copy;
+                    for value in values;
+                    "bound" => try!(parse_bound(&mut copy.bounds, value)),
+                }
+            }
             "Debug" => {
                 match_attributes! {
                     let Some(debug) = input.debug;
@@ -174,6 +222,14 @@ impl Input {
         }
 
         Ok(input)
+    }
+
+    pub fn clone_bound(&self) -> Option<&[syn::WherePredicate]> {
+        self.clone.as_ref().map_or(None, |d| d.bounds.as_ref().map(Vec::as_slice))
+    }
+
+    pub fn copy_bound(&self) -> Option<&[syn::WherePredicate]> {
+        self.copy.as_ref().map_or(None, |d| d.bounds.as_ref().map(Vec::as_slice))
     }
 
     pub fn debug_bound(&self) -> Option<&[syn::WherePredicate]> {
@@ -253,6 +309,14 @@ impl Field {
         }
 
         Ok(out)
+    }
+
+    pub fn clone_bound(&self) -> Option<&[syn::WherePredicate]> {
+        self.clone.bounds.as_ref().map(Vec::as_slice)
+    }
+
+    pub fn copy_bound(&self) -> Option<&[syn::WherePredicate]> {
+        self.copy_bound.as_ref().map(Vec::as_slice)
     }
 
     pub fn debug_bound(&self) -> Option<&[syn::WherePredicate]> {

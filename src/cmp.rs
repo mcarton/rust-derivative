@@ -45,10 +45,10 @@ pub fn derive_partial_eq(input: &ast::Input) -> Result<quote::Tokens, String> {
 
     let body = matcher::Matcher::new(matcher::BindingStyle::Ref)
         .with_name("__self".into())
-        .build_arms(input, |outer_arm_name, _style, _attrs, outer_bis| {
+        .build_arms(input, |_, outer_arm_name, _, _, outer_bis| {
             let body = matcher::Matcher::new(matcher::BindingStyle::Ref)
                 .with_name("__other".into())
-                .build_arms(input, |inner_arm_name, _style, _attrs, inner_bis| {
+                .build_arms(input, |_, inner_arm_name, _, _, inner_bis| {
                     if outer_arm_name == inner_arm_name {
                         let cmp = outer_bis.iter().zip(inner_bis).map(|(o, i)| {
                             let outer_name = &o.ident;

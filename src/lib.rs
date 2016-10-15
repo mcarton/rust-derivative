@@ -9,6 +9,7 @@ extern crate quote;
 mod ast;
 mod attr;
 mod bound;
+mod clone;
 mod cmp;
 mod debug;
 mod default;
@@ -20,6 +21,12 @@ use proc_macro::TokenStream;
 fn derive_impls(input: &ast::Input) -> Result<quote::Tokens, String> {
     let mut tokens = quote::Tokens::new();
 
+    if input.attrs.clone.is_some() {
+        tokens.append(&clone::derive_clone(input).to_string());
+    }
+    if input.attrs.copy.is_some() {
+        tokens.append(&clone::derive_copy(input).to_string());
+    }
     if input.attrs.debug.is_some() {
         tokens.append(&debug::derive(input).to_string());
     }

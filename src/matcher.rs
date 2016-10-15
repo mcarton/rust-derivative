@@ -67,7 +67,7 @@ impl Matcher {
     }
 
     pub fn build_arms<F>(self, input: &ast::Input, f: F) -> quote::Tokens
-    where F: Fn(&syn::Ident, ast::Style, &attr::Input, Vec<BindingInfo>) -> quote::Tokens
+    where F: Fn(syn::Path, &syn::Ident, ast::Style, &attr::Input, Vec<BindingInfo>) -> quote::Tokens
     {
         let ident = &input.ident;
         // Generate patterns for matching against all of the variants
@@ -76,26 +76,29 @@ impl Matcher {
                 variants.iter()
                     .map(|variant| {
                         let variant_ident = &variant.ident;
+                        let variant_path = syn::aster::path().ids(&[ident, variant_ident]).build();
+
                         let pat = self.build_match_pattern(
-                            &quote!(#ident :: #variant_ident),
+                            &variant_path,
                             variant.style,
                             &variant.fields
                         );
 
-                        (variant_ident, variant.style, &variant.attrs, pat)
+                        (variant_path, variant_ident, variant.style, &variant.attrs, pat)
                     })
                     .collect()
             }
             ast::Body::Struct(style, ref vd) => {
-                vec![(ident, style, &input.attrs, self.build_match_pattern(ident, style, vd))]
+                let path = syn::aster::path().id(ident).build();
+                vec![(path, ident, style, &input.attrs, self.build_match_pattern(ident, style, vd))]
             },
         };
 
         // Now that we have the patterns, generate the actual branches of the match
         // expression
         let mut t = quote::Tokens::new();
-        for (name, style, attrs, (pat, bindings)) in variants {
-            let body = f(name, style, attrs, bindings);
+        for (path, name, style, attrs, (pat, bindings)) in variants {
+            let body = f(path, name, style, attrs, bindings);
             quote!(#pat => { #body }).to_tokens(&mut t);
         }
 
@@ -150,4 +153,3 @@ impl Matcher {
         (t, matches)
     }
 }
-
