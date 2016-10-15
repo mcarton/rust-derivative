@@ -66,14 +66,18 @@ pub fn derive_clone(input: &ast::Input) -> quote::Tokens {
                 let field_clones = bis.iter().map(|bi| {
                     let arg = &bi.ident;
 
+                    let clone = if let Some(clone_with) = bi.field.attrs.clone_with() {
+                        quote!(#clone_with(#arg))
+                    } else {
+                        quote!(#arg.clone())
+                    };
+
                     if let Some(ref name) = bi.field.ident {
                         quote! {
-                            #name: #arg.clone()
+                            #name: #clone
                         }
                     } else {
-                        quote! {
-                            #arg.clone()
-                        }
+                        clone
                     }
                 });
 
@@ -99,6 +103,64 @@ pub fn derive_clone(input: &ast::Input) -> quote::Tokens {
             }
         );
 
+        let clone_from = if input.attrs.clone_from() {
+            Some(matcher::Matcher::new(matcher::BindingStyle::RefMut)
+                .build_arms(input, |outer_arm_path, _, _, _, outer_bis| {
+                    let body = matcher::Matcher::new(matcher::BindingStyle::Ref)
+                        .with_name("__other".into())
+                        .build_arms(input, |inner_arm_path, _, _, _, inner_bis| {
+                            if outer_arm_path == inner_arm_path {
+                                let field_clones =
+                                    outer_bis
+                                        .iter()
+                                        .zip(inner_bis)
+                                        .map(|(outer_bi, inner_bi)| {
+                                    let outer = &outer_bi.ident;
+                                    let inner = &inner_bi.ident;
+
+                                    quote!(#outer.clone_from(#inner);)
+                                });
+
+                                quote! {
+                                    #(#field_clones)*
+                                    return;
+                                }
+                            } else {
+                                quote!()
+                            }
+                        });
+
+                    quote! {
+                        match *other {
+                            #body
+                        }
+                    }
+                })
+            )
+        } else {
+            None
+        };
+
+        let clone_from = clone_from.map(|body| {
+            // Enumerations are only cloned-from if both variants are the same.
+            // If they are different, fallback to normal cloning.
+            let fallback = if let ast::Body::Enum(_) = input.body {
+                Some(quote!(*self = other.clone();))
+            } else {
+                None
+            };
+
+            quote! {
+                fn clone_from(&mut self, other: &Self) {
+                    match *self {
+                        #body
+                    }
+
+                    #fallback
+                }
+            }
+        });
+
         quote! {
             #[allow(unused_qualifications)]
             impl #impl_generics #clone_trait_path for #ty #where_clause {
@@ -107,6 +169,8 @@ pub fn derive_clone(input: &ast::Input) -> quote::Tokens {
                         #body
                     }
                 }
+
+                #clone_from
             }
         }
     }

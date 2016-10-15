@@ -89,6 +89,8 @@ pub struct InputPartialEq {
 pub struct FieldClone {
     /// The `bound` attribute if present and the corresponding bounds.
     bounds: Option<Vec<syn::WherePredicate>>,
+    /// The `clone_with` attribute if present and the path to the clonning function.
+    clone_with: Option<syn::Path>,
 }
 
 #[derive(Debug, Default)]
@@ -116,7 +118,7 @@ pub struct FieldDefault {
 pub struct FieldPartialEq {
     /// The `bound` attribute if present and the corresponding bounds.
     bounds: Option<Vec<syn::WherePredicate>>,
-    /// The `compare_with` attribute if present and the path to the formatting function.
+    /// The `compare_with` attribute if present and the path to the comparison function.
     compare_with: Option<syn::Path>,
     /// Whether the field is to be ignored when comparing.
     ignore: bool,
@@ -228,6 +230,10 @@ impl Input {
         self.clone.as_ref().map_or(None, |d| d.bounds.as_ref().map(Vec::as_slice))
     }
 
+    pub fn clone_from(&self) -> bool {
+        self.clone.as_ref().map_or(false, |d| d.clone_from)
+    }
+
     pub fn copy_bound(&self) -> Option<&[syn::WherePredicate]> {
         self.copy.as_ref().map_or(None, |d| d.bounds.as_ref().map(Vec::as_slice))
     }
@@ -264,6 +270,16 @@ impl Field {
 
         for_all_attr! {
             for (name, values) in field.attrs;
+            "Clone" => {
+                match_attributes! {
+                    for value in values;
+                    "bound" => try!(parse_bound(&mut out.clone.bounds, value)),
+                    "clone_with" => {
+                        let path = try!(value.ok_or_else(|| "`clone_with` needs a value".to_string()));
+                        out.clone.clone_with = Some(try!(syn::parse_path(path)));
+                    }
+                }
+            }
             "Debug" => {
                 match_attributes! {
                     for value in values;
@@ -313,6 +329,10 @@ impl Field {
 
     pub fn clone_bound(&self) -> Option<&[syn::WherePredicate]> {
         self.clone.bounds.as_ref().map(Vec::as_slice)
+    }
+
+    pub fn clone_with(&self) -> Option<&syn::Path> {
+        self.clone.clone_with.as_ref()
     }
 
     pub fn copy_bound(&self) -> Option<&[syn::WherePredicate]> {
