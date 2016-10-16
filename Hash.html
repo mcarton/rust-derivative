@@ -4,7 +4,7 @@
     <head>
         <meta charset="UTF-8">
         <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
-        <title>Copy and Clone traits · Derivative</title>
+        <title>Hash trait · Derivative</title>
         <meta http-equiv="X-UA-Compatible" content="IE=edge" />
         <meta name="description" content="">
         <meta name="generator" content="GitBook 3.2.2">
@@ -63,10 +63,10 @@
     <link rel="shortcut icon" href="gitbook/images/favicon.ico" type="image/x-icon">
 
     
-    <link rel="next" href="Clone.html" />
+    <link rel="next" href="Hash.html" />
     
     
-    <link rel="prev" href="./" />
+    <link rel="prev" href="Default.html" />
     
 
     </head>
@@ -104,7 +104,7 @@
             
         </li>
     
-        <li class="chapter active" data-level="1.2" data-path="Clone.html">
+        <li class="chapter " data-level="1.2" data-path="Clone.html">
             
                 <a href="Clone.html">
             
@@ -291,7 +291,7 @@
             
         </li>
     
-        <li class="chapter " data-level="1.5" data-path="Hash.html">
+        <li class="chapter active" data-level="1.5" data-path="Hash.html">
             
                 <a href="Hash.html">
             
@@ -450,7 +450,7 @@
     <!-- Title -->
     <h1>
         <i class="fa fa-circle-o-notch fa-spin"></i>
-        <a href="." >Copy and Clone traits</a>
+        <a href="." >Hash trait</a>
     </h1>
 </div>
 
@@ -463,36 +463,56 @@
                                 <section class="normal markdown-section">
                                 
                                 <h1 id="custom-attributes"><a name="custom-attributes" class="plugin-anchor" href="#custom-attributes"><i class="fa fa-link" aria-hidden="true"></i></a>Custom attributes</h1>
-<p>The <code>Copy</code> and <code>Clone</code> traits support the following attributes:</p>
+<p>The <code>Hash</code> trait supports the following attributes:</p>
 <h2 id="container-attributes"><a name="container-attributes" class="plugin-anchor" href="#container-attributes"><i class="fa fa-link" aria-hidden="true"></i></a>Container attributes</h2>
 <ul>
-<li><a href="#custom-bound"><code>&lt;Copy or Clone&gt;(bound=&quot;&lt;where-clause or empty&gt;&quot;)</code></a></li>
-<li><a href="#clone-from"><code>Clone(clone_from=&quot;true&quot;)</code></a></li>
+<li><a href="#custom-bound"><code>Hash(bound=&quot;&lt;where-clause or empty&gt;&quot;)</code></a></li>
 </ul>
 <h2 id="field-attributes"><a name="field-attributes" class="plugin-anchor" href="#field-attributes"><i class="fa fa-link" aria-hidden="true"></i></a>Field attributes</h2>
 <ul>
-<li><a href="#custom-bound"><code>&lt;Copy or Clone&gt;(bound=&quot;&lt;where-clause or empty&gt;&quot;)</code></a></li>
+<li><a href="#custom-bound"><code>Hash(bound=&quot;&lt;where-clause or empty&gt;&quot;)</code></a></li>
+<li><a href="#hash-with"><code>Hash(format_with=&quot;&lt;path&gt;&quot;)</code></a></li>
+<li><a href="#ignoring-a-field"><code>Hash=&quot;ignore&quot;</code></a></li>
 </ul>
-<h1 id="clonefrom"><a name="clonefrom" class="plugin-anchor" href="#clonefrom"><i class="fa fa-link" aria-hidden="true"></i></a><a id="clone-from"> <code>clone_from</code></a></h1>
-<p>The <a href="https://doc.rust-lang.org/std/clone/trait.Clone.html" target="_blank"><code>Clone</code></a> trait has a default implementation for <a href="https://doc.rust-lang.org/std/clone/trait.Clone.html#method.clone_from" target="_blank"><code>clone_from</code></a> and
-<code>derive(Clone)</code> never implements that method. <em>derivative</em> can implement it if
-asked explicitly.</p>
-<p>Note that while the generated implementation is good for structures, it might
-not be very efficient for enumerations. What it does is check if both <code>self</code>
-and the clone-from value have the same variant, if they have, use <code>clone_from</code>
-on the members, otherwise fallback to <code>*self = other.clone();</code>. Ask yourself if
-you really need this.</p>
-<h1 id="custom-bound"><a name="custom-bound" class="plugin-anchor" href="#custom-bound"><i class="fa fa-link" aria-hidden="true"></i></a>Custom bound</h1>
-<p>As most other traits, <code>Copy</code> and <code>Debug</code> support a custom bound on container
-and fields. See <a href="Debug.html#custom-bound"><code>Debug</code>&apos;s documentation</a> for more
-information.</p>
+<h1 id="ignoring-a-field"><a name="ignoring-a-field" class="plugin-anchor" href="#ignoring-a-field"><i class="fa fa-link" aria-hidden="true"></i></a>Ignoring a field</h1>
+<p>You can use <em>derivative</em> to ignore fields from a <code>Hash</code> implementation:</p>
+<pre><code class="lang-rust"><span class="hljs-meta">#[derive(Derivative)]</span>
+<span class="hljs-meta">#[derivative(Hash)]</span>
+<span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">Foo</span></span> {
+    foo: <span class="hljs-keyword">u8</span>,
+    <span class="hljs-meta">#[derivative(Hash=<span class="hljs-meta-string">&quot;ignore&quot;</span>)]</span>
+    bar: <span class="hljs-keyword">i32</span>,
+}
+
+<span class="hljs-meta">#[derive(Hash)]</span>
+<span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">Bar</span></span> {
+    foo: <span class="hljs-keyword">u8</span>,
+}
+
+<span class="hljs-built_in">assert_eq!</span>(hash(Foo { foo: <span class="hljs-number">42</span>, bar: -<span class="hljs-number">1337</span> }), hash(Bar { foo: <span class="hljs-number">42</span> }));
+</code></pre>
+<h1 id="hash-with"><a name="hash-with" class="plugin-anchor" href="#hash-with"><i class="fa fa-link" aria-hidden="true"></i></a>Hash with</h1>
+<p>You can pass a field to a hash function:</p>
+<pre><code class="lang-rust"><span class="hljs-meta">#[derive(Derivative)]</span>
+<span class="hljs-meta">#[derivative(Hash)]</span>
+<span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">Foo</span></span> {
+    foo: <span class="hljs-keyword">u32</span>,
+    <span class="hljs-meta">#[derivative(Hash(hash_with=<span class="hljs-meta-string">&quot;path::to::my_hash_fn&quot;</span>))]</span>
+    bar: SomeTypeThatMightNotBeHash,
+}
+</code></pre>
+<p>The field <code>bar</code> will be hashed with <code>path::to::my_hash_fn(&amp;bar, &amp;mut state)</code>
+where <code>state</code> is the current <a href="https://doc.rust-lang.org/std/hash/trait.Hasher.html" target="_blank"><code>Hasher</code></a>.</p>
+<p>The function must the following prototype:</p>
+<pre><code class="lang-rust"><span class="hljs-function"><span class="hljs-keyword">fn</span> <span class="hljs-title">my_hash_fn</span></span>&lt;H&gt;(&amp;T, state: &amp;<span class="hljs-keyword">mut</span> H) <span class="hljs-keyword">where</span> H: Hasher;
+</code></pre>
 <h1 id="limitations"><a name="limitations" class="plugin-anchor" href="#limitations"><i class="fa fa-link" aria-hidden="true"></i></a>Limitations</h1>
-<p><em>rustc</em> can optimize <code>derive(Clone, Copy)</code> to generate faster, smaller code.
-So does <em>derivative</em>. But <em>rustc</em> does not know about <code>derivative(Copy)</code> and
-would not optimize <code>#[derivative(Copy)] #[derive(Clone)]</code>.
-To avoid that issue, you should avoid deriving <code>Clone</code> using <em>rustc</em>&apos;s default
-<code>derive</code> and <code>Copy</code> using <code>derivative</code>. <em>derivative</em> will error if it detects
-that, but can&apos;t always do it.</p>
+<p>On structure, <code>derivative(Hash)</code> will produce the same hash as <code>derive(Hash)</code>.
+On unions however, it will produces the same hashes <em>only for unitary
+variants</em>!</p>
+<h1 id="custom-bound"><a name="custom-bound" class="plugin-anchor" href="#custom-bound"><i class="fa fa-link" aria-hidden="true"></i></a>Custom bound</h1>
+<p>As most other traits, <code>Hash</code> supports a custom bound on container and fields.
+See <a href="Debug.html#custom-bound"><code>Debug</code>&apos;s documentation</a> for more information.</p>
 
                                 
                                 </section>
@@ -504,12 +524,12 @@ that, but can&apos;t always do it.</p>
 
             
                 
-                <a href="./" class="navigation navigation-prev " aria-label="Previous page: Overview">
+                <a href="Default.html#custom-bound" class="navigation navigation-prev " aria-label="Previous page: Custom bound">
                     <i class="fa fa-angle-left"></i>
                 </a>
                 
                 
-                <a href="Clone.html#clone-from" class="navigation navigation-next " aria-label="Next page: clone_from">
+                <a href="Hash.html#ignoring-a-field" class="navigation navigation-next " aria-label="Next page: Hiding fields">
                     <i class="fa fa-angle-right"></i>
                 </a>
                 
@@ -520,7 +540,7 @@ that, but can&apos;t always do it.</p>
     <script>
         var gitbook = gitbook || [];
         gitbook.push(function() {
-            gitbook.page.hasChanged({"page":{"title":"Copy and Clone traits","level":"1.2","depth":1,"next":{"title":"clone_from","level":"1.2.1","depth":2,"anchor":"#clone-from","path":"Clone.md","ref":"Clone.md#clone-from","articles":[]},"previous":{"title":"Overview","level":"1.1","depth":1,"path":"README.md","ref":"README.md","articles":[]},"dir":"ltr"},"config":{"plugins":["-search","-sharing","codeblock-filename","edit-link","anchors"],"root":"doc","styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"pluginsConfig":{"edit-link":{"label":"Edit","base":"https://github.com/mcarton/rust-derivative/tree/master/doc"},"codeblock-filename":{},"anchors":{},"highlight":{},"lunr":{"maxIndexSize":1000000,"ignoreSpecialCharacters":false},"fontsettings":{"theme":"white","family":"sans","size":2},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false}},"theme":"default","pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"variables":{},"title":"Derivative","language":"en","gitbook":"*"},"file":{"path":"Clone.md","mtime":"2016-10-15T21:41:41.498Z","type":"markdown"},"gitbook":{"version":"3.2.2","time":"2016-10-16T18:30:28.225Z"},"basePath":".","book":{"language":""}});
+            gitbook.page.hasChanged({"page":{"title":"Hash trait","level":"1.5","depth":1,"next":{"title":"Hiding fields","level":"1.5.1","depth":2,"anchor":"#ignoring-a-field","path":"Hash.md","ref":"Hash.md#ignoring-a-field","articles":[]},"previous":{"title":"Custom bound","level":"1.4.4","depth":2,"anchor":"#custom-bound","path":"Default.md","ref":"Default.md#custom-bound","articles":[]},"dir":"ltr"},"config":{"plugins":["-search","-sharing","codeblock-filename","edit-link","anchors"],"root":"doc","styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"pluginsConfig":{"edit-link":{"label":"Edit","base":"https://github.com/mcarton/rust-derivative/tree/master/doc"},"codeblock-filename":{},"anchors":{},"highlight":{},"lunr":{"maxIndexSize":1000000,"ignoreSpecialCharacters":false},"fontsettings":{"theme":"white","family":"sans","size":2},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false}},"theme":"default","pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"variables":{},"title":"Derivative","language":"en","gitbook":"*"},"file":{"path":"Hash.md","mtime":"2016-10-16T18:29:06.115Z","type":"markdown"},"gitbook":{"version":"3.2.2","time":"2016-10-16T18:30:28.225Z"},"basePath":".","book":{"language":""}});
         });
     </script>
 </div>
