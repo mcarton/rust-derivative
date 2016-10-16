@@ -73,3 +73,16 @@ pub fn build_impl_generics<F, G, H>(
         }
     }
 }
+
+/// Construct a name for the inner type parameter that can't collide with any
+/// type parameters of the item. This is achieved by starting with a base and
+/// then concatenating the names of all other type parameters.
+pub fn hygienic_type_parameter(item: &ast::Input, base: &str) -> syn::Ident {
+    let mut typaram = String::from(base);
+
+    for ty in &item.generics.ty_params {
+        typaram.push_str(&ty.ident.as_ref());
+    }
+
+    syn::Ident::new(typaram)
+}

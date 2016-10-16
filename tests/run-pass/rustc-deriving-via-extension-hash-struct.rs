@@ -1,4 +1,4 @@
-// Copyright 2013-2014 The Rust Project Developers. See the COPYRIGHT
+// Copyright 2012-2014 The Rust Project Developers. See the COPYRIGHT
 // file at the top-level directory of this distribution and at
 // http://rust-lang.org/COPYRIGHT.
 //
@@ -15,24 +15,12 @@
 #[macro_use]
 extern crate derivative;
 
-use std::hash::{Hash, SipHasher};
-
-// testing multiple separate deriving attributes
 #[derive(Derivative)]
-#[derivative(PartialEq)]
-#[derivative(Clone)]
 #[derivative(Hash)]
 struct Foo {
-    bar: usize,
-    baz: isize
+    x: isize,
+    y: isize,
+    z: isize
 }
 
-fn hash<T: Hash>(_t: &T) {}
-
-pub fn main() {
-    let a = Foo {bar: 4, baz: -3};
-
-    a == a;    // check for PartialEq impl w/o testing its correctness
-    a.clone(); // check for Clone impl w/o testing its correctness
-    hash(&a);  // check for Hash impl w/o testing its correctness
-}
+pub fn main() {}

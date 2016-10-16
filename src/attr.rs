@@ -13,6 +13,8 @@ pub struct Input {
     pub default: Option<InputDefault>,
     /// Whether `Eq` is present and its specitif attributes.
     pub eq: Option<InputEq>,
+    /// Whether `Hash` is present and its specific attributes.
+    pub hash: Option<InputHash>,
     /// Whether `Eq` is present and its specitif attributes.
     pub partial_eq: Option<InputPartialEq>,
 }
@@ -30,6 +32,8 @@ pub struct Field {
     default: FieldDefault,
     /// The parameters for `Eq`.
     eq_bound: Option<Vec<syn::WherePredicate>>,
+    /// The parameters for `Hash`.
+    hash: FieldHash,
     /// The parameters for `Eq`.
     partial_eq: FieldPartialEq,
 }
@@ -80,6 +84,13 @@ pub struct InputEq {
 }
 
 #[derive(Debug, Default)]
+/// Represent the `derivative(Hash(…))` attributes on an input.
+pub struct InputHash {
+    /// The `bound` attribute if present and the corresponding bounds.
+    bounds: Option<Vec<syn::WherePredicate>>,
+}
+
+#[derive(Debug, Default)]
 /// Represent the `derivative(PartialEq(…))` attributes on an input.
 pub struct InputPartialEq {
     /// The `bound` attribute if present and the corresponding bounds.
@@ -115,6 +126,17 @@ pub struct FieldDefault {
     bounds: Option<Vec<syn::WherePredicate>>,
     /// The default value for the field if present.
     pub value: Option<syn::Expr>,
+}
+
+#[derive(Debug, Default)]
+/// Represents the `derivarive(Hash(…))` attributes on a field.
+pub struct FieldHash {
+    /// The `bound` attribute if present and the corresponding bounds.
+    bounds: Option<Vec<syn::WherePredicate>>,
+    /// The `hash_with` attribute if present and the path to the hashing function.
+    hash_with: Option<syn::Path>,
+    /// Whether the field is to be ignored when hashing.
+    ignore: bool,
 }
 
 #[derive(Debug, Default)]
@@ -174,7 +196,6 @@ impl Input {
             "Clone" => {
                 let mut clone = input.clone.take().unwrap_or_default();
 
-                println!("{:?}", attrs);
                 clone.rustc_copy_clone_marker = attrs
                     .iter()
                     .any(|attr| attr.value.name() == "rustc_copy_clone_marker");
@@ -234,6 +255,13 @@ impl Input {
                     "bound" => try!(parse_bound(&mut eq.bounds, value)),
                 }
             }
+            "Hash" => {
+                match_attributes! {
+                    let Some(hash) = input.hash;
+                    for value in values;
+                    "bound" => try!(parse_bound(&mut hash.bounds, value)),
+                }
+            }
             "PartialEq" => {
                 match_attributes! {
                     let Some(partial_eq) = input.partial_eq;
@@ -279,6 +307,10 @@ impl Input {
 
     pub fn eq_bound(&self) -> Option<&[syn::WherePredicate]> {
         self.eq.as_ref().map_or(None, |d| d.bounds.as_ref().map(Vec::as_slice))
+    }
+
+    pub fn hash_bound(&self) -> Option<&[syn::WherePredicate]> {
+        self.hash.as_ref().map_or(None, |d| d.bounds.as_ref().map(Vec::as_slice))
     }
 
     pub fn rustc_copy_clone_marker(&self) -> bool {
@@ -340,6 +372,19 @@ impl Field {
                     "bound" => try!(parse_bound(&mut out.eq_bound, value)),
                 }
             }
+            "Hash" => {
+                match_attributes! {
+                    for value in values;
+                    "bound" => try!(parse_bound(&mut out.hash.bounds, value)),
+                    "hash_with" => {
+                        let path = try!(value.ok_or_else(|| "`hash_with` needs a value".to_string()));
+                        out.hash.hash_with = Some(try!(syn::parse_path(path)));
+                    }
+                    "ignore" => {
+                        out.hash.ignore = try!(parse_boolean_meta_item(&value, true, "ignore"));
+                    }
+                }
+            }
             "PartialEq" => {
                 match_attributes! {
                     for value in values;
@@ -382,6 +427,10 @@ impl Field {
         self.debug.ignore
     }
 
+    pub fn ignore_hash(&self) -> bool {
+        self.hash.ignore
+    }
+
     pub fn default_bound(&self) -> Option<&[syn::WherePredicate]> {
         self.default.bounds.as_ref().map(Vec::as_slice)
     }
@@ -392,6 +441,14 @@ impl Field {
 
     pub fn eq_bound(&self) -> Option<&[syn::WherePredicate]> {
         self.eq_bound.as_ref().map(Vec::as_slice)
+    }
+
+    pub fn hash_bound(&self) -> Option<&[syn::WherePredicate]> {
+        self.hash.bounds.as_ref().map(Vec::as_slice)
+    }
+
+    pub fn hash_with(&self) -> Option<&syn::Path> {
+        self.hash.hash_with.as_ref()
     }
 
     pub fn partial_eq_bound(&self) -> Option<&[syn::WherePredicate]> {

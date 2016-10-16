@@ -17,11 +17,8 @@ extern crate derivative;
 
 use std::hash::{Hash, SipHasher};
 
-// testing multiple separate deriving attributes
 #[derive(Derivative)]
-#[derivative(PartialEq)]
-#[derivative(Clone)]
-#[derivative(Hash)]
+#[derivative(PartialEq, Clone, Hash)]
 struct Foo {
     bar: usize,
     baz: isize

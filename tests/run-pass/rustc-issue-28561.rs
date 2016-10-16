@@ -14,8 +14,8 @@
 extern crate derivative;
 
 #[derive(Derivative)]
-#[derivative(Debug, Default, Eq, PartialEq)]
-// TODO: Hash, Ord, PartialOrd
+#[derivative(Debug, Default, Eq, Hash, PartialEq)]
+// TODO: Ord, PartialOrd
 struct Array<T> {
     f00: [T; 00],
     f01: [T; 01],
@@ -92,8 +92,8 @@ struct CopyArray<T: Copy> {
 }
 
 #[derive(Derivative)]
-#[derivative(Clone, Copy, Debug, Eq, PartialEq)]
-// TODO: Hash, Ord, PartialOrd
+#[derivative(Clone, Copy, Debug, Eq, Hash, PartialEq)]
+// TODO: Ord, PartialOrd
 struct Fn<A, B, C, D, E, F, G, H, I, J, K, L> {
     f00: fn(),
     f01: fn(A),
@@ -111,8 +111,8 @@ struct Fn<A, B, C, D, E, F, G, H, I, J, K, L> {
 }
 
 #[derive(Derivative)]
-#[derivative(Clone, Copy, Debug, Default, Eq, PartialEq)]
-// TODO: Hash, Ord, PartialOrd
+#[derivative(Clone, Copy, Debug, Default, Eq, Hash, PartialEq)]
+// TODO: Ord, PartialOrd
 struct Tuple<A, B, C, D, E, F, G, H, I, J, K, L> {
     f00: (),
     f01: (A),

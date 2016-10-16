@@ -13,6 +13,7 @@ mod clone;
 mod cmp;
 mod debug;
 mod default;
+mod hash;
 mod matcher;
 mod utils;
 
@@ -35,6 +36,9 @@ fn derive_impls(input: &ast::Input) -> Result<quote::Tokens, String> {
     }
     if input.attrs.eq.is_some() {
         tokens.append(&cmp::derive_eq(input).to_string());
+    }
+    if input.attrs.hash.is_some() {
+        tokens.append(&hash::derive(input).to_string());
     }
     if input.attrs.partial_eq.is_some() {
         tokens.append(&try!(cmp::derive_partial_eq(input)).to_string());

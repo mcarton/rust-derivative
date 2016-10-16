@@ -2,6 +2,7 @@
 
 * [Overview](README.md)
 * [`Copy` and `Clone` traits](Clone.md)
+    * [`clone_from`](Clone.md#clone-from)
     * [Custom bound](Clone.md#custom-bound)
 * [`Debug` trait](Debug.md)
     * [Hiding fields](Debug.md#ignoring-a-field)
@@ -13,6 +14,10 @@
     * [Setting the value of a field](Default.md#setting-the-value-of-a-field)
     * [`new` function](Default.md#new-function)
     * [Custom bound](Default.md#custom-bound)
+* [`Hash` trait](Hash.md)
+    * [Hiding fields](Hash.md#ignoring-a-field)
+    * [Alternative hash function](Debug.md#hash-with)
+    * [Custom bound](Hash.md#custom-bound)
 * [Comparison traits](cmp.md)
     * [Note about enumerations](cmp.md#enumerations)
     * [Ignoring fields](cmp.md#ignoring-a-field)
