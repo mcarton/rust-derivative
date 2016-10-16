@@ -23,11 +23,12 @@ pub fn derive_copy(input: &ast::Input) -> Result<quote::Tokens, String> {
     );
     let where_clause = &impl_generics.where_clause;
 
-    let ty = syn::aster::ty().path()
-                             .segment(name.clone())
-                             .with_generics(impl_generics.clone())
-                             .build()
-                             .build();
+    let ty = syn::aster::ty()
+        .path()
+        .segment(name.clone())
+        .with_generics(impl_generics.clone())
+        .build()
+        .build();
 
     Ok(quote! {
         #[allow(unused_qualifications)]
@@ -49,11 +50,12 @@ pub fn derive_clone(input: &ast::Input) -> quote::Tokens {
     );
     let where_clause = &impl_generics.where_clause;
 
-    let ty = syn::aster::ty().path()
-                             .segment(name.clone())
-                             .with_generics(impl_generics.clone())
-                             .build()
-                             .build();
+    let ty = syn::aster::ty()
+        .path()
+        .segment(name.clone())
+        .with_generics(impl_generics.clone())
+        .build()
+        .build();
 
     let is_copy = input.attrs.rustc_copy_clone_marker() || input.attrs.copy.is_some();
     if is_copy && input.generics.ty_params.is_empty() {
@@ -105,8 +107,7 @@ pub fn derive_clone(input: &ast::Input) -> quote::Tokens {
                         }
                     }
                 }
-            }
-        );
+            });
 
         let clone_from = if input.attrs.clone_from() {
             Some(matcher::Matcher::new(matcher::BindingStyle::RefMut)
@@ -115,16 +116,15 @@ pub fn derive_clone(input: &ast::Input) -> quote::Tokens {
                         .with_name("__other".into())
                         .build_arms(input, |inner_arm_path, _, _, _, inner_bis| {
                             if outer_arm_path == inner_arm_path {
-                                let field_clones =
-                                    outer_bis
-                                        .iter()
-                                        .zip(inner_bis)
-                                        .map(|(outer_bi, inner_bi)| {
-                                    let outer = &outer_bi.ident;
-                                    let inner = &inner_bi.ident;
+                                let field_clones = outer_bis
+                                    .iter()
+                                    .zip(inner_bis)
+                                    .map(|(outer_bi, inner_bi)| {
+                                        let outer = &outer_bi.ident;
+                                        let inner = &inner_bi.ident;
 
-                                    quote!(#outer.clone_from(#inner);)
-                                });
+                                        quote!(#outer.clone_from(#inner);)
+                                    });
 
                                 quote! {
                                     #(#field_clones)*

@@ -9,9 +9,9 @@
 use ast;
 use attr;
 use quote;
-use syn;
 
 use quote::ToTokens;
+use syn;
 
 /// The type of binding to use when generating a pattern.
 #[derive(Debug, Copy, Clone)]
@@ -60,10 +60,7 @@ impl Matcher {
     }
 
     pub fn with_name(self, name: String) -> Self {
-        Matcher {
-            binding_name: name,
-            ..self
-        }
+        Matcher { binding_name: name, ..self }
     }
 
     pub fn build_arms<F>(self, input: &ast::Input, f: F) -> quote::Tokens
@@ -91,7 +88,7 @@ impl Matcher {
             ast::Body::Struct(style, ref vd) => {
                 let path = syn::aster::path().id(ident).build();
                 vec![(path, ident, style, &input.attrs, self.build_match_pattern(ident, style, vd))]
-            },
+            }
         };
 
         // Now that we have the patterns, generate the actual branches of the match

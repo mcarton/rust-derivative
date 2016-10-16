@@ -20,11 +20,12 @@ pub fn derive_eq(input: &ast::Input) -> quote::Tokens {
     );
     let where_clause = &impl_generics.where_clause;
 
-    let ty = syn::aster::ty().path()
-                             .segment(name.clone())
-                             .with_generics(impl_generics.clone())
-                             .build()
-                             .build();
+    let ty = syn::aster::ty()
+        .path()
+        .segment(name.clone())
+        .with_generics(impl_generics.clone())
+        .build()
+        .build();
 
     quote! {
         #[allow(unused_qualifications)]
@@ -67,16 +68,14 @@ pub fn derive_partial_eq(input: &ast::Input) -> Result<quote::Tokens, String> {
                     } else {
                         quote!(false)
                     }
-                }
-            );
+                });
 
             quote! {
                 match *other {
                     #body
                 }
             }
-        }
-    );
+        });
 
     let name = &input.ident;
 
@@ -90,11 +89,12 @@ pub fn derive_partial_eq(input: &ast::Input) -> Result<quote::Tokens, String> {
     );
     let where_clause = &impl_generics.where_clause;
 
-    let ty = syn::aster::ty().path()
-                             .segment(name.clone())
-                             .with_generics(impl_generics.clone())
-                             .build()
-                             .build();
+    let ty = syn::aster::ty()
+        .path()
+        .segment(name.clone())
+        .with_generics(impl_generics.clone())
+        .build()
+        .build();
 
     Ok(quote! {
         #[allow(unused_qualifications)]

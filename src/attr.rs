@@ -452,9 +452,7 @@ fn read_items(item: &syn::MetaItem) -> Result<MetaItem, String> {
 /// Filter the `derivative` items from an attribute.
 fn derivative_attribute(attr: &syn::Attribute) -> Option<&[syn::MetaItem]> {
     match attr.value {
-        syn::MetaItem::List(ref name, ref mis) if name == "derivative" => {
-            Some(mis)
-        }
+        syn::MetaItem::List(ref name, ref mis) if name == "derivative" => Some(mis),
         syn::MetaItem::Word(..) |
         syn::MetaItem::NameValue(..) |
         syn::MetaItem::List(..) => None,

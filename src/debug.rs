@@ -60,8 +60,7 @@ pub fn derive(input: &ast::Input) -> quote::Tokens {
                     builder.finish()
                 }
             }
-        }
-    );
+        });
 
     let name = &input.ident;
 
@@ -75,11 +74,12 @@ pub fn derive(input: &ast::Input) -> quote::Tokens {
     );
     let where_clause = &impl_generics.where_clause;
 
-    let ty = syn::aster::ty().path()
-                             .segment(name.clone())
-                             .with_generics(impl_generics.clone())
-                             .build()
-                             .build();
+    let ty = syn::aster::ty()
+        .path()
+        .segment(name.clone())
+        .with_generics(impl_generics.clone())
+        .build()
+        .build();
 
     quote! {
         #[allow(unused_qualifications)]
@@ -117,13 +117,12 @@ fn format_with(
     generics.lifetimes.push(syn::LifetimeDef::new("'_derivative"));
     for ty in &generics.ty_params {
         let path = aster::path::PathBuilder::new().id(&ty.ident).build();
-        generics.where_clause.predicates.push(syn::WherePredicate::BoundPredicate(
-            syn::WhereBoundPredicate {
+        generics.where_clause.predicates
+            .push(syn::WherePredicate::BoundPredicate(syn::WhereBoundPredicate {
                 bound_lifetimes: vec![],
                 bounded_ty: syn::Ty::Path(None, path),
                 bounds: vec![syn::TyParamBound::Region(syn::Lifetime::new("'_derivative"))],
-            }
-        ));
+            }));
     }
 
     let (impl_generics, ty_generics, where_clause) = generics.split_for_impl();

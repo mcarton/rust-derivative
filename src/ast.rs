@@ -69,9 +69,7 @@ impl<'a> Body<'a> {
                     .flat_map(|variant| variant.fields.iter())
                     .collect()
             }
-            Body::Struct(_, ref fields) => {
-                fields.iter().collect()
-            }
+            Body::Struct(_, ref fields) => fields.iter().collect(),
         }
     }
 }

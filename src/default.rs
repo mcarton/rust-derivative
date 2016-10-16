@@ -56,11 +56,12 @@ pub fn derive(input: &ast::Input, default: &attr::InputDefault) -> quote::Tokens
     );
     let where_clause = &impl_generics.where_clause;
 
-    let ty = syn::aster::ty().path()
-                             .segment(name.clone())
-                             .with_generics(impl_generics.clone())
-                             .build()
-                             .build();
+    let ty = syn::aster::ty()
+        .path()
+        .segment(name.clone())
+        .with_generics(impl_generics.clone())
+        .build()
+        .build();
 
     let body = match input.body {
         ast::Body::Enum(ref data) => {

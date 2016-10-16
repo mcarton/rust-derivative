@@ -23,12 +23,11 @@ use syn::{self, aster, visit};
 /// allowed here".
 pub fn without_defaults(generics: &syn::Generics) -> syn::Generics {
     syn::Generics {
-        ty_params: generics.ty_params.iter().map(|ty_param| {
-            syn::TyParam {
-                default: None,
-                .. ty_param.clone()
-            }}).collect(),
-        .. generics.clone()
+        ty_params: generics.ty_params
+            .iter()
+            .map(|ty_param| syn::TyParam { default: None, ..ty_param.clone() })
+            .collect(),
+        ..generics.clone()
     }
 }
 
@@ -108,7 +107,8 @@ pub fn with_bound<F>(
         }
     }
 
-    let all_ty_params: HashSet<_> = generics.ty_params.iter()
+    let all_ty_params: HashSet<_> = generics.ty_params
+        .iter()
         .map(|ty_param| ty_param.ident.clone())
         .collect();
 
@@ -127,17 +127,17 @@ pub fn with_bound<F>(
     }
 
     aster::from_generics(generics.clone())
-        .with_predicates(
-            generics.ty_params
-                .iter()
-                .map(|ty_param| ty_param.ident.clone())
-                .filter(|id| visitor.relevant_ty_params.contains(id))
-                .map(|id| aster::where_predicate()
+        .with_predicates(generics.ty_params
+            .iter()
+            .map(|ty_param| ty_param.ident.clone())
+            .filter(|id| visitor.relevant_ty_params.contains(id))
+            .map(|id| {
+                aster::where_predicate()
                     // the type parameter that is being bounded e.g. `T`
                     .bound().build(aster::ty().id(id))
                     // the bound e.g. `Debug`
                     .bound().trait_(bound.clone()).build()
-                    .build())
-        )
+                    .build()
+            }))
         .build()
 }

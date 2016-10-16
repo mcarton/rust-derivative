@@ -17,11 +17,12 @@ pub fn derivative_attribute(attr: &syn::Attribute) -> Option<&[syn::MetaItem]> {
 pub fn remove_derivative_attrs(input: &mut syn::MacroInput) {
     fn remove_from_vec(attrs: &mut Vec<syn::Attribute>) {
         attrs.retain(|attr| derivative_attribute(attr).is_none());
-     }
+    }
 
     fn remove_from_variant_data(vd: &mut syn::VariantData) {
         match *vd {
-            syn::VariantData::Struct(ref mut fields) | syn::VariantData::Tuple(ref mut fields) => {
+            syn::VariantData::Struct(ref mut fields) |
+            syn::VariantData::Tuple(ref mut fields) => {
                 for field in fields {
                     remove_from_vec(&mut field.attrs);
                 }
