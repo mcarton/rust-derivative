@@ -464,23 +464,27 @@
                                 
                                 <h1 id="custom-attributes"><a name="custom-attributes" class="plugin-anchor" href="#custom-attributes"><i class="fa fa-link" aria-hidden="true"></i></a>Custom attributes</h1>
 <p>The <code>Eq</code> and <code>PartialEq</code> traits support the following attributes:</p>
-<h2 id="container-attributes"><a name="container-attributes" class="plugin-anchor" href="#container-attributes"><i class="fa fa-link" aria-hidden="true"></i></a>Container attributes</h2>
 <ul>
-<li><a href="#custom-bound"><code>Trait(bound=&quot;&lt;where-clause or empty&gt;&quot;)</code></a></li>
+<li><strong>Container attributes</strong><ul>
+<li><a href="#custom-bound"><code>&lt;Trait&gt;(bound=&quot;&lt;where-clause or empty&gt;&quot;)</code></a></li>
 </ul>
-<h2 id="field-attributes"><a name="field-attributes" class="plugin-anchor" href="#field-attributes"><i class="fa fa-link" aria-hidden="true"></i></a>Field attributes</h2>
-<ul>
-<li><a href="#custom-bound"><code>Trait(bound=&quot;&lt;where-clause or empty&gt;&quot;)</code></a></li>
+</li>
+<li><strong>Field attributes</strong><ul>
+<li><a href="#custom-bound"><code>&lt;Trait&gt;(bound=&quot;&lt;where-clause or empty&gt;&quot;)</code></a></li>
 </ul>
-<p>The <code>Partial</code> trait also supports the following attributes:</p>
-<h2 id="container-attributes"><a name="container-attributes" class="plugin-anchor" href="#container-attributes"><i class="fa fa-link" aria-hidden="true"></i></a>Container attributes</h2>
+</li>
+</ul>
+<p>The <code>PartialEq</code> trait also supports the following attributes:</p>
 <ul>
+<li><strong>Container attributes</strong><ul>
 <li><a href="#enumerations"><code>PartialEq=&quot;feature_allow_slow_enum&quot;</code></a></li>
 </ul>
-<h2 id="field-attributes"><a name="field-attributes" class="plugin-anchor" href="#field-attributes"><i class="fa fa-link" aria-hidden="true"></i></a>Field attributes</h2>
-<ul>
+</li>
+<li><strong>Field attributes</strong><ul>
 <li><a href="#ignoring-a-field"><code>PartialEq=&quot;ignore&quot;</code></a></li>
 <li><a href="#compare-with"><code>PartialEq(compare_with=&quot;&lt;path&gt;&quot;)</code></a></li>
+</ul>
+</li>
 </ul>
 <h1 id="enumerations"><a name="enumerations" class="plugin-anchor" href="#enumerations"><i class="fa fa-link" aria-hidden="true"></i></a>Enumerations</h1>
 <p>Unfortunatelly, there is no way for derivative to derive <code>PartialEq</code> on
@@ -558,7 +562,7 @@ use:</p>
     <script>
         var gitbook = gitbook || [];
         gitbook.push(function() {
-            gitbook.page.hasChanged({"page":{"title":"Comparison traits","level":"1.6","depth":1,"next":{"title":"Note about enumerations","level":"1.6.1","depth":2,"anchor":"#enumerations","path":"cmp.md","ref":"cmp.md#enumerations","articles":[]},"previous":{"title":"Custom bound","level":"1.5.3","depth":2,"anchor":"#custom-bound","path":"Hash.md","ref":"Hash.md#custom-bound","articles":[]},"dir":"ltr"},"config":{"plugins":["-search","-sharing","codeblock-filename","edit-link","anchors"],"root":"doc","styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"pluginsConfig":{"edit-link":{"label":"Edit","base":"https://github.com/mcarton/rust-derivative/tree/master/doc"},"codeblock-filename":{},"anchors":{},"highlight":{},"lunr":{"maxIndexSize":1000000,"ignoreSpecialCharacters":false},"fontsettings":{"theme":"white","family":"sans","size":2},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false}},"theme":"default","pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"variables":{},"title":"Derivative","language":"en","gitbook":"*"},"file":{"path":"cmp.md","mtime":"2016-10-12T22:11:44.004Z","type":"markdown"},"gitbook":{"version":"3.2.2","time":"2016-10-16T18:30:28.225Z"},"basePath":".","book":{"language":""}});
+            gitbook.page.hasChanged({"page":{"title":"Comparison traits","level":"1.6","depth":1,"next":{"title":"Note about enumerations","level":"1.6.1","depth":2,"anchor":"#enumerations","path":"cmp.md","ref":"cmp.md#enumerations","articles":[]},"previous":{"title":"Custom bound","level":"1.5.3","depth":2,"anchor":"#custom-bound","path":"Hash.md","ref":"Hash.md#custom-bound","articles":[]},"dir":"ltr"},"config":{"plugins":["-search","-sharing","codeblock-filename","edit-link","anchors"],"root":"doc","styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"pluginsConfig":{"edit-link":{"label":"Edit","base":"https://github.com/mcarton/rust-derivative/tree/master/doc"},"codeblock-filename":{},"anchors":{},"highlight":{},"lunr":{"maxIndexSize":1000000,"ignoreSpecialCharacters":false},"fontsettings":{"theme":"white","family":"sans","size":2},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false}},"theme":"default","pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"variables":{},"title":"Derivative","language":"en","gitbook":"*"},"file":{"path":"cmp.md","mtime":"2016-10-17T20:55:15.774Z","type":"markdown"},"gitbook":{"version":"3.2.2","time":"2016-10-17T20:58:52.816Z"},"basePath":".","book":{"language":""}});
         });
     </script>
 </div>

@@ -464,20 +464,22 @@
                                 
                                 <h1 id="custom-attributes"><a name="custom-attributes" class="plugin-anchor" href="#custom-attributes"><i class="fa fa-link" aria-hidden="true"></i></a>Custom attributes</h1>
 <p>The <code>Debug</code> trait supports the following attributes:</p>
-<h2 id="container-attributes"><a name="container-attributes" class="plugin-anchor" href="#container-attributes"><i class="fa fa-link" aria-hidden="true"></i></a>Container attributes</h2>
 <ul>
+<li><strong>Container attributes</strong><ul>
 <li><a href="#custom-bound"><code>Debug(bound=&quot;&lt;where-clause or empty&gt;&quot;)</code></a></li>
 <li><a href="#hiding-newtypes"><code>Debug=&quot;transparent&quot;</code></a></li>
 </ul>
-<h2 id="variant-attributes"><a name="variant-attributes" class="plugin-anchor" href="#variant-attributes"><i class="fa fa-link" aria-hidden="true"></i></a>Variant attributes</h2>
-<ul>
+</li>
+<li><strong>Variant attributes</strong><ul>
 <li><a href="#hiding-newtypes"><code>Debug=&quot;transparent&quot;</code></a></li>
 </ul>
-<h2 id="field-attributes"><a name="field-attributes" class="plugin-anchor" href="#field-attributes"><i class="fa fa-link" aria-hidden="true"></i></a>Field attributes</h2>
-<ul>
+</li>
+<li><strong>Field attributes</strong><ul>
 <li><a href="#custom-bound"><code>Debug(bound=&quot;&lt;where-clause or empty&gt;&quot;)</code></a></li>
 <li><a href="#format-with"><code>Debug(format_with=&quot;&lt;path&gt;&quot;)</code></a></li>
 <li><a href="#ignoring-a-field"><code>Debug=&quot;ignore&quot;</code></a></li>
+</ul>
+</li>
 </ul>
 <h1 id="ignoring-a-field"><a name="ignoring-a-field" class="plugin-anchor" href="#ignoring-a-field"><i class="fa fa-link" aria-hidden="true"></i></a>Ignoring a field</h1>
 <p>You can use <em>derivative</em> to hide fields from a structure or enumeration <code>Debug</code>
@@ -582,7 +584,7 @@ if your type contains a <code>Foo&lt;T&gt;</code> that is <code>Debug</code> eve
     <script>
         var gitbook = gitbook || [];
         gitbook.push(function() {
-            gitbook.page.hasChanged({"page":{"title":"Debug trait","level":"1.3","depth":1,"next":{"title":"Hiding fields","level":"1.3.1","depth":2,"anchor":"#ignoring-a-field","path":"Debug.md","ref":"Debug.md#ignoring-a-field","articles":[]},"previous":{"title":"Custom bound","level":"1.2.2","depth":2,"anchor":"#custom-bound","path":"Clone.md","ref":"Clone.md#custom-bound","articles":[]},"dir":"ltr"},"config":{"plugins":["-search","-sharing","codeblock-filename","edit-link","anchors"],"root":"doc","styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"pluginsConfig":{"edit-link":{"label":"Edit","base":"https://github.com/mcarton/rust-derivative/tree/master/doc"},"codeblock-filename":{},"anchors":{},"highlight":{},"lunr":{"maxIndexSize":1000000,"ignoreSpecialCharacters":false},"fontsettings":{"theme":"white","family":"sans","size":2},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false}},"theme":"default","pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"variables":{},"title":"Derivative","language":"en","gitbook":"*"},"file":{"path":"Debug.md","mtime":"2016-10-15T13:38:36.120Z","type":"markdown"},"gitbook":{"version":"3.2.2","time":"2016-10-16T18:30:28.225Z"},"basePath":".","book":{"language":""}});
+            gitbook.page.hasChanged({"page":{"title":"Debug trait","level":"1.3","depth":1,"next":{"title":"Hiding fields","level":"1.3.1","depth":2,"anchor":"#ignoring-a-field","path":"Debug.md","ref":"Debug.md#ignoring-a-field","articles":[]},"previous":{"title":"Custom bound","level":"1.2.2","depth":2,"anchor":"#custom-bound","path":"Clone.md","ref":"Clone.md#custom-bound","articles":[]},"dir":"ltr"},"config":{"plugins":["-search","-sharing","codeblock-filename","edit-link","anchors"],"root":"doc","styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"pluginsConfig":{"edit-link":{"label":"Edit","base":"https://github.com/mcarton/rust-derivative/tree/master/doc"},"codeblock-filename":{},"anchors":{},"highlight":{},"lunr":{"maxIndexSize":1000000,"ignoreSpecialCharacters":false},"fontsettings":{"theme":"white","family":"sans","size":2},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false}},"theme":"default","pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"variables":{},"title":"Derivative","language":"en","gitbook":"*"},"file":{"path":"Debug.md","mtime":"2016-10-17T20:27:14.289Z","type":"markdown"},"gitbook":{"version":"3.2.2","time":"2016-10-17T20:58:52.816Z"},"basePath":".","book":{"language":""}});
         });
     </script>
 </div>
