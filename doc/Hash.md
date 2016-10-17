@@ -1,13 +1,12 @@
 # Custom attributes
 The `Hash` trait supports the following attributes:
 
-## Container attributes
-* [`Hash(bound="<where-clause or empty>")`](#custom-bound)
-
-## Field attributes
-* [`Hash(bound="<where-clause or empty>")`](#custom-bound)
-* [`Hash(format_with="<path>")`](#hash-with)
-* [`Hash="ignore"`](#ignoring-a-field)
+* **Container attributes**
+    * [`Hash(bound="<where-clause or empty>")`](#custom-bound)
+* **Field attributes**
+    * [`Hash(bound="<where-clause or empty>")`](#custom-bound)
+    * [`Hash(format_with="<path>")`](#hash-with)
+    * [`Hash="ignore"`](#ignoring-a-field)
 
 # Ignoring a field
 

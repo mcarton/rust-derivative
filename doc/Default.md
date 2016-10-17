@@ -1,16 +1,14 @@
 # Custom attributes
 The `Default` trait supports the following attributes:
 
-## Container attributes
-* [`Default(bound="<where-clause or empty>")`](#custom-bound)
-* [`Default="new"`](#new-function)
-
-## Variant attributes
-* [`Default`](#default-enumeration)
-
-## Field attributes
-* [`Default(bound="<where-clause or empty>")`](#custom-bound)
-* [`Default(value="<expr>")`](#ignoring-a-field)
+* **Container attributes**
+    * [`Default(bound="<where-clause or empty>")`](#custom-bound)
+    * [`Default="new"`](#new-function)
+* **Variant attributes**
+    * [`Default`](#default-enumeration)
+* **Field attributes**
+    * [`Default(bound="<where-clause or empty>")`](#custom-bound)
+    * [`Default(value="<expr>")`](#ignoring-a-field)
 
 # Default enumeration
 

@@ -2,12 +2,11 @@
 
 The `Copy` and `Clone` traits support the following attributes:
 
-## Container attributes
-* [`<Copy or Clone>(bound="<where-clause or empty>")`](#custom-bound)
-* [`Clone(clone_from="true")`](#clone-from)
-
-## Field attributes
-* [`<Copy or Clone>(bound="<where-clause or empty>")`](#custom-bound)
+* **Container attributes**
+    * [`<Copy or Clone>(bound="<where-clause or empty>")`](#custom-bound)
+    * [`Clone(clone_from="true")`](#clone-from)
+* **Field attributes**
+    * [`<Copy or Clone>(bound="<where-clause or empty>")`](#custom-bound)
 
 # <a id="clone-from"/> `clone_from`
 

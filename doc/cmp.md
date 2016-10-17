@@ -1,20 +1,18 @@
 # Custom attributes
 The `Eq` and `PartialEq` traits support the following attributes:
 
-## Container attributes
-* [`Trait(bound="<where-clause or empty>")`](#custom-bound)
+* **Container attributes**
+    * [`<Trait>(bound="<where-clause or empty>")`](#custom-bound)
+* **Field attributes**
+    * [`<Trait>(bound="<where-clause or empty>")`](#custom-bound)
 
-## Field attributes
-* [`Trait(bound="<where-clause or empty>")`](#custom-bound)
+The `PartialEq` trait also supports the following attributes:
 
-The `Partial` trait also supports the following attributes:
-
-## Container attributes
-* [`PartialEq="feature_allow_slow_enum"`](#enumerations)
-
-## Field attributes
-* [`PartialEq="ignore"`](#ignoring-a-field)
-* [`PartialEq(compare_with="<path>")`](#compare-with)
+* **Container attributes**
+    * [`PartialEq="feature_allow_slow_enum"`](#enumerations)
+* **Field attributes**
+    * [`PartialEq="ignore"`](#ignoring-a-field)
+    * [`PartialEq(compare_with="<path>")`](#compare-with)
 
 # Enumerations
 
