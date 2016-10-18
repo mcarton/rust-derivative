@@ -17,10 +17,6 @@
     
             
                 
-                <link rel="stylesheet" href="gitbook/gitbook-plugin-codeblock-filename/block.css">
-                
-            
-                
                 <link rel="stylesheet" href="gitbook/gitbook-plugin-anchors/plugin.css">
                 
             
@@ -308,7 +304,7 @@
                 <a href="Hash.html#ignoring-a-field">
             
                     
-                    Hiding fields
+                    Ignoring fields
             
                 </a>
             
@@ -466,6 +462,206 @@
 <p>This crate is not stable yet and the attributes might change at any time.</p>
 <p>For now the crate only works on nightly but it uses <em>rustc</em>&apos;s Macros 1.1 and is
 meant to be usable on stable as soon as it is possible.</p>
+<h2 id="examples"><a name="examples" class="plugin-anchor" href="#examples"><i class="fa fa-link" aria-hidden="true"></i></a>Examples</h2>
+<p><em>derivative</em> uses attributes to make it possible to derive more implementations
+than the built-in <code>derive(Trait)</code>. Here are a few examples of stuffs you cannot
+just <code>derive</code>.</p>
+<p>You can derive <code>Default</code> on enumerations:</p>
+<table>
+<thead>
+<tr>
+<th>With <em>derivative</em></th>
+<th><a href="https://github.com/rust-lang/rust/blob/16eeeac783d2ede28e09f2a433c612dea309fe33/src/libcore/option.rs#L714-L718" target="_blank">Original</a></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><pre><code class="lang-rs"><span class="hljs-meta">#[derive(Derivative)]</span>
+<span class="hljs-meta">#[derivative(Default(bound=<span class="hljs-meta-string">&quot;&quot;</span>))]</span>
+<span class="hljs-keyword">pub</span> <span class="hljs-class"><span class="hljs-keyword">enum</span> <span class="hljs-title">Option</span></span>&lt;T&gt; {
+    <span class="hljs-meta">#[derivative(Default)]</span>
+    <span class="hljs-comment">/// No value</span>
+    <span class="hljs-literal">None</span>,
+    <span class="hljs-comment">/// Some value `T`</span>
+    <span class="hljs-literal">Some</span>(T),
+}
+</code></pre></td>
+<td><pre><code class="lang-rs"><span class="hljs-keyword">pub</span> <span class="hljs-class"><span class="hljs-keyword">enum</span> <span class="hljs-title">Option</span></span>&lt;T&gt; {
+    <span class="hljs-comment">/// No value</span>
+    <span class="hljs-literal">None</span>,
+    <span class="hljs-comment">/// Some value `T`</span>
+    <span class="hljs-literal">Some</span>(T),
+}
+
+<span class="hljs-keyword">impl</span>&lt;T&gt; <span class="hljs-built_in">Default</span> <span class="hljs-keyword">for</span> <span class="hljs-built_in">Option</span>&lt;T&gt; {
+    <span class="hljs-comment">/// Returns None.</span>
+    <span class="hljs-meta">#[inline]</span>
+    <span class="hljs-function"><span class="hljs-keyword">fn</span> <span class="hljs-title">default</span></span>() -&gt; <span class="hljs-built_in">Option</span>&lt;T&gt; {
+        <span class="hljs-literal">None</span>
+    }
+}
+</code></pre></td>
+</tr>
+</tbody>
+</table>
+<p>You can use different default values for some fields:</p>
+<table>
+<thead>
+<tr>
+<th>With <em>derivative</em></th>
+<th><a href="https://github.com/rust-lang-nursery/regex/blob/3cfef1e79d135a3e8a670aff53e7fabef453a3e1/src/re_builder.rs#L12-L39" target="_blank">Original</a></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><pre><code class="lang-rs"><span class="hljs-meta">#[derive(Derivative)]</span>
+<span class="hljs-meta">#[derivative(Default)]</span>
+<span class="hljs-keyword">pub</span> <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">RegexOptions</span></span> {
+    <span class="hljs-keyword">pub</span> pats: <span class="hljs-built_in">Vec</span>&lt;<span class="hljs-built_in">String</span>&gt;,
+    <span class="hljs-meta">#[derivative(Default(value=<span class="hljs-meta-string">&quot;10 * (1&lt;&lt;20)&quot;</span>))]</span>
+    <span class="hljs-keyword">pub</span> size_limit: usize,
+    <span class="hljs-meta">#[derivative(Default(value=<span class="hljs-meta-string">&quot;2 * (1&lt;&lt;20)&quot;</span>))]</span>
+    <span class="hljs-keyword">pub</span> dfa_size_limit: usize,
+    <span class="hljs-keyword">pub</span> case_insensitive: <span class="hljs-keyword">bool</span>,
+    <span class="hljs-keyword">pub</span> multi_line: <span class="hljs-keyword">bool</span>,
+    <span class="hljs-keyword">pub</span> dot_matches_new_line: <span class="hljs-keyword">bool</span>,
+    <span class="hljs-keyword">pub</span> swap_greed: <span class="hljs-keyword">bool</span>,
+    <span class="hljs-keyword">pub</span> ignore_whitespace: <span class="hljs-keyword">bool</span>,
+    <span class="hljs-meta">#[derivative(Default(value=<span class="hljs-meta-string">&quot;true&quot;</span>))]</span>
+    <span class="hljs-keyword">pub</span> unicode: <span class="hljs-keyword">bool</span>,
+}
+</code></pre></td>
+<td><pre><code class="lang-rs"><span class="hljs-meta">#[derive(Default)]</span>
+<span class="hljs-keyword">pub</span> <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">RegexOptions</span></span> {
+    <span class="hljs-keyword">pub</span> pats: <span class="hljs-built_in">Vec</span>&lt;<span class="hljs-built_in">String</span>&gt;,
+    <span class="hljs-keyword">pub</span> size_limit: usize,
+    <span class="hljs-keyword">pub</span> dfa_size_limit: usize,
+    <span class="hljs-keyword">pub</span> case_insensitive: <span class="hljs-keyword">bool</span>,
+    <span class="hljs-keyword">pub</span> multi_line: <span class="hljs-keyword">bool</span>,
+    <span class="hljs-keyword">pub</span> dot_matches_new_line: <span class="hljs-keyword">bool</span>,
+    <span class="hljs-keyword">pub</span> swap_greed: <span class="hljs-keyword">bool</span>,
+    <span class="hljs-keyword">pub</span> ignore_whitespace: <span class="hljs-keyword">bool</span>,
+    <span class="hljs-keyword">pub</span> unicode: <span class="hljs-keyword">bool</span>,
+}
+
+<span class="hljs-keyword">impl</span> <span class="hljs-built_in">Default</span> <span class="hljs-keyword">for</span> RegexOptions {
+    <span class="hljs-function"><span class="hljs-keyword">fn</span> <span class="hljs-title">default</span></span>() -&gt; <span class="hljs-keyword">Self</span> {
+        RegexOptions {
+            pats: <span class="hljs-built_in">vec!</span>[],
+            size_limit: <span class="hljs-number">10</span> * (<span class="hljs-number">1</span>&lt;&lt;<span class="hljs-number">20</span>),
+            dfa_size_limit: <span class="hljs-number">2</span> * (<span class="hljs-number">1</span>&lt;&lt;<span class="hljs-number">20</span>),
+            case_insensitive: <span class="hljs-literal">false</span>,
+            multi_line: <span class="hljs-literal">false</span>,
+            dot_matches_new_line: <span class="hljs-literal">false</span>,
+            swap_greed: <span class="hljs-literal">false</span>,
+            ignore_whitespace: <span class="hljs-literal">false</span>,
+            unicode: <span class="hljs-literal">true</span>,
+        }
+    }
+}
+</code></pre></td>
+</tr>
+</tbody>
+</table>
+<p>Want a transparent <code>Debug</code> implementation for your wrapper? We got that:</p>
+<table>
+<thead>
+<tr>
+<th>With <em>derivative</em></th>
+<th><a href="https://github.com/rust-lang/rust/blob/5457c35ece57bbc4a65baff239a02d6abb81c8a2/src/libcore/num/mod.rs#L46-L54" target="_blank">Original</a></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><pre><code class="lang-rs"><span class="hljs-meta">#[derive(Derivative)]</span>
+<span class="hljs-meta">#[derivative(Debug=<span class="hljs-meta-string">&quot;transparent&quot;</span>)]</span>
+<span class="hljs-keyword">pub</span> <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">Wrapping</span></span>&lt;T&gt;(<span class="hljs-keyword">pub</span> T);
+</code></pre></td>
+<td><pre><code class="lang-rs"><span class="hljs-keyword">pub</span> <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">Wrapping</span></span>&lt;T&gt;(<span class="hljs-keyword">pub</span> T);
+
+<span class="hljs-keyword">impl</span>&lt;T: fmt::Debug&gt; fmt::Debug <span class="hljs-keyword">for</span> Wrapping&lt;T&gt; {
+    <span class="hljs-function"><span class="hljs-keyword">fn</span> <span class="hljs-title">fmt</span></span>(&amp;<span class="hljs-keyword">self</span>, f: &amp;<span class="hljs-keyword">mut</span> fmt::Formatter) -&gt; fmt::<span class="hljs-built_in">Result</span> {
+        <span class="hljs-keyword">self</span>.<span class="hljs-number">0</span>.fmt(f)
+    }
+}
+</code></pre></td>
+</tr>
+</tbody>
+</table>
+<p>Need to ignore a field? We got that too:</p>
+<table>
+<thead>
+<tr>
+<th>With <em>derivative</em></th>
+<th><a href="https://github.com/steveklabnik/semver/blob/baa0fbb57c80a7fb344fbeedac24a28439ddf5b5/src/version.rs#L196-L205" target="_blank">Original</a></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><pre><code class="lang-rs"><span class="hljs-meta">#[derive(Derivative)]</span>
+<span class="hljs-meta">#[derivative(PartialEq, Hash)]</span>
+<span class="hljs-keyword">pub</span> <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">Version</span></span> {
+    <span class="hljs-comment">/// The major version.</span>
+    <span class="hljs-keyword">pub</span> major: <span class="hljs-keyword">u64</span>,
+    <span class="hljs-comment">/// The minor version.</span>
+    <span class="hljs-keyword">pub</span> minor: <span class="hljs-keyword">u64</span>,
+    <span class="hljs-comment">/// The patch version.</span>
+    <span class="hljs-keyword">pub</span> patch: <span class="hljs-keyword">u64</span>,
+    <span class="hljs-comment">/// The pre-release version identifier.</span>
+    <span class="hljs-keyword">pub</span> pre: <span class="hljs-built_in">Vec</span>&lt;Identifier&gt;,
+    <span class="hljs-comment">// We should ignore build metadata</span>
+    <span class="hljs-comment">// here, otherwise versions v1 and</span>
+    <span class="hljs-comment">// v2 can exist such that !(v1 &lt; v2)</span>
+    <span class="hljs-comment">// &amp;&amp; !(v1 &gt; v2) &amp;&amp; v1 != v2, which</span>
+    <span class="hljs-comment">// violate strict total ordering rules.</span>
+    <span class="hljs-meta">#[derivative(PartialEq=<span class="hljs-meta-string">&quot;ignore&quot;</span>)]</span>
+    <span class="hljs-meta">#[derivative(Hash=<span class="hljs-meta-string">&quot;ignore&quot;</span>)]</span>
+    <span class="hljs-comment">/// The build metadata, ignored when</span>
+    <span class="hljs-comment">/// determining version precedence.</span>
+    <span class="hljs-keyword">pub</span> build: <span class="hljs-built_in">Vec</span>&lt;Identifier&gt;,
+}
+</code></pre></td>
+<td><pre><code class="lang-rs"><span class="hljs-keyword">pub</span> <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">Version</span></span> {
+    <span class="hljs-comment">/// The major version.</span>
+    <span class="hljs-keyword">pub</span> major: <span class="hljs-keyword">u64</span>,
+    <span class="hljs-comment">/// The minor version.</span>
+    <span class="hljs-keyword">pub</span> minor: <span class="hljs-keyword">u64</span>,
+    <span class="hljs-comment">/// The patch version.</span>
+    <span class="hljs-keyword">pub</span> patch: <span class="hljs-keyword">u64</span>,
+    <span class="hljs-comment">/// The pre-release version identifier.</span>
+    <span class="hljs-keyword">pub</span> pre: <span class="hljs-built_in">Vec</span>&lt;Identifier&gt;,
+    <span class="hljs-comment">/// The build metadata, ignored when</span>
+    <span class="hljs-comment">/// determining version precedence.</span>
+    <span class="hljs-keyword">pub</span> build: <span class="hljs-built_in">Vec</span>&lt;Identifier&gt;,
+}
+
+<span class="hljs-keyword">impl</span> cmp::<span class="hljs-built_in">PartialEq</span> <span class="hljs-keyword">for</span> Version {
+    <span class="hljs-meta">#[inline]</span>
+    <span class="hljs-function"><span class="hljs-keyword">fn</span> <span class="hljs-title">eq</span></span>(&amp;<span class="hljs-keyword">self</span>, other: &amp;Version) -&gt; <span class="hljs-keyword">bool</span> {
+        <span class="hljs-comment">// We should ignore build metadata</span>
+        <span class="hljs-comment">// here, otherwise versions v1 and</span>
+        <span class="hljs-comment">// v2 can exist such that !(v1 &lt; v2)</span>
+        <span class="hljs-comment">// &amp;&amp; !(v1 &gt; v2) &amp;&amp; v1 != v2, which</span>
+        <span class="hljs-comment">// violate strict total ordering rules.</span>
+        <span class="hljs-keyword">self</span>.major == other.major &amp;&amp;
+        <span class="hljs-keyword">self</span>.minor == other.minor &amp;&amp;
+        <span class="hljs-keyword">self</span>.patch == other.patch &amp;&amp;
+        <span class="hljs-keyword">self</span>.pre == other.pre
+    }
+}
+
+<span class="hljs-keyword">impl</span> hash::Hash <span class="hljs-keyword">for</span> Version {
+    <span class="hljs-function"><span class="hljs-keyword">fn</span> <span class="hljs-title">hash</span></span>&lt;H: hash::Hasher&gt;(&amp;<span class="hljs-keyword">self</span>, into: &amp;<span class="hljs-keyword">mut</span> H) {
+        <span class="hljs-keyword">self</span>.major.hash(into);
+        <span class="hljs-keyword">self</span>.minor.hash(into);
+        <span class="hljs-keyword">self</span>.patch.hash(into);
+        <span class="hljs-keyword">self</span>.pre.hash(into);
+    }
+}
+</code></pre></td>
+</tr>
+</tbody>
+</table>
 
                                 
                                 </section>
@@ -489,7 +685,7 @@ meant to be usable on stable as soon as it is possible.</p>
     <script>
         var gitbook = gitbook || [];
         gitbook.push(function() {
-            gitbook.page.hasChanged({"page":{"title":"Overview","level":"1.1","depth":1,"next":{"title":"Copy and Clone traits","level":"1.2","depth":1,"path":"Clone.md","ref":"Clone.md","articles":[{"title":"clone_from","level":"1.2.1","depth":2,"anchor":"#clone-from","path":"Clone.md","ref":"Clone.md#clone-from","articles":[]},{"title":"Custom bound","level":"1.2.2","depth":2,"anchor":"#custom-bound","path":"Clone.md","ref":"Clone.md#custom-bound","articles":[]}]},"dir":"ltr"},"config":{"plugins":["-search","-sharing","codeblock-filename","edit-link","anchors"],"root":"doc","styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"pluginsConfig":{"edit-link":{"label":"Edit","base":"https://github.com/mcarton/rust-derivative/tree/master/doc"},"codeblock-filename":{},"anchors":{},"highlight":{},"lunr":{"maxIndexSize":1000000,"ignoreSpecialCharacters":false},"fontsettings":{"theme":"white","family":"sans","size":2},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false}},"theme":"default","pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"variables":{},"title":"Derivative","language":"en","gitbook":"*"},"file":{"path":"README.md","mtime":"2016-10-07T21:40:35.395Z","type":"markdown"},"gitbook":{"version":"3.2.2","time":"2016-10-18T18:13:52.860Z"},"basePath":".","book":{"language":""}});
+            gitbook.page.hasChanged({"page":{"title":"Overview","level":"1.1","depth":1,"next":{"title":"Copy and Clone traits","level":"1.2","depth":1,"path":"Clone.md","ref":"Clone.md","articles":[{"title":"clone_from","level":"1.2.1","depth":2,"anchor":"#clone-from","path":"Clone.md","ref":"Clone.md#clone-from","articles":[]},{"title":"Custom bound","level":"1.2.2","depth":2,"anchor":"#custom-bound","path":"Clone.md","ref":"Clone.md#custom-bound","articles":[]}]},"dir":"ltr"},"config":{"plugins":["-search","-sharing","codesnippet","edit-link","anchors"],"root":"doc","styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"pluginsConfig":{"edit-link":{"label":"Edit","base":"https://github.com/mcarton/rust-derivative/tree/master/doc"},"codesnippet":{},"anchors":{},"highlight":{},"lunr":{"maxIndexSize":1000000,"ignoreSpecialCharacters":false},"fontsettings":{"theme":"white","family":"sans","size":2},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false}},"theme":"default","pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"variables":{},"title":"Derivative","language":"en","gitbook":"*"},"file":{"path":"README.md","mtime":"2016-10-18T22:50:18.674Z","type":"markdown"},"gitbook":{"version":"3.2.2","time":"2016-10-18T22:57:45.046Z"},"basePath":".","book":{"language":""}});
         });
     </script>
 </div>
