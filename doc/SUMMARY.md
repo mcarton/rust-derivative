@@ -15,7 +15,7 @@
     * [`new` function](Default.md#new-function)
     * [Custom bound](Default.md#custom-bound)
 * [`Hash` trait](Hash.md)
-    * [Hiding fields](Hash.md#ignoring-a-field)
+    * [Ignoring fields](Hash.md#ignoring-a-field)
     * [Alternative hash function](Debug.md#hash-with)
     * [Custom bound](Hash.md#custom-bound)
 * [Comparison traits](cmp.md)
