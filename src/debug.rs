@@ -110,9 +110,10 @@ fn format_with(
 ) -> quote::Tokens {
     let debug_trait_path = debug_trait_path();
 
-    generics.where_clause.predicates.extend(f.attrs.debug_bound().unwrap_or(&[]).iter().cloned());
+    let ctor_generics = generics.clone();
+    let (_, ctor_ty_generics, _) = ctor_generics.split_for_impl();
 
-    let (_, ctor_generics, _) = generics.split_for_impl();
+    generics.where_clause.predicates.extend(f.attrs.debug_bound().unwrap_or(&[]).iter().cloned());
 
     generics.lifetimes.push(syn::LifetimeDef::new("'_derivative"));
     for ty in &generics.ty_params {
@@ -129,7 +130,8 @@ fn format_with(
 
     let ty = f.ty;
 
-    let phantom = &ty_generics.ty_params;
+    // Leave off the type parameter bounds, defaults, and attributes
+    let phantom = generics.ty_params.iter().map(|tp| &tp.ident);
 
     quote!(
         let #arg_n = {
@@ -141,7 +143,7 @@ fn format_with(
                 }
             }
 
-            Dummy:: #ctor_generics (#arg_n, ::std::marker::PhantomData)
+            Dummy:: #ctor_ty_generics (#arg_n, ::std::marker::PhantomData)
         };
     )
 }

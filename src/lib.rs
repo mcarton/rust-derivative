@@ -50,15 +50,9 @@ fn derive_impls(input: &ast::Input) -> Result<quote::Tokens, String> {
 #[cfg_attr(not(test), proc_macro_derive(Derivative, attributes(derivative)))]
 pub fn derivative(input: TokenStream) -> TokenStream {
     fn detail(input: TokenStream) -> Result<TokenStream, String> {
-        let mut input = try!(syn::parse_macro_input(&input.to_string()));
-        let output = {
-            let parsed = try!(ast::Input::from_ast(&input));
-
-            try!(derive_impls(&parsed))
-        };
-
-        utils::remove_derivative_attrs(&mut input);
-
+        let input = try!(syn::parse_macro_input(&input.to_string()));
+        let parsed = try!(ast::Input::from_ast(&input));
+        let output = try!(derive_impls(&parsed));
         Ok(output.to_string().parse().unwrap())
     }
 
