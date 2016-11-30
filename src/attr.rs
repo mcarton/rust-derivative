@@ -215,7 +215,13 @@ impl Input {
 
                 for attr in attrs {
                     if let syn::MetaItem::List(ref name, ref traits) = attr.value {
-                        if name == "derive" && traits.iter().any(|mi| mi.name() == "Clone") {
+                        fn is_clone(elem: &syn::NestedMetaItem) -> bool {
+                            match *elem {
+                                syn::NestedMetaItem::MetaItem(ref mi) => mi.name() == "Clone",
+                                syn::NestedMetaItem::Literal(..) => false,
+                            }
+                        }
+                        if name == "derive" && traits.iter().any(is_clone) {
                             copy.derives_clone = true;
                         }
                     }
@@ -474,7 +480,13 @@ impl Field {
 struct MetaItem<'a>(&'a str, Vec<(&'a str, Option<&'a str>)>);
 
 /// Parse an arbitrary item for our limited `MetaItem` subset.
-fn read_items(item: &syn::MetaItem) -> Result<MetaItem, String> {
+fn read_items(item: &syn::NestedMetaItem) -> Result<MetaItem, String> {
+    let item = match *item {
+        syn::NestedMetaItem::MetaItem(ref item) => item,
+        syn::NestedMetaItem::Literal(..) => {
+            return Err("Expected meta-item but found literal".to_string());
+        }
+    };
     match *item {
         syn::MetaItem::Word(ref name) => Ok(MetaItem(name.as_ref(), Vec::new())),
         syn::MetaItem::List(ref name, ref values) => {
@@ -482,15 +494,12 @@ fn read_items(item: &syn::MetaItem) -> Result<MetaItem, String> {
                 values
                 .iter()
                 .map(|value| {
-                    match *value {
-                        syn::MetaItem::Word(..) | syn::MetaItem::List(..) => {
-                            Err("Expected named value".to_string())
-                        }
-                        syn::MetaItem::NameValue(ref name, ref value) => {
-                            let value = try!(str_or_err(value));
+                    if let syn::NestedMetaItem::MetaItem(syn::MetaItem::NameValue(ref name, ref value)) = *value {
+                        let value = try!(str_or_err(value));
 
-                            Ok((name.as_ref(), Some(value)))
-                        }
+                        Ok((name.as_ref(), Some(value)))
+                    } else {
+                        Err("Expected named value".to_string())
                     }
                 })
                 .collect()
@@ -507,7 +516,7 @@ fn read_items(item: &syn::MetaItem) -> Result<MetaItem, String> {
 }
 
 /// Filter the `derivative` items from an attribute.
-fn derivative_attribute(attr: &syn::Attribute) -> Option<&[syn::MetaItem]> {
+fn derivative_attribute(attr: &syn::Attribute) -> Option<&[syn::NestedMetaItem]> {
     match attr.value {
         syn::MetaItem::List(ref name, ref mis) if name == "derivative" => Some(mis),
         syn::MetaItem::Word(..) |
