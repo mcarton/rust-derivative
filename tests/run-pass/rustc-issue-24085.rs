@@ -12,8 +12,6 @@
 // inference due to the requirement that `'a:b'`, which was getting
 // incorrectly translated in connection with the closure below.
 
-#![feature(proc_macro)]
-
 #[macro_use]
 extern crate derivative;
 

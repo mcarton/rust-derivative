@@ -11,8 +11,6 @@
 //! Test that #[derive(Copy, Clone)] produces a shallow copy
 //! even when a member violates RFC 1521
 
-#![feature(proc_macro)]
-
 #[macro_use]
 extern crate derivative;
 

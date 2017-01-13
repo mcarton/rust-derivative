@@ -8,13 +8,8 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
-#![allow(unknown_features)]
-#![feature(box_syntax)]
-#![feature(proc_macro)]
-
 #[macro_use]
 extern crate derivative;
-
 
 // Example from lkuper's intern talk, August 2012.
 use Color::{cyan, magenta, yellow, black};
@@ -68,11 +63,11 @@ pub fn main() {
     assert!(leaf(cyan).isEq(&leaf(cyan)));
     assert!(!leaf(cyan).isEq(&leaf(yellow)));
 
-    assert!(branch(box leaf(magenta), box leaf(cyan))
-        .isEq(&branch(box leaf(magenta), box leaf(cyan))));
+    assert!(branch(Box::new(leaf(magenta)), Box::new(leaf(cyan)))
+        .isEq(&branch(Box::new(leaf(magenta)), Box::new(leaf(cyan)))));
 
-    assert!(!branch(box leaf(magenta), box leaf(cyan))
-        .isEq(&branch(box leaf(magenta), box leaf(magenta))));
+    assert!(!branch(Box::new(leaf(magenta)), Box::new(leaf(cyan)))
+        .isEq(&branch(Box::new(leaf(magenta)), Box::new(leaf(magenta)))));
 
     println!("Assertions all succeeded!");
 }

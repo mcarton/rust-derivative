@@ -9,7 +9,6 @@
 // except according to those terms.
 
 #![deny(unused_qualifications)]
-#![feature(proc_macro)]
 
 use self::A::B;
 

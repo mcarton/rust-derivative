@@ -1,7 +1,5 @@
 //! This tests that we compute the same hash as `derive(Hash)`.
 
-#![feature(proc_macro)]
-
 #[macro_use]
 extern crate derivative;
 

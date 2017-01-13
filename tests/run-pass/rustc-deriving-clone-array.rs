@@ -10,8 +10,6 @@
 
 // test for issue #30244
 
-#![feature(proc_macro)]
-
 #[macro_use]
 extern crate derivative;
 

@@ -10,8 +10,6 @@
 
 // no-pretty-expanded FIXME #15189
 
-#![feature(proc_macro)]
-
 #[macro_use]
 extern crate derivative;
 
