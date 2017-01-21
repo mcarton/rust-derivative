@@ -31,7 +31,7 @@ pub fn derive(input: &ast::Input) -> quote::Tokens {
 
             let variant = if let ast::Body::Enum(_) = input.body {
                 Some(quote!(
-                    #hash_trait_path::hash(&(#arm_path as isize), __state);
+                    #hash_trait_path::hash(&(#arm_path as u64), __state);
                 ))
             } else {
                 None
