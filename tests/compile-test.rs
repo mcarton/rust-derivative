@@ -1,9 +1,11 @@
+#[cfg(feature = "compiletest_rs")]
 extern crate compiletest_rs as compiletest;
 
-use std::path::PathBuf;
-use std::env::var;
-
+#[cfg(feature = "compiletest_rs")]
 fn run_mode(dir: &'static str, mode: &'static str) {
+    use std::path::PathBuf;
+    use std::env::var;
+
     let mut config = compiletest::default_config();
 
     let cfg_mode = mode.parse().expect("Invalid mode");
@@ -19,8 +21,8 @@ fn run_mode(dir: &'static str, mode: &'static str) {
     compiletest::run_tests(&config);
 }
 
+#[cfg(feature = "compiletest_rs")]
 #[test]
 fn compile_test() {
-    run_mode("run-pass", "run-pass");
     run_mode("compile-fail", "compile-fail");
 }
