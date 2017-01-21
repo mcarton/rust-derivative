@@ -62,7 +62,7 @@ pub fn with_where_predicates_from_fields<F>(
 ///
 /// For example, the following structure needs the bound `A: Debug, B: Debug`.
 ///
-/// ```
+/// ```ignore
 /// struct S<'b, A, B: 'b, C> {
 ///     a: A,
 ///     b: Option<&'b B>

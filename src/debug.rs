@@ -15,7 +15,7 @@ pub fn derive(input: &ast::Input) -> quote::Tokens {
 
                 if attrs.debug_transparent() {
                     return Some(quote!{
-                        ::std::fmt::Debug::fmt(__arg_0, f)
+                        ::std::fmt::Debug::fmt(__arg_0, __f)
                     });
                 }
 
@@ -55,7 +55,7 @@ pub fn derive(input: &ast::Input) -> quote::Tokens {
                 }
             } else {
                 quote! {
-                    let mut builder = f.#method(#name);
+                    let mut builder = __f.#method(#name);
                     #(#field_prints)*
                     builder.finish()
                 }
@@ -84,7 +84,7 @@ pub fn derive(input: &ast::Input) -> quote::Tokens {
     quote! {
         #[allow(unused_qualifications)]
         impl #impl_generics #debug_trait_path for #ty #where_clause {
-            fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
+            fn fmt(&self, __f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
                 match *self {
                     #body
                 }
@@ -138,8 +138,8 @@ fn format_with(
             struct Dummy #ty_generics (&'_derivative #ty, ::std::marker::PhantomData <(#(#phantom),*)>) #where_clause;
 
             impl #impl_generics #debug_trait_path for Dummy #ty_generics #where_clause {
-                fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
-                    #format_fn(&self.0, f)
+                fn fmt(&self, __f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
+                    #format_fn(&self.0, __f)
                 }
             }
 
