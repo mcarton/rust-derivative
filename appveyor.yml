@@ -12,6 +12,7 @@ environment:
       MSYS2_BITS: 64
 
 configuration:
+  - stable
   - nightly
   - beta
 
