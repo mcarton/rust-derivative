@@ -5,10 +5,9 @@ This crate provides a set of alternative `#[derive]` attributes for Rust.
 ## [Documentation][documentation]
 ## Stability
 
-This crate is not stable yet and the attributes might change at any time.
+This crate is now stable and usable on rustc stable too!
 
-For now the crate only works on *nightly* but it uses *rustc*'s Macros 1.1 and
-is meant to be usable on *stable* as soon as it is possible.
+Note that you need *rustc 1.15 or later*.
 
 ## What it does
 
