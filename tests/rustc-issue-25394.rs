@@ -15,7 +15,7 @@ extern crate derivative;
 #[derivative(Debug)]
 struct Row<T>([T]);
 
-fn use_row(_: Row<u8>) {}
+fn use_row(_: &Row<u8>) {}
 
 #[test]
 fn main() {
