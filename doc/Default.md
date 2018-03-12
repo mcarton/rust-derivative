@@ -52,7 +52,7 @@ that calls `Default::default`:
 
 ```rust
 #[derive(Debug, Derivative)]
-#[derivative(Default(new="true")]
+#[derivative(Default(new="true"))]
 struct Foo {
     foo: u8,
     bar: u8,
