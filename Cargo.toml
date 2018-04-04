@@ -18,7 +18,7 @@ proc-macro = true
 
 [dependencies]
 quote = "0.5"
-syn = { version = "0.13", features = ["extra-traits", "full", "visit"] }
+syn = { version = "0.13.1", features = ["extra-traits", "full", "visit"] }
 compiletest_rs = { version = "0.3", optional = true }
 
 [features]
