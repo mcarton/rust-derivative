@@ -81,10 +81,10 @@ fn needs_hash_bound(attrs: &attr::Field) -> bool {
     !attrs.ignore_hash() && attrs.hash_bound().is_none()
 }
 
-fn hasher_trait_path() -> syn::Path {
-    parse_quote! { ::std::hash::Hasher }
-}
-
 fn hash_trait_path() -> syn::Path {
     parse_quote! { ::std::hash::Hash }
+}
+
+fn hasher_trait_path() -> syn::Path {
+    parse_quote! { ::std::hash::Hasher }
 }

@@ -113,27 +113,6 @@ fn format_with(
     let ctor_generics = generics.clone();
     let (_, ctor_type_generics, _) = ctor_generics.split_for_impl();
 
-    fn new_where_clause() -> syn::WhereClause {
-        syn::WhereClause {
-            where_token: <Token![where]>::default(),
-            predicates: syn::punctuated::Punctuated::new(),
-        }
-    }
-
-    fn get_or_insert_with<F, T>(option: &mut Option<T>, f: F) -> &mut T
-        where F: FnOnce() -> T,
-    {
-        match *option {
-            None => *option = Some(f()),
-            _ => (),
-        }
-
-        match *option {
-            Some(ref mut v) => v,
-            _ => unreachable!(),
-        }
-    }
-
     generics
         .make_where_clause()
         .predicates
@@ -144,6 +123,11 @@ fn format_with(
             .cloned());
     generics.params.push(parse_quote!('_derivative));
 
+    // The ergonomic-looking code has a problem with overlapping borrows:
+    // - immutable borrow when iterating over `TypeParam` via `Generics::type_params()`
+    // - mutable borrow when calling `Generics::make_where_clause()`
+    //
+    // The solution is to make borrows disjoint at the cost of readability.
     for type_param in generics.params.iter().filter_map(|param| {
         match *param {
             syn::GenericParam::Type(ref type_param) => Some(type_param),
@@ -152,6 +136,30 @@ fn format_with(
     }) {
         let path = type_param.ident.into();
         let bound: syn::TypeParamBound = parse_quote!('_derivative);
+
+        // This is a workaround so that the code would work on Rust 1.15
+        // NOTE: Implementation copied from the actual `Option::get_or_insert_with` (which is
+        // stable since Rust 1.20)
+        fn get_or_insert_with<F, T>(option: &mut Option<T>, f: F) -> &mut T
+            where F: FnOnce() -> T,
+        {
+            match *option {
+                None => *option = Some(f()),
+                _ => (),
+            }
+
+            match *option {
+                Some(ref mut v) => v,
+                _ => unreachable!(),
+            }
+        }
+
+        fn new_where_clause() -> syn::WhereClause {
+            syn::WhereClause {
+                where_token: <Token![where]>::default(),
+                predicates: syn::punctuated::Punctuated::new(),
+            }
+        }
 
         get_or_insert_with(&mut generics.where_clause, new_where_clause)
             .predicates
