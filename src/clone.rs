@@ -2,19 +2,18 @@ use ast;
 use attr;
 use matcher;
 use quote;
-use syn::{self, aster};
+use syn;
 use utils;
 
-/// Derive `Copy` for `input`.
 pub fn derive_copy(input: &ast::Input) -> Result<quote::Tokens, String> {
-    let name = &input.ident;
-
     if input.attrs.derives_clone() {
-        return Err("`#[derivative(Copy)]` can't be used with `#[derive(Clone)]`".into());
+        return Err("`#[derivative(Copy)]` can't be used with `#[derive(Clone)]`".to_string());
     }
 
+    let name = input.ident;
     let copy_trait_path = copy_trait_path();
-    let impl_generics = utils::build_impl_generics(
+
+    let (impl_generics, path_args) = utils::build_generics(
         input,
         &copy_trait_path,
         |attrs| attrs.copy_bound().is_none(),
@@ -23,25 +22,25 @@ pub fn derive_copy(input: &ast::Input) -> Result<quote::Tokens, String> {
     );
     let where_clause = &impl_generics.where_clause;
 
-    let ty = syn::aster::ty()
-        .path()
-        .segment(name.clone())
-        .with_generics(impl_generics.clone())
-        .build()
-        .build();
+    let type_ = syn::Type::Path(syn::TypePath {
+        qself: None,
+        path: syn::PathSegment {
+            ident: name,
+            arguments: path_args,
+        }.into(),
+    });
 
     Ok(quote! {
-        #[allow(unused_qualifications)]
-        impl #impl_generics #copy_trait_path for #ty #where_clause {}
+        impl #impl_generics #copy_trait_path for #type_ #where_clause {}
     })
 }
 
 /// Derive `Clone` for `input`.
 pub fn derive_clone(input: &ast::Input) -> quote::Tokens {
-    let name = &input.ident;
-
+    let name = input.ident;
     let clone_trait_path = clone_trait_path();
-    let impl_generics = utils::build_impl_generics(
+
+    let (impl_generics, path_args) = utils::build_generics(
         input,
         &clone_trait_path,
         needs_clone_bound,
@@ -50,18 +49,18 @@ pub fn derive_clone(input: &ast::Input) -> quote::Tokens {
     );
     let where_clause = &impl_generics.where_clause;
 
-    let ty = syn::aster::ty()
-        .path()
-        .segment(name.clone())
-        .with_generics(impl_generics.clone())
-        .build()
-        .build();
+    let type_ = syn::Type::Path(syn::TypePath {
+        qself: None,
+        path: syn::PathSegment {
+            ident: name,
+            arguments: path_args,
+        }.into(),
+    });
 
     let is_copy = input.attrs.rustc_copy_clone_marker() || input.attrs.copy.is_some();
-    if is_copy && input.generics.ty_params.is_empty() {
+    if is_copy && input.generics.type_params().count() == 0 {
         quote! {
-            #[allow(unused_qualifications)]
-            impl #impl_generics #clone_trait_path for #ty #where_clause {
+            impl #impl_generics #clone_trait_path for #type_ #where_clause {
                 fn clone(&self) -> Self {
                     *self
                 }
@@ -71,7 +70,7 @@ pub fn derive_clone(input: &ast::Input) -> quote::Tokens {
         let body = matcher::Matcher::new(matcher::BindingStyle::Ref)
             .build_arms(input, |arm_path, _, style, _, bis| {
                 let field_clones = bis.iter().map(|bi| {
-                    let arg = &bi.ident;
+                    let arg = bi.ident;
 
                     let clone = if let Some(clone_with) = bi.field.attrs.clone_with() {
                         quote!(#clone_with(#arg))
@@ -109,8 +108,8 @@ pub fn derive_clone(input: &ast::Input) -> quote::Tokens {
                 }
             });
 
-        let clone_from = if input.attrs.clone_from() {
-            Some(matcher::Matcher::new(matcher::BindingStyle::RefMut)
+        let clone_from_body = if input.attrs.clone_from() {
+            let clone_from_def = matcher::Matcher::new(matcher::BindingStyle::RefMut)
                 .build_arms(input, |outer_arm_path, _, _, _, outer_bis| {
                     let body = matcher::Matcher::new(matcher::BindingStyle::Ref)
                         .with_name("__other".into())
@@ -120,8 +119,8 @@ pub fn derive_clone(input: &ast::Input) -> quote::Tokens {
                                     .iter()
                                     .zip(inner_bis)
                                     .map(|(outer_bi, inner_bi)| {
-                                        let outer = &outer_bi.ident;
-                                        let inner = &inner_bi.ident;
+                                        let outer = outer_bi.ident;
+                                        let inner = inner_bi.ident;
 
                                         quote!(#outer.clone_from(#inner);)
                                     });
@@ -140,16 +139,17 @@ pub fn derive_clone(input: &ast::Input) -> quote::Tokens {
                             #body
                         }
                     }
-                })
-            )
+                });
+
+            Some(clone_from_def)
         } else {
             None
         };
 
-        let clone_from = clone_from.map(|body| {
+        let clone_from_item = clone_from_body.map(|body| {
             // Enumerations are only cloned-from if both variants are the same.
             // If they are different, fallback to normal cloning.
-            let fallback = if let ast::Body::Enum(_) = input.body {
+            let fallback = if let ast::Data::Enum(_) = input.data {
                 Some(quote!(*self = other.clone();))
             } else {
                 None
@@ -167,15 +167,14 @@ pub fn derive_clone(input: &ast::Input) -> quote::Tokens {
         });
 
         quote! {
-            #[allow(unused_qualifications)]
-            impl #impl_generics #clone_trait_path for #ty #where_clause {
+            impl #impl_generics #clone_trait_path for #type_ #where_clause {
                 fn clone(&self) -> Self {
                     match *self {
                         #body
                     }
                 }
 
-                #clone_from
+                #clone_from_item
             }
         }
     }
@@ -185,12 +184,12 @@ fn needs_clone_bound(attrs: &attr::Field) -> bool {
     attrs.clone_bound().is_none()
 }
 
-/// Return the path of the `Clone` trait, that is `::std::clone::Clone`.
-fn clone_trait_path() -> syn::Path {
-    aster::path().global().ids(&["std", "clone", "Clone"]).build()
+/// Return the path of the `Copy` trait, that is `::std::marker::Copy`.
+fn copy_trait_path() -> syn::Path {
+    parse_quote! { ::std::marker::Copy }
 }
 
-/// Return the path of the `Copy` trait, that is `::std::marker::Clone`.
-fn copy_trait_path() -> syn::Path {
-    aster::path().global().ids(&["std", "marker", "Copy"]).build()
+/// Return the path of the `Clone` trait, that is `::std::clone::Clone`.
+fn clone_trait_path() -> syn::Path {
+    parse_quote! { ::std::clone::Clone }
 }

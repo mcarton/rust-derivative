@@ -8,9 +8,7 @@
 
 use ast;
 use attr;
-use quote;
-
-use quote::ToTokens;
+use quote::{self, ToTokens};
 use syn;
 
 /// The type of binding to use when generating a pattern.
@@ -26,17 +24,19 @@ pub enum BindingStyle {
     RefMut,
 }
 
-impl quote::ToTokens for BindingStyle {
-    fn to_tokens(&self, tokens: &mut quote::Tokens) {
-        match *self {
-            BindingStyle::Move => (),
-            BindingStyle::MoveMut => tokens.append("mut"),
-            BindingStyle::Ref => tokens.append("ref"),
-            BindingStyle::RefMut => {
-                tokens.append("ref");
-                tokens.append("mut");
-            }
-        }
+fn to_pat_ident(binding_style: BindingStyle, ident: syn::Ident) -> syn::PatIdent {
+    let (by_ref, mutability) = match binding_style {
+        BindingStyle::Move    => (None,                           None),
+        BindingStyle::MoveMut => (None,                           Some(<Token![mut]>::default())),
+        BindingStyle::Ref     => (Some(<Token![ref]>::default()), None),
+        BindingStyle::RefMut  => (Some(<Token![ref]>::default()), Some(<Token![mut]>::default())),
+    };
+
+    syn::PatIdent {
+        by_ref: by_ref,
+        mutability: mutability,
+        ident: ident,
+        subpat: None,
     }
 }
 
@@ -64,89 +64,106 @@ impl Matcher {
     }
 
     pub fn build_arms<F>(self, input: &ast::Input, f: F) -> quote::Tokens
-    where F: Fn(syn::Path, &syn::Ident, ast::Style, &attr::Input, Vec<BindingInfo>) -> quote::Tokens
+        where F: Fn(syn::Path, &syn::Ident, ast::Style, &attr::Input, Vec<BindingInfo>) -> quote::Tokens
     {
-        let ident = &input.ident;
-        // Generate patterns for matching against all of the variants
-        let variants = match input.body {
-            ast::Body::Enum(ref variants) => {
-                variants.iter()
-                    .map(|variant| {
-                        let variant_ident = &variant.ident;
-                        let variant_path = syn::aster::path().ids(&[ident, variant_ident]).build();
+        let ident = input.ident;
 
-                        let pat = self.build_match_pattern(
-                            &variant_path,
+        // Generate patterns for matching against all of the variants
+        let variants = match input.data {
+            ast::Data::Enum(ref variants) => {
+                variants
+                    .iter()
+                    .map(|variant| {
+                        let variant_ident = variant.ident;
+                        let variant_path: syn::Path = parse_quote! { #ident::#variant_ident };
+
+                        let pattern_info = self.build_match_pattern(
+                            variant_path.clone(),
                             variant.style,
-                            &variant.fields
+                            &variant.fields,
                         );
 
-                        (variant_path, variant_ident, variant.style, &variant.attrs, pat)
+                        (variant_path, variant_ident, variant.style, &variant.attrs, pattern_info)
                     })
                     .collect()
             }
-            ast::Body::Struct(style, ref vd) => {
-                let path = syn::aster::path().id(ident).build();
-                vec![(path, ident, style, &input.attrs, self.build_match_pattern(ident, style, vd))]
+            ast::Data::Struct(style, ref fields) => {
+                let path = ident.into();
+                vec![(path, ident, style, &input.attrs, self.build_match_pattern(ident, style, fields))]
             }
         };
 
         // Now that we have the patterns, generate the actual branches of the match
         // expression
-        let mut t = quote::Tokens::new();
-        for (path, name, style, attrs, (pat, bindings)) in variants {
-            let body = f(path, name, style, attrs, bindings);
-            quote!(#pat => { #body }).to_tokens(&mut t);
-        }
+        let processed = variants
+            .into_iter()
+            .map(|(path, name, style, attrs, (pattern, bindings))| {
+                let body = f(path, &name, style, attrs, bindings);
+                quote! { #pattern => { #body } }
+            });
 
-        t
+        quote! {
+            #(#processed)*
+        }
     }
 
     pub fn build_match_pattern<'a, N>(
         &self,
-        name: &N,
+        name: N,
         style: ast::Style,
         fields: &'a [ast::Field<'a>]
-    )
-    -> (quote::Tokens, Vec<BindingInfo<'a>>)
-    where N: quote::ToTokens,
+    ) -> (quote::Tokens, Vec<BindingInfo<'a>>)
+        where N: Into<syn::Path>,
     {
-        let mut t = quote::Tokens::new();
-        let mut matches = Vec::new();
-
-        let binding = self.binding_style;
-        name.to_tokens(&mut t);
-        match style {
-            ast::Style::Unit => {}
-            ast::Style::Tuple => {
-                t.append("(");
-                for (i, field) in fields.iter().enumerate() {
-                    let ident: syn::Ident = format!("{}_{}", self.binding_name, i).into();
-                    quote!(#binding #ident ,).to_tokens(&mut t);
-                    matches.push(BindingInfo {
-                        ident: ident,
-                        field: field,
-                    });
+        let matches: Vec<_> = fields
+            .iter()
+            .enumerate()
+            .map(|(i, field)| {
+                BindingInfo {
+                    ident: format!("{}_{}", self.binding_name, i).into(),
+                    field: field,
                 }
-                t.append(")");
-            }
-            ast::Style::Struct => {
-                t.append("{");
-                for (i, field) in fields.iter().enumerate() {
-                    let ident: syn::Ident = format!("{}_{}", self.binding_name, i).into();
-                    {
-                        let field_name = field.ident.as_ref().unwrap();
-                        quote!(#field_name : #binding #ident ,).to_tokens(&mut t);
-                    }
-                    matches.push(BindingInfo {
-                        ident: ident,
-                        field: field,
-                    });
-                }
-                t.append("}");
-            }
-        }
+            })
+            .collect();
 
-        (t, matches)
+        let match_expr = match style {
+            ast::Style::Unit => syn::Pat::Path(syn::PatPath {
+                qself: None,
+                path: name.into(),
+            }),
+            ast::Style::Tuple => syn::Pat::TupleStruct(syn::PatTupleStruct {
+                path: name.into(),
+                pat: syn::PatTuple {
+                    paren_token: syn::token::Paren::default(),
+                    front: matches
+                        .iter()
+                        .map(|&BindingInfo { ref ident, .. }| {
+                            syn::Pat::Ident(to_pat_ident(self.binding_style, *ident))
+                        })
+                        .collect(),
+                    dot2_token: None,
+                    comma_token: None,
+                    back: syn::punctuated::Punctuated::new(),
+                },
+            }),
+            ast::Style::Struct => syn::Pat::Struct(syn::PatStruct {
+                path: name.into(),
+                brace_token: syn::token::Brace::default(),
+                fields: matches
+                    .iter()
+                    .map(|&BindingInfo { ref ident, ref field }| {
+                        syn::FieldPat {
+                            attrs: vec![],
+                            member: syn::Member::Named(field.ident.unwrap()),
+                            colon_token: Some(<Token![:]>::default()),
+                            pat: Box::new(syn::Pat::Ident(to_pat_ident(self.binding_style, *ident))),
+                        }
+                    })
+                    .collect(),
+                dot2_token: None,
+            }),
+        };
+
+        (match_expr.into_tokens(), matches)
     }
 }

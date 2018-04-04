@@ -4,13 +4,13 @@ use syn;
 #[derive(Debug)]
 pub struct Input<'a> {
     pub attrs: attr::Input,
-    pub body: Body<'a>,
+    pub data: Data<'a>,
     pub generics: &'a syn::Generics,
     pub ident: syn::Ident,
 }
 
 #[derive(Debug)]
-pub enum Body<'a> {
+pub enum Data<'a> {
     Enum(Vec<Variant<'a>>),
     Struct(Style, Vec<Field<'a>>),
 }
@@ -27,7 +27,7 @@ pub struct Variant<'a> {
 pub struct Field<'a> {
     pub attrs: attr::Field,
     pub ident: Option<syn::Ident>,
-    pub ty: &'a syn::Ty,
+    pub type_: &'a syn::Type,
 }
 
 #[derive(Clone, Copy, Debug)]
@@ -38,79 +38,87 @@ pub enum Style {
 }
 
 impl<'a> Input<'a> {
-    pub fn from_ast(item: &'a syn::MacroInput) -> Result<Input<'a>, String> {
-        let attrs = try!(attr::Input::from_ast(&item.attrs));
+    pub fn from_ast(item: &'a syn::DeriveInput) -> Result<Input<'a>, String> {
+        let attrs = attr::Input::from_ast(&item.attrs)?;
 
-        let body = match item.body {
-            syn::Body::Enum(ref variants) => {
-                Body::Enum(try!(enum_from_ast(variants)))
+        let data = match item.data {
+            syn::Data::Enum(ref data_enum) => {
+                Data::Enum(enum_from_ast(&data_enum.variants)?)
             }
-            syn::Body::Struct(ref variant_data) => {
-                let (style, fields) = try!(struct_from_ast(variant_data));
-                Body::Struct(style, fields)
+            syn::Data::Struct(ref data_struct) => {
+                let (style, fields) = struct_like_data_from_ast(&data_struct.fields)?;
+                Data::Struct(style, fields)
+            }
+            syn::Data::Union(_) => {
+                // TODO: support or not support?
+                return Err("`derivative` doesn't support unions".to_string());
             }
         };
 
         Ok(Input {
             attrs: attrs,
-            body: body,
+            data: data,
             generics: &item.generics,
-            ident: item.ident.clone(),
+            ident: item.ident,
         })
     }
 }
 
-impl<'a> Body<'a> {
+impl<'a> Data<'a> {
     pub fn all_fields(&self) -> Vec<&Field> {
         match *self {
-            Body::Enum(ref variants) => {
+            Data::Enum(ref variants) => {
                 variants
                     .iter()
                     .flat_map(|variant| variant.fields.iter())
                     .collect()
             }
-            Body::Struct(_, ref fields) => fields.iter().collect(),
+            Data::Struct(_, ref fields) => fields.iter().collect(),
         }
     }
 }
 
-fn enum_from_ast<'a>(variants: &'a [syn::Variant]) -> Result<Vec<Variant<'a>>, String> {
+fn enum_from_ast<'a>(
+    variants: &'a syn::punctuated::Punctuated<syn::Variant, Token![,]>,
+) -> Result<Vec<Variant<'a>>, String> {
     variants
         .iter()
         .map(|variant| {
-            let (style, fields) = try!(struct_from_ast(&variant.data));
+            let (style, fields) = struct_like_data_from_ast(&variant.fields)?;
             Ok(Variant {
-                attrs: try!(attr::Input::from_ast(&variant.attrs)),
+                attrs: attr::Input::from_ast(&variant.attrs)?,
                 fields: fields,
-                ident: variant.ident.clone(),
+                ident: variant.ident,
                 style: style,
             })
         })
         .collect()
 }
 
-fn struct_from_ast<'a>(data: &'a syn::VariantData) -> Result<(Style, Vec<Field<'a>>), String> {
-    match *data {
-        syn::VariantData::Struct(ref fields) => {
-            Ok((Style::Struct, try!(fields_from_ast(fields))))
+fn struct_like_data_from_ast<'a>(fields: &'a syn::Fields) -> Result<(Style, Vec<Field<'a>>), String> {
+    match *fields {
+        syn::Fields::Named(syn::FieldsNamed { ref named, .. }) => {
+            Ok((Style::Struct, fields_from_ast(named)?))
         }
-        syn::VariantData::Tuple(ref fields) => {
-            Ok((Style::Tuple, try!(fields_from_ast(fields))))
+        syn::Fields::Unnamed(syn::FieldsUnnamed { ref unnamed, .. }) => {
+            Ok((Style::Tuple, fields_from_ast(unnamed)?))
         }
-        syn::VariantData::Unit => {
+        syn::Fields::Unit => {
             Ok((Style::Unit, Vec::new()))
         }
     }
 }
 
-fn fields_from_ast<'a>(fields: &'a [syn::Field]) -> Result<Vec<Field<'a>>, String> {
+fn fields_from_ast<'a>(
+    fields: &'a syn::punctuated::Punctuated<syn::Field, Token![,]>,
+) -> Result<Vec<Field<'a>>, String> {
     fields
         .iter()
         .map(|field| {
             Ok(Field {
-                attrs: try!(attr::Field::from_ast(field)),
-                ident: field.ident.clone(),
-                ty: &field.ty,
+                attrs: attr::Field::from_ast(field)?,
+                ident: field.ident,
+                type_: &field.ty,
             })
         })
         .collect()

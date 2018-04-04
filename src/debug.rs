@@ -2,7 +2,7 @@ use ast;
 use attr;
 use matcher;
 use quote;
-use syn::{self, aster};
+use syn;
 use utils;
 
 pub fn derive(input: &ast::Input) -> quote::Tokens {
@@ -19,7 +19,7 @@ pub fn derive(input: &ast::Input) -> quote::Tokens {
                     });
                 }
 
-                let arg = &bi.ident;
+                let arg = bi.ident;
 
                 let dummy_debug = bi.field.attrs.debug_format_with().map(|format_fn| {
                     format_with(bi.field, &arg, format_fn, input.generics.clone())
@@ -45,7 +45,7 @@ pub fn derive(input: &ast::Input) -> quote::Tokens {
                 ast::Style::Struct => "debug_struct",
                 ast::Style::Tuple | ast::Style::Unit => "debug_tuple",
             };
-            let method = syn::Ident::new(method);
+            let method = syn::Ident::from(method);
 
             let name = arm_name.as_ref();
 
@@ -62,10 +62,10 @@ pub fn derive(input: &ast::Input) -> quote::Tokens {
             }
         });
 
-    let name = &input.ident;
-
+    let name = input.ident;
     let debug_trait_path = debug_trait_path();
-    let impl_generics = utils::build_impl_generics(
+
+    let (impl_generics, path_args) = utils::build_generics(
         input,
         &debug_trait_path,
         needs_debug_bound,
@@ -74,16 +74,16 @@ pub fn derive(input: &ast::Input) -> quote::Tokens {
     );
     let where_clause = &impl_generics.where_clause;
 
-    let ty = syn::aster::ty()
-        .path()
-        .segment(name.clone())
-        .with_generics(impl_generics.clone())
-        .build()
-        .build();
+    let type_ = syn::Type::Path(syn::TypePath {
+        qself: None,
+        path: syn::PathSegment {
+            ident: name,
+            arguments: path_args,
+        }.into(),
+    });
 
     quote! {
-        #[allow(unused_qualifications)]
-        impl #impl_generics #debug_trait_path for #ty #where_clause {
+        impl #impl_generics #debug_trait_path for #type_ #where_clause {
             fn fmt(&self, __f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
                 match *self {
                     #body
@@ -99,7 +99,7 @@ fn needs_debug_bound(attrs: &attr::Field) -> bool {
 
 /// Return the path of the `Debug` trait, that is `::std::fmt::Debug`.
 fn debug_trait_path() -> syn::Path {
-    aster::path().global().ids(&["std", "fmt", "Debug"]).build()
+    parse_quote! { ::std::fmt::Debug }
 }
 
 fn format_with(
@@ -111,39 +111,95 @@ fn format_with(
     let debug_trait_path = debug_trait_path();
 
     let ctor_generics = generics.clone();
-    let (_, ctor_ty_generics, _) = ctor_generics.split_for_impl();
+    let (_, ctor_type_generics, _) = ctor_generics.split_for_impl();
 
-    generics.where_clause.predicates.extend(f.attrs.debug_bound().unwrap_or(&[]).iter().cloned());
+    fn new_where_clause() -> syn::WhereClause {
+        syn::WhereClause {
+            where_token: <Token![where]>::default(),
+            predicates: syn::punctuated::Punctuated::new(),
+        }
+    }
 
-    generics.lifetimes.push(syn::LifetimeDef::new("'_derivative"));
-    for ty in &generics.ty_params {
-        let path = aster::path::PathBuilder::new().id(&ty.ident).build();
-        generics.where_clause.predicates
-            .push(syn::WherePredicate::BoundPredicate(syn::WhereBoundPredicate {
-                bound_lifetimes: vec![],
-                bounded_ty: syn::Ty::Path(None, path),
-                bounds: vec![syn::TyParamBound::Region(syn::Lifetime::new("'_derivative"))],
+    fn get_or_insert_with<F, T>(option: &mut Option<T>, f: F) -> &mut T
+        where F: FnOnce() -> T,
+    {
+        match *option {
+            None => *option = Some(f()),
+            _ => (),
+        }
+
+        match *option {
+            Some(ref mut v) => v,
+            _ => unreachable!(),
+        }
+    }
+
+    generics
+        .make_where_clause()
+        .predicates
+        .extend(f.attrs
+            .debug_bound()
+            .unwrap_or(&[])
+            .iter()
+            .cloned());
+    generics.params.push(parse_quote!('_derivative));
+
+    for type_param in generics.params.iter().filter_map(|param| {
+        match *param {
+            syn::GenericParam::Type(ref type_param) => Some(type_param),
+            _ => None,
+        }
+    }) {
+        let path = type_param.ident.into();
+        let bound: syn::TypeParamBound = parse_quote!('_derivative);
+
+        get_or_insert_with(&mut generics.where_clause, new_where_clause)
+            .predicates
+            .push(syn::WherePredicate::Type(syn::PredicateType {
+                lifetimes: None,
+                bounded_ty: syn::Type::Path(syn::TypePath {
+                    qself: None,
+                    path: path,
+                }),
+                colon_token: <Token![:]>::default(),
+                bounds: vec![bound].into_iter().collect(),
             }));
     }
 
-    let (impl_generics, ty_generics, where_clause) = generics.split_for_impl();
+    let (impl_generics, type_generics, where_clause) = generics.split_for_impl();
 
-    let ty = f.ty;
+    let type_ = f.type_;
 
     // Leave off the type parameter bounds, defaults, and attributes
-    let phantom = generics.ty_params.iter().map(|tp| &tp.ident);
+    let phantom = generics.type_params().map(|tp| tp.ident);
 
-    quote!(
+    quote! {
         let #arg_n = {
-            struct Dummy #ty_generics (&'_derivative #ty, ::std::marker::PhantomData <(#(#phantom),*)>) #where_clause;
+            struct Dummy #type_generics (&'_derivative #type_, ::std::marker::PhantomData <(#(#phantom),*)>) #where_clause;
 
-            impl #impl_generics #debug_trait_path for Dummy #ty_generics #where_clause {
+            impl #impl_generics #debug_trait_path for Dummy #type_generics #where_clause {
                 fn fmt(&self, __f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
                     #format_fn(&self.0, __f)
                 }
             }
 
-            Dummy:: #ctor_ty_generics (#arg_n, ::std::marker::PhantomData)
+            Dummy:: #ctor_type_generics (#arg_n, ::std::marker::PhantomData)
         };
-    )
+    }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -6,7 +6,8 @@ fn run_mode(dir: &'static str, mode: &'static str) {
     use std::path::PathBuf;
     use std::env::var;
 
-    let mut config = compiletest::default_config();
+    //let mut config = compiletest::default_config();
+    let mut config = compiletest::Config::default();
 
     let cfg_mode = mode.parse().expect("Invalid mode");
     config.target_rustcflags = Some("-L target/debug/ -L target/debug/deps".to_owned());
