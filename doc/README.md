@@ -6,7 +6,7 @@ This crate provides a set of alternative `#[derive]` attributes for Rust.
 
 This crate is now stable and usable on rustc stable too!
 
-FNote that you need *rustc 1.15 or later*.
+Note that you need *rustc 1.15 or later*.
 
 ## Examples
 
