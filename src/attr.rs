@@ -49,8 +49,6 @@ pub struct InputClone {
     bounds: Option<Vec<syn::WherePredicate>>,
     /// Whether the implementation should have an explicit `clone_from`.
     pub clone_from: bool,
-    /// Whether the `rustc_copy_clone_marker` was found.
-    pub rustc_copy_clone_marker: bool,
 }
 
 #[derive(Debug, Default)]
@@ -58,8 +56,6 @@ pub struct InputClone {
 pub struct InputCopy {
     /// The `bound` attribute if present and the corresponding bounds.
     bounds: Option<Vec<syn::WherePredicate>>,
-    /// Whether the input also derive `Clone` (ie. `derive(Clone)`, but not `derivative(Clone)`)
-    derives_clone: bool,
 }
 
 #[derive(Debug, Default)]
@@ -215,50 +211,21 @@ impl Input {
         for_all_attr! {
             for (name, values) in attrs;
             "Clone" => {
-                let mut clone = input.clone.take().unwrap_or_default();
-
-                clone.rustc_copy_clone_marker = attrs
-                    .iter()
-                    .filter_map(|attr| attr.parse_meta().ok())
-                    .any(|meta| meta.name().to_string() == "rustc_copy_clone_marker");
-
                 match_attributes! {
+                    let Some(clone) = input.clone;
                     for value in values;
                     "bound" => try!(parse_bound(&mut clone.bounds, opt_string_to_str!(value))),
                     "clone_from" => {
                         clone.clone_from = try!(parse_boolean_meta_item(&opt_string_to_str!(value), true, "clone_from"));
                     }
                 }
-
-                input.clone = Some(clone);
             }
             "Copy" => {
-                let mut copy = input.copy.take().unwrap_or_default();
-
-                for attr in attrs {
-                    if let Ok(syn::Meta::List(syn::MetaList{
-                        ident: ref name,
-                        nested: ref traits,
-                        ..
-                    })) = attr.parse_meta() {
-                        fn is_clone(elem: &syn::NestedMeta) -> bool {
-                            match *elem {
-                                syn::NestedMeta::Meta(ref mi) => mi.name() == "Clone",
-                                syn::NestedMeta::Literal(..) => false,
-                            }
-                        }
-                        if name == "derive" && traits.iter().any(is_clone) {
-                            copy.derives_clone = true;
-                        }
-                    }
-                }
-
                 match_attributes! {
+                    let Some(copy) = input.copy;
                     for value in values;
                     "bound" => try!(parse_bound(&mut copy.bounds, opt_string_to_str!(value))),
                 }
-
-                input.copy = Some(copy);
             }
             "Debug" => {
                 match_attributes! {
@@ -325,10 +292,6 @@ impl Input {
             .map_or(None, |d| d.bounds.as_ref().map(Vec::as_slice))
     }
 
-    pub fn derives_clone(&self) -> bool {
-        self.copy.as_ref().map_or(false, |d| d.derives_clone)
-    }
-
     pub fn debug_bound(&self) -> Option<&[syn::WherePredicate]> {
         self.debug
             .as_ref()
@@ -355,12 +318,6 @@ impl Input {
         self.hash
             .as_ref()
             .map_or(None, |d| d.bounds.as_ref().map(Vec::as_slice))
-    }
-
-    pub fn rustc_copy_clone_marker(&self) -> bool {
-        self.clone
-            .as_ref()
-            .map_or(false, |d| d.rustc_copy_clone_marker)
     }
 
     pub fn partial_eq_bound(&self) -> Option<&[syn::WherePredicate]> {

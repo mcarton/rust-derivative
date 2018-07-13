@@ -26,7 +26,7 @@ fn derive_impls(input: &ast::Input) -> Result<proc_macro2::TokenStream, String> 
         tokens.extend(clone::derive_clone(input));
     }
     if input.attrs.copy.is_some() {
-        tokens.extend(clone::derive_copy(input)?);
+        tokens.extend(clone::derive_copy(input));
     }
     if input.attrs.debug.is_some() {
         tokens.extend(debug::derive(input));

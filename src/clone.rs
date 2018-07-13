@@ -7,12 +7,8 @@ use syn;
 use utils;
 
 /// Derive `Copy` for `input`.
-pub fn derive_copy(input: &ast::Input) -> Result<proc_macro2::TokenStream, String> {
+pub fn derive_copy(input: &ast::Input) -> proc_macro2::TokenStream {
     let name = &input.ident;
-
-    if input.attrs.derives_clone() {
-        return Err("`#[derivative(Copy)]` can't be used with `#[derive(Clone)]`".into());
-    }
 
     let copy_trait_path = copy_trait_path();
     let generics = utils::build_impl_generics(
@@ -24,10 +20,10 @@ pub fn derive_copy(input: &ast::Input) -> Result<proc_macro2::TokenStream, Strin
     );
     let (impl_generics, ty_generics, where_clause) = generics.split_for_impl();
 
-    Ok(quote! {
+    quote! {
         #[allow(unused_qualifications)]
         impl #impl_generics #copy_trait_path for #name #ty_generics #where_clause {}
-    })
+    }
 }
 
 /// Derive `Clone` for `input`.
@@ -44,7 +40,7 @@ pub fn derive_clone(input: &ast::Input) -> proc_macro2::TokenStream {
     );
     let (impl_generics, ty_generics, where_clause) = generics.split_for_impl();
 
-    let is_copy = input.attrs.rustc_copy_clone_marker() || input.attrs.copy.is_some();
+    let is_copy = input.attrs.copy.is_some();
     if is_copy && input.generics.type_params().count() == 0 {
         quote! {
             #[allow(unused_qualifications)]
