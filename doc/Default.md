@@ -63,7 +63,7 @@ println!("{:?}", Foo::new()); // Foo { foo: 0, bar: 0 }
 
 # Custom bound
 
-The following does now work because `derive` adds a `T: Default` bound on the
+The following does not work because `derive` adds a `T: Default` bound on the
 `impl Default for Foo<T>`:
 
 ```rust
