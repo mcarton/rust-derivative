@@ -1,16 +1,16 @@
 use ast;
 use attr;
 use matcher;
-use quote;
-use syn::{self, aster};
+use syn;
 use utils;
 
-pub fn derive(input: &ast::Input) -> quote::Tokens {
+pub fn derive(input: &ast::Input) -> proc_macro2::TokenStream {
     let hasher_trait_path = hasher_trait_path();
     let hash_trait_path = hash_trait_path();
 
-    let body = matcher::Matcher::new(matcher::BindingStyle::Ref)
-        .build_arms(input, |arm_path, _, _, _, bis| {
+    let body = matcher::Matcher::new(matcher::BindingStyle::Ref).build_arms(
+        input,
+        |arm_path, _, _, _, bis| {
             let field_prints = bis.iter().filter_map(|bi| {
                 if bi.field.attrs.ignore_hash() {
                     return None;
@@ -41,10 +41,11 @@ pub fn derive(input: &ast::Input) -> quote::Tokens {
                 #variant
                 #(#field_prints)*
             }
-        });
+        },
+    );
 
     let name = &input.ident;
-
+    let (_impl_generics, ty_generics, _where_clause) = input.generics.split_for_impl();
     let impl_generics = utils::build_impl_generics(
         input,
         &hash_trait_path,
@@ -54,17 +55,10 @@ pub fn derive(input: &ast::Input) -> quote::Tokens {
     );
     let where_clause = &impl_generics.where_clause;
 
-    let ty = syn::aster::ty()
-        .path()
-        .segment(name.clone())
-        .with_generics(impl_generics.clone())
-        .build()
-        .build();
-
     let hasher_ty_parameter = utils::hygienic_type_parameter(input, "__H");
     quote! {
         #[allow(unused_qualifications)]
-        impl #impl_generics #hash_trait_path for #ty #where_clause {
+        impl #impl_generics #hash_trait_path for #name #ty_generics #where_clause {
             fn hash<#hasher_ty_parameter>(&self, __state: &mut #hasher_ty_parameter)
                 where #hasher_ty_parameter: #hasher_trait_path
             {
@@ -82,10 +76,10 @@ fn needs_hash_bound(attrs: &attr::Field) -> bool {
 
 /// Return the path of the `Hash` trait, that is `::std::hash::Hash`.
 fn hash_trait_path() -> syn::Path {
-    aster::path().global().ids(&["std", "hash", "Hash"]).build()
+    parse_quote!(::std::hash::Hash)
 }
 
 /// Return the path of the `Hasher` trait, that is `::std::hash::Hasher`.
 fn hasher_trait_path() -> syn::Path {
-    aster::path().global().ids(&["std", "hash", "Hasher"]).build()
+    parse_quote!(::std::hash::Hasher)
 }

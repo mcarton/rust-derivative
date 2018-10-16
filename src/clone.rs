@@ -1,12 +1,11 @@
 use ast;
 use attr;
 use matcher;
-use quote;
-use syn::{self, aster};
+use syn;
 use utils;
 
 /// Derive `Copy` for `input`.
-pub fn derive_copy(input: &ast::Input) -> Result<quote::Tokens, String> {
+pub fn derive_copy(input: &ast::Input) -> Result<proc_macro2::TokenStream, String> {
     let name = &input.ident;
 
     if input.attrs.derives_clone() {
@@ -14,6 +13,7 @@ pub fn derive_copy(input: &ast::Input) -> Result<quote::Tokens, String> {
     }
 
     let copy_trait_path = copy_trait_path();
+    let (_impl_generics, ty_generics, _where_clause) = input.generics.split_for_impl();
     let impl_generics = utils::build_impl_generics(
         input,
         &copy_trait_path,
@@ -23,24 +23,18 @@ pub fn derive_copy(input: &ast::Input) -> Result<quote::Tokens, String> {
     );
     let where_clause = &impl_generics.where_clause;
 
-    let ty = syn::aster::ty()
-        .path()
-        .segment(name.clone())
-        .with_generics(impl_generics.clone())
-        .build()
-        .build();
-
     Ok(quote! {
         #[allow(unused_qualifications)]
-        impl #impl_generics #copy_trait_path for #ty #where_clause {}
+        impl #impl_generics #copy_trait_path for #name #ty_generics #where_clause {}
     })
 }
 
 /// Derive `Clone` for `input`.
-pub fn derive_clone(input: &ast::Input) -> quote::Tokens {
+pub fn derive_clone(input: &ast::Input) -> proc_macro2::TokenStream {
     let name = &input.ident;
 
     let clone_trait_path = clone_trait_path();
+    let (_impl_generics, ty_generics, _where_clause) = input.generics.split_for_impl();
     let impl_generics = utils::build_impl_generics(
         input,
         &clone_trait_path,
@@ -50,26 +44,20 @@ pub fn derive_clone(input: &ast::Input) -> quote::Tokens {
     );
     let where_clause = &impl_generics.where_clause;
 
-    let ty = syn::aster::ty()
-        .path()
-        .segment(name.clone())
-        .with_generics(impl_generics.clone())
-        .build()
-        .build();
-
     let is_copy = input.attrs.rustc_copy_clone_marker() || input.attrs.copy.is_some();
-    if is_copy && input.generics.ty_params.is_empty() {
+    if is_copy && input.generics.type_params().count() == 0 {
         quote! {
             #[allow(unused_qualifications)]
-            impl #impl_generics #clone_trait_path for #ty #where_clause {
+            impl #impl_generics #clone_trait_path for #name #ty_generics #where_clause {
                 fn clone(&self) -> Self {
                     *self
                 }
             }
         }
     } else {
-        let body = matcher::Matcher::new(matcher::BindingStyle::Ref)
-            .build_arms(input, |arm_path, _, style, _, bis| {
+        let body = matcher::Matcher::new(matcher::BindingStyle::Ref).build_arms(
+            input,
+            |arm_path, _, style, _, bis| {
                 let field_clones = bis.iter().map(|bi| {
                     let arg = &bi.ident;
 
@@ -107,40 +95,43 @@ pub fn derive_clone(input: &ast::Input) -> quote::Tokens {
                         }
                     }
                 }
-            });
+            },
+        );
 
         let clone_from = if input.attrs.clone_from() {
-            Some(matcher::Matcher::new(matcher::BindingStyle::RefMut)
-                .build_arms(input, |outer_arm_path, _, _, _, outer_bis| {
-                    let body = matcher::Matcher::new(matcher::BindingStyle::Ref)
-                        .with_name("__other".into())
-                        .build_arms(input, |inner_arm_path, _, _, _, inner_bis| {
-                            if outer_arm_path == inner_arm_path {
-                                let field_clones = outer_bis
-                                    .iter()
-                                    .zip(inner_bis)
-                                    .map(|(outer_bi, inner_bi)| {
-                                        let outer = &outer_bi.ident;
-                                        let inner = &inner_bi.ident;
+            Some(
+                matcher::Matcher::new(matcher::BindingStyle::RefMut).build_arms(
+                    input,
+                    |outer_arm_path, _, _, _, outer_bis| {
+                        let body = matcher::Matcher::new(matcher::BindingStyle::Ref)
+                            .with_name("__other".into())
+                            .build_arms(input, |inner_arm_path, _, _, _, inner_bis| {
+                                if outer_arm_path == inner_arm_path {
+                                    let field_clones = outer_bis.iter().zip(inner_bis).map(
+                                        |(outer_bi, inner_bi)| {
+                                            let outer = &outer_bi.ident;
+                                            let inner = &inner_bi.ident;
 
-                                        quote!(#outer.clone_from(#inner);)
-                                    });
+                                            quote!(#outer.clone_from(#inner);)
+                                        },
+                                    );
 
-                                quote! {
-                                    #(#field_clones)*
-                                    return;
+                                    quote! {
+                                        #(#field_clones)*
+                                        return;
+                                    }
+                                } else {
+                                    quote!()
                                 }
-                            } else {
-                                quote!()
-                            }
-                        });
+                            });
 
-                    quote! {
-                        match *other {
-                            #body
+                        quote! {
+                            match *other {
+                                #body
+                            }
                         }
-                    }
-                })
+                    },
+                ),
             )
         } else {
             None
@@ -168,7 +159,7 @@ pub fn derive_clone(input: &ast::Input) -> quote::Tokens {
 
         quote! {
             #[allow(unused_qualifications)]
-            impl #impl_generics #clone_trait_path for #ty #where_clause {
+            impl #impl_generics #clone_trait_path for #name #ty_generics #where_clause {
                 fn clone(&self) -> Self {
                     match *self {
                         #body
@@ -187,10 +178,10 @@ fn needs_clone_bound(attrs: &attr::Field) -> bool {
 
 /// Return the path of the `Clone` trait, that is `::std::clone::Clone`.
 fn clone_trait_path() -> syn::Path {
-    aster::path().global().ids(&["std", "clone", "Clone"]).build()
+    parse_quote!(::std::clone::Clone)
 }
 
-/// Return the path of the `Copy` trait, that is `::std::marker::Clone`.
+/// Return the path of the `Copy` trait, that is `::std::marker::Copy`.
 fn copy_trait_path() -> syn::Path {
-    aster::path().global().ids(&["std", "marker", "Copy"]).build()
+    parse_quote!(::std::marker::Copy)
 }
