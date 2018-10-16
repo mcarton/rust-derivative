@@ -599,7 +599,13 @@ fn parse_boolean_meta_item(item: &Option<&str>, default: bool, name: &str) -> Re
     match *item {
         Some("true") => Ok(true),
         Some("false") => Ok(false),
-        Some(_) => Err(format!("Invalid value for `{}`", name)),
+        Some(val @ _) => {
+            if val == name {
+                Ok(true)
+            } else {
+                Err(format!("Invalid value for `{}`: `{}`", name, val))
+            }
+        }
         None => Ok(default),
     }
 }
