@@ -26,6 +26,7 @@ pub fn derive(input: &ast::Input) -> proc_macro2::TokenStream {
                 });
 
                 let builder = if let Some(ref name) = bi.field.ident {
+                    let name = name.to_string();
                     quote! {
                         #dummy_debug
                         let _ = builder.field(#name, &#arg);
