@@ -51,8 +51,9 @@ pub fn derive(input: &ast::Input) -> proc_macro2::TokenStream {
                     #(#field_prints)*
                 }
             } else {
+                let name = arm_name.to_string();
                 quote! {
-                    let mut builder = __f.#method(#arm_name);
+                    let mut builder = __f.#method(#name);
                     #(#field_prints)*
                     builder.finish()
                 }
