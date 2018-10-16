@@ -20,7 +20,7 @@ proc-macro = true
 itertools = "~0.5"
 quote = "^0.3"
 syn = { version = "0.10", features = ["aster", "full", "visit"] }
-compiletest_rs = { version = "^0.2", optional = true }
+compiletest_rs = { version = "^0.3", optional = true }
 
 [features]
 nightly = ["compiletest_rs"]
