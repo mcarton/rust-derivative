@@ -123,48 +123,55 @@ impl Matcher {
     where
         N: quote::ToTokens,
     {
-        let mut t = proc_macro2::TokenStream::new();
-        let mut matches = Vec::new();
-
         let binding = self.binding_style;
-        name.to_tokens(&mut t);
-        match style {
-            ast::Style::Unit => {}
+        let (stream, matches) = match style {
+            ast::Style::Unit => (proc_macro2::TokenStream::new(), Vec::new()),
             ast::Style::Tuple => {
-                t.extend(quote!("("));
-                for (i, field) in fields.iter().enumerate() {
-                    let ident: syn::Ident = syn::Ident::new(
-                        &format!("{}_{}", self.binding_name, i),
-                        proc_macro2::Span::call_site(),
-                    );
-                    quote!(#binding #ident ,).to_tokens(&mut t);
-                    matches.push(BindingInfo {
-                        ident: ident,
-                        field: field,
-                    });
-                }
-                t.extend(quote!(")"));
+                let (mut stream, matches) = fields.iter().enumerate().fold(
+                    (proc_macro2::TokenStream::new(), Vec::new()),
+                    |(mut stream, mut matches), (i, field)| {
+                        let ident: syn::Ident = syn::Ident::new(
+                            &format!("{}_{}", self.binding_name, i),
+                            proc_macro2::Span::call_site(),
+                        );
+                        quote!(#binding #ident ,).to_tokens(&mut stream);
+                        matches.push(BindingInfo { ident, field });
+
+                        (stream, matches)
+                    },
+                );
+
+                (quote! { ( #stream ) }, matches)
             }
             ast::Style::Struct => {
-                t.extend(quote!("{"));
-                for (i, field) in fields.iter().enumerate() {
-                    let ident: syn::Ident = syn::Ident::new(
-                        &format!("{}_{}", self.binding_name, i),
-                        proc_macro2::Span::call_site(),
-                    );
-                    {
-                        let field_name = field.ident.as_ref().unwrap();
-                        quote!(#field_name : #binding #ident ,).to_tokens(&mut t);
-                    }
-                    matches.push(BindingInfo {
-                        ident: ident,
-                        field: field,
-                    });
-                }
-                t.extend(quote!("}"));
-            }
-        }
+                let (mut stream, matches) = fields.iter().enumerate().fold(
+                    (proc_macro2::TokenStream::new(), Vec::new()),
+                    |(mut stream, mut matches), (i, field)| {
+                        let ident: syn::Ident = syn::Ident::new(
+                            &format!("{}_{}", self.binding_name, i),
+                            proc_macro2::Span::call_site(),
+                        );
+                        {
+                            let field_name = field.ident.as_ref().unwrap();
+                            quote!(#field_name : #binding #ident ,).to_tokens(&mut stream);
+                        }
+                        matches.push(BindingInfo {
+                            ident: ident,
+                            field: field,
+                        });
 
-        (t, matches)
+                        (stream, matches)
+                    },
+                );
+
+                (quote! { { #stream } }, matches)
+            }
+        };
+
+        let mut all_tokens = proc_macro2::TokenStream::new();
+        name.to_tokens(&mut all_tokens);
+        all_tokens.extend(stream);
+
+        (all_tokens, matches)
     }
 }
