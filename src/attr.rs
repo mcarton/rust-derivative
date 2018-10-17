@@ -386,7 +386,7 @@ impl Field {
                     "bound" => try!(parse_bound(&mut out.clone.bounds, opt_string_to_str!(value))),
                     "clone_with" => {
                         let path = try!(opt_string_to_str!(value).ok_or_else(|| "`clone_with` needs a value".to_string()));
-                        out.clone.clone_with = Some(try!(parse_str_to_type::<syn::Path>(&path)));
+                        out.clone.clone_with = Some(try!(parse_str(&path)));
                     }
                 }
             }
@@ -396,7 +396,7 @@ impl Field {
                     "bound" => try!(parse_bound(&mut out.debug.bounds, opt_string_to_str!(value))),
                     "format_with" => {
                         let path = try!(opt_string_to_str!(value).ok_or_else(|| "`format_with` needs a value".to_string()));
-                        out.debug.format_with = Some(try!(parse_str_to_type::<syn::Path>(&path)));
+                        out.debug.format_with = Some(try!(parse_str(&path)));
                     }
                     "ignore" => {
                         out.debug.ignore = try!(parse_boolean_meta_item(&opt_string_to_str!(value), true, "ignore"));
@@ -409,7 +409,7 @@ impl Field {
                     "bound" => try!(parse_bound(&mut out.default.bounds, opt_string_to_str!(value))),
                     "value" => {
                         let value = try!(opt_string_to_str!(value).ok_or_else(|| "`value` needs a value".to_string()));
-                        out.default.value = Some(try!(parse_str_to_type(&value)));
+                        out.default.value = Some(try!(parse_str(&value)));
                     }
                 }
             }
@@ -425,7 +425,7 @@ impl Field {
                     "bound" => try!(parse_bound(&mut out.hash.bounds, opt_string_to_str!(value))),
                     "hash_with" => {
                         let path = try!(opt_string_to_str!(value).ok_or_else(|| "`hash_with` needs a value".to_string()));
-                        out.hash.hash_with = Some(try!(parse_str_to_type::<syn::Path>(&path)));
+                        out.hash.hash_with = Some(try!(parse_str(&path)));
                     }
                     "ignore" => {
                         out.hash.ignore = try!(parse_boolean_meta_item(&opt_string_to_str!(value), true, "ignore"));
@@ -438,7 +438,7 @@ impl Field {
                     "bound" => try!(parse_bound(&mut out.partial_eq.bounds, opt_string_to_str!(value))),
                     "compare_with" => {
                         let path = try!(opt_string_to_str!(value).ok_or_else(|| "`compare_with` needs a value".to_string()));
-                        out.partial_eq.compare_with = Some(try!(parse_str_to_type::<syn::Path>(&path)));
+                        out.partial_eq.compare_with = Some(try!(parse_str(&path)));
                     }
                     "ignore" => {
                         out.partial_eq.ignore = try!(parse_boolean_meta_item(&opt_string_to_str!(value), true, "ignore"));
@@ -643,11 +643,9 @@ fn string_or_err(lit: &syn::Lit) -> Result<String, String> {
     }
 }
 
-fn parse_str_to_type<T>(value: &str) -> Result<T, String>
+fn parse_str<T>(value: &str) -> Result<T, String>
 where
     T: syn::parse::Parse,
 {
-    proc_macro2::TokenStream::from_str(value)
-        .map_err(|e| format!("{:?}", e))
-        .and_then(|stream| syn::parse2::<T>(stream).map_err(|e| e.to_string()))
+    syn::parse_str::<T>(value).map_err(|e| e.to_string())
 }
