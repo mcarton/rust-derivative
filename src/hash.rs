@@ -45,15 +45,14 @@ pub fn derive(input: &ast::Input) -> proc_macro2::TokenStream {
     );
 
     let name = &input.ident;
-    let (_impl_generics, ty_generics, _where_clause) = input.generics.split_for_impl();
-    let impl_generics = utils::build_impl_generics(
+    let generics = utils::build_impl_generics(
         input,
         &hash_trait_path,
         needs_hash_bound,
         |field| field.hash_bound(),
         |input| input.hash_bound(),
     );
-    let where_clause = &impl_generics.where_clause;
+    let (impl_generics, ty_generics, where_clause) = generics.split_for_impl();
 
     let hasher_ty_parameter = utils::hygienic_type_parameter(input, "__H");
     quote! {

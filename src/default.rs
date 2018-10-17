@@ -49,15 +49,14 @@ pub fn derive(input: &ast::Input, default: &attr::InputDefault) -> proc_macro2::
 
     let name = &input.ident;
     let default_trait_path = default_trait_path();
-    let (_impl_generics, ty_generics, _where_clause) = input.generics.split_for_impl();
-    let impl_generics = utils::build_impl_generics(
+    let generics = utils::build_impl_generics(
         input,
         &default_trait_path,
         |attrs| attrs.default_bound().is_none(),
         |field| field.default_bound(),
         |input| input.default_bound(),
     );
-    let where_clause = &impl_generics.where_clause;
+    let (impl_generics, ty_generics, where_clause) = generics.split_for_impl();
 
     let body = match input.body {
         ast::Body::Enum(ref data) => {

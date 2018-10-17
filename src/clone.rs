@@ -13,15 +13,14 @@ pub fn derive_copy(input: &ast::Input) -> Result<proc_macro2::TokenStream, Strin
     }
 
     let copy_trait_path = copy_trait_path();
-    let (_impl_generics, ty_generics, _where_clause) = input.generics.split_for_impl();
-    let impl_generics = utils::build_impl_generics(
+    let generics = utils::build_impl_generics(
         input,
         &copy_trait_path,
         |attrs| attrs.copy_bound().is_none(),
         |field| field.copy_bound(),
         |input| input.copy_bound(),
     );
-    let where_clause = &impl_generics.where_clause;
+    let (impl_generics, ty_generics, where_clause) = generics.split_for_impl();
 
     Ok(quote! {
         #[allow(unused_qualifications)]
@@ -34,15 +33,14 @@ pub fn derive_clone(input: &ast::Input) -> proc_macro2::TokenStream {
     let name = &input.ident;
 
     let clone_trait_path = clone_trait_path();
-    let (_impl_generics, ty_generics, _where_clause) = input.generics.split_for_impl();
-    let impl_generics = utils::build_impl_generics(
+    let generics = utils::build_impl_generics(
         input,
         &clone_trait_path,
         needs_clone_bound,
         |field| field.clone_bound(),
         |input| input.clone_bound(),
     );
-    let where_clause = &impl_generics.where_clause;
+    let (impl_generics, ty_generics, where_clause) = generics.split_for_impl();
 
     let is_copy = input.attrs.rustc_copy_clone_marker() || input.attrs.copy.is_some();
     if is_copy && input.generics.type_params().count() == 0 {

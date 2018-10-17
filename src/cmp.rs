@@ -10,15 +10,14 @@ pub fn derive_eq(input: &ast::Input) -> proc_macro2::TokenStream {
     let name = &input.ident;
 
     let eq_trait_path = eq_trait_path();
-    let (_impl_generics, ty_generics, _where_clause) = input.generics.split_for_impl();
-    let impl_generics = utils::build_impl_generics(
+    let generics = utils::build_impl_generics(
         input,
         &eq_trait_path,
         |attrs| attrs.eq_bound().is_none(),
         |field| field.eq_bound(),
         |input| input.eq_bound(),
     );
-    let where_clause = &impl_generics.where_clause;
+    let (impl_generics, ty_generics, where_clause) = generics.split_for_impl();
 
     quote! {
         #[allow(unused_qualifications)]
@@ -75,15 +74,14 @@ pub fn derive_partial_eq(input: &ast::Input) -> Result<proc_macro2::TokenStream,
     let name = &input.ident;
 
     let partial_eq_trait_path = partial_eq_trait_path();
-    let (_impl_generics, ty_generics, _where_clause) = input.generics.split_for_impl();
-    let impl_generics = utils::build_impl_generics(
+    let generics = utils::build_impl_generics(
         input,
         &partial_eq_trait_path,
         |attrs| attrs.partial_eq_bound().is_none(),
         |field| field.partial_eq_bound(),
         |input| input.partial_eq_bound(),
     );
-    let where_clause = &impl_generics.where_clause;
+    let (impl_generics, ty_generics, where_clause) = generics.split_for_impl();
 
     Ok(quote! {
         #[allow(unused_qualifications)]

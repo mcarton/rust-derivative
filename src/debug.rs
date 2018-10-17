@@ -65,15 +65,14 @@ pub fn derive(input: &ast::Input) -> proc_macro2::TokenStream {
     let name = &input.ident;
 
     let debug_trait_path = debug_trait_path();
-    let (_impl_generics, ty_generics, _where_clause) = input.generics.split_for_impl();
-    let impl_generics = utils::build_impl_generics(
+    let generics = utils::build_impl_generics(
         input,
         &debug_trait_path,
         needs_debug_bound,
         |field| field.debug_bound(),
         |input| input.debug_bound(),
     );
-    let where_clause = &impl_generics.where_clause;
+    let (impl_generics, ty_generics, where_clause) = generics.split_for_impl();
 
     quote! {
         #[allow(unused_qualifications)]
