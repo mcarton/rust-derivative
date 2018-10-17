@@ -1,5 +1,6 @@
 use std::str::FromStr;
 
+use quote::ToTokens;
 use syn;
 
 /// Represent the `derivative` attributes on the input type (`struct`/`enum`).
@@ -619,8 +620,12 @@ fn parse_bound(
     let bound = try!(value.ok_or_else(|| "`bound` needs a value".to_string()));
 
     if !bound.is_empty() {
-        let where_clause =
-            syn::parse2::<syn::WhereClause>(quote!(where #bound)).map_err(|e| e.to_string());
+        let mut stream = proc_macro2::TokenStream::new();
+        quote!(where).to_tokens(&mut stream);
+        let constraints = proc_macro2::TokenStream::from_str(bound).map_err(|e| format!("{:?}", e));
+        stream.extend(constraints);
+
+        let where_clause = syn::parse2::<syn::WhereClause>(stream).map_err(|e| e.to_string());
         bounds.extend(try!(where_clause).predicates);
     }
 
