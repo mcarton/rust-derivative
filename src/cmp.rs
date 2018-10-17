@@ -1,5 +1,7 @@
 // https://github.com/rust-lang/rust/issues/13101
 
+use proc_macro2;
+
 use ast;
 use matcher;
 use syn;

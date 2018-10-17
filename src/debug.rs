@@ -1,3 +1,5 @@
+use proc_macro2;
+
 use ast;
 use attr;
 use matcher;

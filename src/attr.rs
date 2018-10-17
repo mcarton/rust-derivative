@@ -1,5 +1,6 @@
 use std::str::FromStr;
 
+use proc_macro2;
 use quote::ToTokens;
 use syn;
 

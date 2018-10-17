@@ -6,12 +6,13 @@
 //     * not generic, we use our own `ast`, `synstructure` only knows about `syn`
 //     * missing information (what arm are we in?, what attributes? etc.)
 
+use proc_macro2;
+use quote::ToTokens;
+use syn;
+
 use ast;
 use attr;
 use quote;
-
-use quote::ToTokens;
-use syn;
 
 /// The type of binding to use when generating a pattern.
 #[derive(Debug, Copy, Clone)]
