@@ -125,7 +125,7 @@ fn format_with(
                 proc_macro2::Span::call_site(),
             )));
 
-            let path = parse_quote!(#ty.ident);
+            let path = syn::Path::from(syn::PathSegment::from(ty.ident.clone()));
 
             syn::WherePredicate::Type(syn::PredicateType {
                 lifetimes: None,
