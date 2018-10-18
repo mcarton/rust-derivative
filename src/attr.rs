@@ -58,7 +58,7 @@ pub struct InputClone {
 pub struct InputCopy {
     /// The `bound` attribute if present and the corresponding bounds.
     bounds: Option<Vec<syn::WherePredicate>>,
-    /// Wether the input also derive `Clone` (ie. `derive(Clone)`, but not `derivative(Clone)`)
+    /// Whether the input also derive `Clone` (ie. `derive(Clone)`, but not `derivative(Clone)`)
     derives_clone: bool,
 }
 
