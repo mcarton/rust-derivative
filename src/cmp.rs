@@ -3,6 +3,7 @@
 use proc_macro2;
 
 use ast;
+use attr;
 use matcher;
 use syn;
 use utils;
@@ -15,7 +16,7 @@ pub fn derive_eq(input: &ast::Input) -> proc_macro2::TokenStream {
     let generics = utils::build_impl_generics(
         input,
         &eq_trait_path,
-        |attrs| attrs.eq_bound().is_none(),
+        needs_eq_bound,
         |field| field.eq_bound(),
         |input| input.eq_bound(),
     );
@@ -79,7 +80,7 @@ pub fn derive_partial_eq(input: &ast::Input) -> Result<proc_macro2::TokenStream,
     let generics = utils::build_impl_generics(
         input,
         &partial_eq_trait_path,
-        |attrs| attrs.partial_eq_bound().is_none(),
+        needs_partial_eq_bound,
         |field| field.partial_eq_bound(),
         |input| input.partial_eq_bound(),
     );
@@ -95,6 +96,14 @@ pub fn derive_partial_eq(input: &ast::Input) -> Result<proc_macro2::TokenStream,
             }
         }
     })
+}
+
+fn needs_partial_eq_bound(attrs: &attr::Field) -> bool {
+    !attrs.ignore_partial_eq() && attrs.partial_eq_bound().is_none()
+}
+
+fn needs_eq_bound(attrs: &attr::Field) -> bool {
+    !attrs.ignore_partial_eq() && attrs.eq_bound().is_none()
 }
 
 /// Return the path of the `Eq` trait, that is `::std::cmp::Eq`.
