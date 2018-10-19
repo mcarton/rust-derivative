@@ -1,6 +1,8 @@
 #[macro_use]
 extern crate derivative;
 
+use std::marker::PhantomData;
+
 #[derive(Derivative)]
 #[derivative(Debug)]
 struct Foo<T, U> {
@@ -58,6 +60,18 @@ impl<T: std::fmt::Debug> ToDebug for T {
     }
 }
 
+#[derive(Derivative)]
+#[derivative(Debug)]
+struct PhantomField<T> {
+    foo: PhantomData<T>,
+}
+
+#[derive(Derivative)]
+#[derivative(Debug)]
+struct PhantomTuple<T> {
+    foo: PhantomData<(T,)>,
+}
+
 #[test]
 fn main() {
     assert_eq!(Foo { foo: 42, bar: NoDebug }.to_show(), "Foo { foo: 42 }".to_string());
@@ -69,4 +83,6 @@ fn main() {
     assert_eq!(F(NoDebug).to_show(), "F".to_string());
     assert_eq!(G(42, NoDebug).to_show(), "G(42)".to_string());
     assert_eq!(J(NoDebug).to_show(), "J".to_string());
+    assert_eq!(&format!("{:?}", PhantomField::<NoDebug> { foo: Default::default() }), "PhantomField { foo: PhantomData }");
+    assert_eq!(&format!("{:?}", PhantomTuple::<NoDebug> { foo: Default::default() }), "PhantomTuple { foo: PhantomData }");
 }

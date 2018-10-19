@@ -112,12 +112,10 @@ where
     }
     impl<'ast> visit::Visit<'ast> for FindTyParams {
         fn visit_path(&mut self, path: &'ast syn::Path) {
-            if let Some(syn::punctuated::Pair::Punctuated(seg, _)) = path.segments.last() {
-                if seg.ident == "PhantomData" {
-                    // Hardcoded exception, because `PhantomData<T>` implements
-                    // most traits whether or not `T` implements it.
-                    return;
-                }
+            if is_phantom_data(path) {
+                // Hardcoded exception, because `PhantomData<T>` implements
+                // most traits whether or not `T` implements it.
+                return;
             }
             if path.leading_colon.is_none() && path.segments.len() == 1 {
                 let id = path.segments[0].ident.clone();
@@ -138,6 +136,13 @@ where
         .body
         .all_fields()
         .into_iter()
+        .filter(|field| {
+            if let syn::Type::Path(syn::TypePath { ref path, .. }) = field.ty {
+                !is_phantom_data(path)
+            } else {
+                true
+            }
+        })
         .filter(|field| filter(&field.attrs))
         .map(|field| &field.ty);
 
@@ -163,4 +168,11 @@ where
         });
     }
     cloned
+}
+
+fn is_phantom_data(path: &syn::Path) -> bool {
+    match path.segments.last() {
+        Some(syn::punctuated::Pair::End(seg)) if seg.ident == "PhantomData" => true,
+        _ => false,
+    }
 }
