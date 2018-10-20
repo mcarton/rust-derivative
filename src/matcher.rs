@@ -6,12 +6,13 @@
 //     * not generic, we use our own `ast`, `synstructure` only knows about `syn`
 //     * missing information (what arm are we in?, what attributes? etc.)
 
+use proc_macro2;
+use quote::ToTokens;
+use syn;
+
 use ast;
 use attr;
 use quote;
-
-use quote::ToTokens;
-use syn;
 
 /// The type of binding to use when generating a pattern.
 #[derive(Debug, Copy, Clone)]
@@ -27,14 +28,13 @@ pub enum BindingStyle {
 }
 
 impl quote::ToTokens for BindingStyle {
-    fn to_tokens(&self, tokens: &mut quote::Tokens) {
+    fn to_tokens(&self, tokens: &mut proc_macro2::TokenStream) {
         match *self {
             BindingStyle::Move => (),
-            BindingStyle::MoveMut => tokens.append("mut"),
-            BindingStyle::Ref => tokens.append("ref"),
+            BindingStyle::MoveMut => tokens.extend(quote!(mut)),
+            BindingStyle::Ref => tokens.extend(quote!(ref)),
             BindingStyle::RefMut => {
-                tokens.append("ref");
-                tokens.append("mut");
+                tokens.extend(quote!(ref mut));
             }
         }
     }
@@ -60,40 +60,53 @@ impl Matcher {
     }
 
     pub fn with_name(self, name: String) -> Self {
-        Matcher { binding_name: name, ..self }
+        Matcher {
+            binding_name: name,
+            ..self
+        }
     }
 
-    pub fn build_arms<F>(self, input: &ast::Input, f: F) -> quote::Tokens
-    where F: Fn(syn::Path, &syn::Ident, ast::Style, &attr::Input, Vec<BindingInfo>) -> quote::Tokens
+    pub fn build_arms<F>(self, input: &ast::Input, f: F) -> proc_macro2::TokenStream
+    where
+        F: Fn(syn::Path, &syn::Ident, ast::Style, &attr::Input, Vec<BindingInfo>)
+            -> proc_macro2::TokenStream,
     {
         let ident = &input.ident;
         // Generate patterns for matching against all of the variants
         let variants = match input.body {
-            ast::Body::Enum(ref variants) => {
-                variants.iter()
-                    .map(|variant| {
-                        let variant_ident = &variant.ident;
-                        let variant_path = syn::aster::path().ids(&[ident, variant_ident]).build();
+            ast::Body::Enum(ref variants) => variants
+                .iter()
+                .map(|variant| {
+                    let variant_ident = &variant.ident;
+                    let variant_path = parse_quote!(#ident::#variant_ident);
 
-                        let pat = self.build_match_pattern(
-                            &variant_path,
-                            variant.style,
-                            &variant.fields
-                        );
+                    let pat =
+                        self.build_match_pattern(&variant_path, variant.style, &variant.fields);
 
-                        (variant_path, variant_ident, variant.style, &variant.attrs, pat)
-                    })
-                    .collect()
-            }
+                    (
+                        variant_path,
+                        variant_ident,
+                        variant.style,
+                        &variant.attrs,
+                        pat,
+                    )
+                })
+                .collect(),
             ast::Body::Struct(style, ref vd) => {
-                let path = syn::aster::path().id(ident).build();
-                vec![(path, ident, style, &input.attrs, self.build_match_pattern(ident, style, vd))]
+                let path = parse_quote!(#ident);
+                vec![(
+                    path,
+                    ident,
+                    style,
+                    &input.attrs,
+                    self.build_match_pattern(ident, style, vd),
+                )]
             }
         };
 
         // Now that we have the patterns, generate the actual branches of the match
         // expression
-        let mut t = quote::Tokens::new();
+        let mut t = proc_macro2::TokenStream::new();
         for (path, name, style, attrs, (pat, bindings)) in variants {
             let body = f(path, name, style, attrs, bindings);
             quote!(#pat => { #body }).to_tokens(&mut t);
@@ -106,47 +119,60 @@ impl Matcher {
         &self,
         name: &N,
         style: ast::Style,
-        fields: &'a [ast::Field<'a>]
-    )
-    -> (quote::Tokens, Vec<BindingInfo<'a>>)
-    where N: quote::ToTokens,
+        fields: &'a [ast::Field<'a>],
+    ) -> (proc_macro2::TokenStream, Vec<BindingInfo<'a>>)
+    where
+        N: quote::ToTokens,
     {
-        let mut t = quote::Tokens::new();
-        let mut matches = Vec::new();
-
         let binding = self.binding_style;
-        name.to_tokens(&mut t);
-        match style {
-            ast::Style::Unit => {}
+        let (stream, matches) = match style {
+            ast::Style::Unit => (proc_macro2::TokenStream::new(), Vec::new()),
             ast::Style::Tuple => {
-                t.append("(");
-                for (i, field) in fields.iter().enumerate() {
-                    let ident: syn::Ident = format!("{}_{}", self.binding_name, i).into();
-                    quote!(#binding #ident ,).to_tokens(&mut t);
-                    matches.push(BindingInfo {
-                        ident: ident,
-                        field: field,
-                    });
-                }
-                t.append(")");
+                let (mut stream, matches) = fields.iter().enumerate().fold(
+                    (proc_macro2::TokenStream::new(), Vec::new()),
+                    |(mut stream, mut matches), (i, field)| {
+                        let ident: syn::Ident = syn::Ident::new(
+                            &format!("{}_{}", self.binding_name, i),
+                            proc_macro2::Span::call_site(),
+                        );
+                        quote!(#binding #ident ,).to_tokens(&mut stream);
+                        matches.push(BindingInfo { ident, field });
+
+                        (stream, matches)
+                    },
+                );
+
+                (quote! { ( #stream ) }, matches)
             }
             ast::Style::Struct => {
-                t.append("{");
-                for (i, field) in fields.iter().enumerate() {
-                    let ident: syn::Ident = format!("{}_{}", self.binding_name, i).into();
-                    {
-                        let field_name = field.ident.as_ref().unwrap();
-                        quote!(#field_name : #binding #ident ,).to_tokens(&mut t);
-                    }
-                    matches.push(BindingInfo {
-                        ident: ident,
-                        field: field,
-                    });
-                }
-                t.append("}");
-            }
-        }
+                let (mut stream, matches) = fields.iter().enumerate().fold(
+                    (proc_macro2::TokenStream::new(), Vec::new()),
+                    |(mut stream, mut matches), (i, field)| {
+                        let ident: syn::Ident = syn::Ident::new(
+                            &format!("{}_{}", self.binding_name, i),
+                            proc_macro2::Span::call_site(),
+                        );
+                        {
+                            let field_name = field.ident.as_ref().unwrap();
+                            quote!(#field_name : #binding #ident ,).to_tokens(&mut stream);
+                        }
+                        matches.push(BindingInfo {
+                            ident: ident,
+                            field: field,
+                        });
 
-        (t, matches)
+                        (stream, matches)
+                    },
+                );
+
+                (quote! { { #stream } }, matches)
+            }
+        };
+
+        let mut all_tokens = proc_macro2::TokenStream::new();
+        name.to_tokens(&mut all_tokens);
+        all_tokens.extend(stream);
+
+        (all_tokens, matches)
     }
 }

@@ -1,45 +1,41 @@
 // https://github.com/rust-lang/rust/issues/13101
 
+use proc_macro2;
+
 use ast;
+use attr;
 use matcher;
-use quote;
-use syn::{self, aster};
+use syn;
 use utils;
 
 /// Derive `Eq` for `input`.
-pub fn derive_eq(input: &ast::Input) -> quote::Tokens {
+pub fn derive_eq(input: &ast::Input) -> proc_macro2::TokenStream {
     let name = &input.ident;
 
     let eq_trait_path = eq_trait_path();
-    let impl_generics = utils::build_impl_generics(
+    let generics = utils::build_impl_generics(
         input,
         &eq_trait_path,
-        |attrs| attrs.eq_bound().is_none(),
+        needs_eq_bound,
         |field| field.eq_bound(),
         |input| input.eq_bound(),
     );
-    let where_clause = &impl_generics.where_clause;
-
-    let ty = syn::aster::ty()
-        .path()
-        .segment(name.clone())
-        .with_generics(impl_generics.clone())
-        .build()
-        .build();
+    let (impl_generics, ty_generics, where_clause) = generics.split_for_impl();
 
     quote! {
         #[allow(unused_qualifications)]
-        impl #impl_generics #eq_trait_path for #ty #where_clause {}
+        impl #impl_generics #eq_trait_path for #name #ty_generics #where_clause {}
     }
 }
 
 /// Derive `PartialEq` for `input`.
-pub fn derive_partial_eq(input: &ast::Input) -> Result<quote::Tokens, String> {
+pub fn derive_partial_eq(input: &ast::Input) -> Result<proc_macro2::TokenStream, String> {
     if let ast::Body::Enum(_) = input.body {
         if !input.attrs.partial_eq_on_enum() {
             return Err(
                 "can't use `#[derivative(PartialEq)]` on an enumeration without \
-                `feature_allow_slow_enum`; see the documentation for more details".into()
+                 `feature_allow_slow_enum`; see the documentation for more details"
+                    .into(),
             );
         }
     }
@@ -57,7 +53,8 @@ pub fn derive_partial_eq(input: &ast::Input) -> Result<quote::Tokens, String> {
 
                             if o.field.attrs.ignore_partial_eq() {
                                 None
-                            } else if let Some(compare_fn) = o.field.attrs.partial_eq_compare_with() {
+                            } else if let Some(compare_fn) = o.field.attrs.partial_eq_compare_with()
+                            {
                                 Some(quote!(&& #compare_fn(#outer_name, #inner_name)))
                             } else {
                                 Some(quote!(&& #outer_name == #inner_name))
@@ -80,25 +77,18 @@ pub fn derive_partial_eq(input: &ast::Input) -> Result<quote::Tokens, String> {
     let name = &input.ident;
 
     let partial_eq_trait_path = partial_eq_trait_path();
-    let impl_generics = utils::build_impl_generics(
+    let generics = utils::build_impl_generics(
         input,
         &partial_eq_trait_path,
-        |attrs| attrs.partial_eq_bound().is_none(),
+        needs_partial_eq_bound,
         |field| field.partial_eq_bound(),
         |input| input.partial_eq_bound(),
     );
-    let where_clause = &impl_generics.where_clause;
-
-    let ty = syn::aster::ty()
-        .path()
-        .segment(name.clone())
-        .with_generics(impl_generics.clone())
-        .build()
-        .build();
+    let (impl_generics, ty_generics, where_clause) = generics.split_for_impl();
 
     Ok(quote! {
         #[allow(unused_qualifications)]
-        impl #impl_generics #partial_eq_trait_path for #ty #where_clause {
+        impl #impl_generics #partial_eq_trait_path for #name #ty_generics #where_clause {
             fn eq(&self, other: &Self) -> bool {
                 match *self {
                     #body
@@ -108,12 +98,20 @@ pub fn derive_partial_eq(input: &ast::Input) -> Result<quote::Tokens, String> {
     })
 }
 
+fn needs_partial_eq_bound(attrs: &attr::Field) -> bool {
+    !attrs.ignore_partial_eq() && attrs.partial_eq_bound().is_none()
+}
+
+fn needs_eq_bound(attrs: &attr::Field) -> bool {
+    !attrs.ignore_partial_eq() && attrs.eq_bound().is_none()
+}
+
 /// Return the path of the `Eq` trait, that is `::std::cmp::Eq`.
 fn eq_trait_path() -> syn::Path {
-    aster::path().global().ids(&["std", "cmp", "Eq"]).build()
+    parse_quote!(::std::cmp::Eq)
 }
 
 /// Return the path of the `PartialEq` trait, that is `::std::cmp::PartialEq`.
 fn partial_eq_trait_path() -> syn::Path {
-    aster::path().global().ids(&["std", "cmp", "PartialEq"]).build()
+    parse_quote!(::std::cmp::PartialEq)
 }

@@ -13,7 +13,7 @@
 use ast;
 use attr;
 use std::collections::HashSet;
-use syn::{self, aster, visit};
+use syn::{self, visit, GenericParam};
 
 // use internals::ast::Item;
 // use internals::attr;
@@ -23,9 +23,16 @@ use syn::{self, aster, visit};
 /// allowed here".
 pub fn without_defaults(generics: &syn::Generics) -> syn::Generics {
     syn::Generics {
-        ty_params: generics.ty_params
+        params: generics
+            .params
             .iter()
-            .map(|ty_param| syn::TyParam { default: None, ..ty_param.clone() })
+            .map(|generic_param| match generic_param {
+                GenericParam::Type(ty_param) => syn::GenericParam::Type(syn::TypeParam {
+                    default: None,
+                    ..ty_param.clone()
+                }),
+                param @ _ => param.clone(),
+            })
             .collect(),
         ..generics.clone()
     }
@@ -35,9 +42,16 @@ pub fn with_where_predicates(
     generics: &syn::Generics,
     predicates: &[syn::WherePredicate],
 ) -> syn::Generics {
-    aster::from_generics(generics.clone())
-        .with_predicates(predicates.to_vec())
-        .build()
+    let mut cloned = generics.clone();
+
+    {
+        let where_clause = cloned.make_where_clause();
+        predicates
+            .iter()
+            .for_each(|predicate| where_clause.predicates.push(predicate.clone()));
+    }
+
+    cloned
 }
 
 pub fn with_where_predicates_from_fields<F>(
@@ -45,16 +59,23 @@ pub fn with_where_predicates_from_fields<F>(
     generics: &syn::Generics,
     from_field: F,
 ) -> syn::Generics
-    where F: Fn(&attr::Field) -> Option<&[syn::WherePredicate]>,
+where
+    F: Fn(&attr::Field) -> Option<&[syn::WherePredicate]>,
 {
-    aster::from_generics(generics.clone())
-        .with_predicates(
-            item.body
-                .all_fields()
-                .iter()
-                .flat_map(|field| from_field(&field.attrs))
-                .flat_map(|predicates| predicates.to_vec()))
-        .build()
+    let mut cloned = generics.clone();
+    {
+        let fields = item.body.all_fields();
+        let field_where_predicates = fields
+            .iter()
+            .flat_map(|field| from_field(&field.attrs))
+            .flat_map(|predicates| predicates.to_vec());
+
+        let where_clause = cloned.make_where_clause();
+        field_where_predicates
+            .into_iter()
+            .for_each(|predicate| where_clause.predicates.push(predicate.clone()));
+    }
+    cloned
 }
 
 /// Puts the given bound on any generic type parameters that are used in fields
@@ -76,7 +97,8 @@ pub fn with_bound<F>(
     filter: F,
     bound: &syn::Path,
 ) -> syn::Generics
-    where F: Fn(&attr::Field) -> bool,
+where
+    F: Fn(&attr::Field) -> bool,
 {
     #[derive(Debug)]
     struct FindTyParams {
@@ -88,33 +110,39 @@ pub fn with_bound<F>(
         /// them.
         relevant_ty_params: HashSet<syn::Ident>,
     }
-    impl visit::Visitor for FindTyParams {
-        fn visit_path(&mut self, path: &syn::Path) {
-            if let Some(seg) = path.segments.last() {
-                if seg.ident == "PhantomData" {
-                    // Hardcoded exception, because `PhantomData<T>` implements
-                    // most traits whether or not `T` implements it.
-                    return;
-                }
+    impl<'ast> visit::Visit<'ast> for FindTyParams {
+        fn visit_path(&mut self, path: &'ast syn::Path) {
+            if is_phantom_data(path) {
+                // Hardcoded exception, because `PhantomData<T>` implements
+                // most traits whether or not `T` implements it.
+                return;
             }
-            if !path.global && path.segments.len() == 1 {
+            if path.leading_colon.is_none() && path.segments.len() == 1 {
                 let id = path.segments[0].ident.clone();
                 if self.all_ty_params.contains(&id) {
                     self.relevant_ty_params.insert(id);
                 }
             }
-            visit::walk_path(self, path);
+            visit::visit_path(self, path);
         }
     }
 
-    let all_ty_params: HashSet<_> = generics.ty_params
-        .iter()
+    let all_ty_params: HashSet<_> = generics
+        .type_params()
         .map(|ty_param| ty_param.ident.clone())
         .collect();
 
-    let relevant_tys = item.body
+    let relevant_tys = item
+        .body
         .all_fields()
         .into_iter()
+        .filter(|field| {
+            if let syn::Type::Path(syn::TypePath { ref path, .. }) = field.ty {
+                !is_phantom_data(path)
+            } else {
+                true
+            }
+        })
         .filter(|field| filter(&field.attrs))
         .map(|field| &field.ty);
 
@@ -123,21 +151,28 @@ pub fn with_bound<F>(
         relevant_ty_params: HashSet::new(),
     };
     for ty in relevant_tys {
-        visit::walk_ty(&mut visitor, ty);
+        visit::visit_type(&mut visitor, ty);
     }
 
-    aster::from_generics(generics.clone())
-        .with_predicates(generics.ty_params
-            .iter()
-            .map(|ty_param| ty_param.ident.clone())
+    let mut cloned = generics.clone();
+    {
+        let relevant_where_predicates = generics
+            .type_params()
+            .map(|ty_param| &ty_param.ident)
             .filter(|id| visitor.relevant_ty_params.contains(id))
-            .map(|id| {
-                aster::where_predicate()
-                    // the type parameter that is being bounded e.g. `T`
-                    .bound().build(aster::ty().id(id))
-                    // the bound e.g. `Debug`
-                    .bound().trait_(bound.clone()).build()
-                    .build()
-            }))
-        .build()
+            .map(|id| parse_quote!( #id : #bound ));
+
+        let where_clause = cloned.make_where_clause();
+        relevant_where_predicates.for_each(|predicate: syn::WherePredicate| {
+            where_clause.predicates.push(predicate.clone())
+        });
+    }
+    cloned
+}
+
+fn is_phantom_data(path: &syn::Path) -> bool {
+    match path.segments.last() {
+        Some(syn::punctuated::Pair::End(seg)) if seg.ident == "PhantomData" => true,
+        _ => false,
+    }
 }

@@ -1,14 +1,16 @@
+use std::marker::PhantomData;
+
 #[macro_use]
 extern crate derivative;
 
 #[derive(Derivative)]
 #[derivative(PartialEq)]
 struct Foo {
-    foo: u8
+    foo: u8,
 }
 
 #[derive(Derivative)]
-#[derivative(PartialEq="feature_allow_slow_enum")]
+#[derivative(PartialEq = "feature_allow_slow_enum")]
 enum Option<T> {
     Some(T),
     None,
@@ -17,8 +19,8 @@ enum Option<T> {
 #[derive(Derivative)]
 #[derivative(PartialEq)]
 struct WithPtr<T: ?Sized> {
-    #[derivative(PartialEq(bound=""))]
-    foo: *const T
+    #[derivative(PartialEq(bound = ""))]
+    foo: *const T,
 }
 
 #[derive(Derivative)]
@@ -28,24 +30,21 @@ struct Empty;
 #[derive(Derivative)]
 #[derivative(PartialEq)]
 struct AllIgnored {
-    #[derivative(PartialEq="ignore")]
+    #[derivative(PartialEq = "ignore")]
     foo: u8,
 }
 
 #[derive(Derivative)]
 #[derivative(PartialEq)]
 struct OneIgnored {
-    #[derivative(PartialEq="ignore")]
+    #[derivative(PartialEq = "ignore")]
     foo: u8,
     bar: u8,
 }
 
 #[derive(Derivative)]
 #[derivative(PartialEq)]
-struct Parity(
-    #[derivative(PartialEq(compare_with="same_parity"))]
-    u8,
-);
+struct Parity(#[derivative(PartialEq(compare_with = "same_parity"))] u8);
 
 fn same_parity(lhs: &u8, rhs: &u8) -> bool {
     lhs % 2 == rhs % 2
@@ -53,19 +52,26 @@ fn same_parity(lhs: &u8, rhs: &u8) -> bool {
 
 #[derive(Derivative)]
 #[derivative(PartialEq)]
-struct Generic<T>(
-    #[derivative(PartialEq(compare_with="dummy_cmp", bound=""))]
-    T,
-);
+struct Generic<T>(#[derivative(PartialEq(compare_with = "dummy_cmp", bound = ""))] T);
 
 fn dummy_cmp<T>(_: &T, _: &T) -> bool {
     true
 }
 
+struct NonPartialEq;
+
+#[derive(Derivative)]
+#[derivative(PartialEq, Eq)]
+struct GenericIgnore<T> {
+    f: u32,
+    #[derivative(PartialEq = "ignore")]
+    t: PhantomData<T>,
+}
+
 trait SomeTrait {}
 struct SomeType {
     #[allow(dead_code)]
-    foo: u8
+    foo: u8,
 }
 impl SomeTrait for SomeType {}
 
@@ -95,5 +101,14 @@ fn main() {
     assert!(Parity(3) != Parity(42));
     assert!(Parity(2) != Parity(7));
 
-    assert!(Generic(SomeType { foo: 0 }) == Generic(SomeType{ foo: 0 }));
+    assert!(Generic(SomeType { foo: 0 }) == Generic(SomeType { foo: 0 }));
+    assert!(
+        GenericIgnore {
+            f: 123,
+            t: PhantomData::<NonPartialEq>::default()
+        } == GenericIgnore {
+            f: 123,
+            t: PhantomData::<NonPartialEq>::default()
+        }
+    );
 }

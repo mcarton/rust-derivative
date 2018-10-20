@@ -18,7 +18,7 @@ extern crate derivative;
 enum E {
     A,
     B(()),
-    C
+    C,
 }
 
 #[test]

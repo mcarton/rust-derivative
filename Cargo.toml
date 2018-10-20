@@ -17,10 +17,11 @@ appveyor = { repository = "mcarton/rust-derivative" }
 proc-macro = true
 
 [dependencies]
-itertools = "~0.5"
-quote = "^0.3"
-syn = { version = "0.10", features = ["aster", "full", "visit"] }
-compiletest_rs = { version = "^0.2", optional = true }
+itertools = "~0.7"
+quote = "^0.6"
+proc-macro2 = "0.4"
+syn = { version = "0.15", features = ["full", "visit", "extra-traits"] }
+compiletest_rs = { version = "^0.3", optional = true }
 
 [features]
 nightly = ["compiletest_rs"]
