@@ -7,7 +7,7 @@
         <title>Default trait · Derivative</title>
         <meta http-equiv="X-UA-Compatible" content="IE=edge" />
         <meta name="description" content="">
-        <meta name="generator" content="GitBook 3.2.2">
+        <meta name="generator" content="GitBook 3.2.3">
         
         
         
@@ -507,7 +507,7 @@ implementation:</p>
 <p>You can use <em>derivative</em> to derive a convenience <code>new</code> method for your type
 that calls <code>Default::default</code>:</p>
 <pre><code class="lang-rust"><span class="hljs-meta">#[derive(Debug, Derivative)]</span>
-<span class="hljs-meta">#[derivative(Default(new=<span class="hljs-meta-string">&quot;true&quot;</span>)]</span>
+<span class="hljs-meta">#[derivative(Default(new=<span class="hljs-meta-string">&quot;true&quot;</span>))]</span>
 <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">Foo</span></span> {
     foo: <span class="hljs-keyword">u8</span>,
     bar: <span class="hljs-keyword">u8</span>,
@@ -516,7 +516,7 @@ that calls <code>Default::default</code>:</p>
 <span class="hljs-built_in">println!</span>(<span class="hljs-string">&quot;{:?}&quot;</span>, Foo::new()); <span class="hljs-comment">// Foo { foo: 0, bar: 0 }</span>
 </code></pre>
 <h1 id="custom-bound"><a name="custom-bound" class="plugin-anchor" href="#custom-bound"><i class="fa fa-link" aria-hidden="true"></i></a>Custom bound</h1>
-<p>The following does now work because <code>derive</code> adds a <code>T: Default</code> bound on the
+<p>The following does not work because <code>derive</code> adds a <code>T: Default</code> bound on the
 <code>impl Default for Foo&lt;T&gt;</code>:</p>
 <pre><code class="lang-rust"><span class="hljs-meta">#[derive(Default)]</span>
 <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">Foo</span></span>&lt;T&gt; {
@@ -569,7 +569,7 @@ Foo::&lt;NonDefault&gt;::default() <span class="hljs-comment">// works!</span>
     <script>
         var gitbook = gitbook || [];
         gitbook.push(function() {
-            gitbook.page.hasChanged({"page":{"title":"Default trait","level":"1.4","depth":1,"next":{"title":"Default enumeration","level":"1.4.1","depth":2,"anchor":"#default-enumeration","path":"Default.md","ref":"Default.md#default-enumeration","articles":[]},"previous":{"title":"Custom bound","level":"1.3.4","depth":2,"anchor":"#custom-bound","path":"Debug.md","ref":"Debug.md#custom-bound","articles":[]},"dir":"ltr"},"config":{"plugins":["-search","-sharing","codesnippet","edit-link","anchors"],"root":"doc","styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"pluginsConfig":{"edit-link":{"label":"Edit","base":"https://github.com/mcarton/rust-derivative/tree/master/doc"},"codesnippet":{},"anchors":{},"highlight":{},"lunr":{"maxIndexSize":1000000,"ignoreSpecialCharacters":false},"fontsettings":{"theme":"white","family":"sans","size":2},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false}},"theme":"default","pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"variables":{},"title":"Derivative","language":"en","gitbook":"*"},"file":{"path":"Default.md","mtime":"2016-10-18T20:54:18.794Z","type":"markdown"},"gitbook":{"version":"3.2.2","time":"2016-10-18T22:57:45.046Z"},"basePath":".","book":{"language":""}});
+            gitbook.page.hasChanged({"page":{"title":"Default trait","level":"1.4","depth":1,"next":{"title":"Default enumeration","level":"1.4.1","depth":2,"anchor":"#default-enumeration","path":"Default.md","ref":"Default.md#default-enumeration","articles":[]},"previous":{"title":"Custom bound","level":"1.3.4","depth":2,"anchor":"#custom-bound","path":"Debug.md","ref":"Debug.md#custom-bound","articles":[]},"dir":"ltr"},"config":{"plugins":["-search","-sharing","codesnippet","edit-link","anchors"],"root":"doc","styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"pluginsConfig":{"edit-link":{"label":"Edit","base":"https://github.com/mcarton/rust-derivative/tree/master/doc"},"codesnippet":{},"anchors":{},"highlight":{},"lunr":{"maxIndexSize":1000000,"ignoreSpecialCharacters":false},"fontsettings":{"theme":"white","family":"sans","size":2},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false}},"theme":"default","pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"variables":{},"title":"Derivative","language":"en","gitbook":"*"},"file":{"path":"Default.md","mtime":"2018-10-20T13:28:51.674Z","type":"markdown"},"gitbook":{"version":"3.2.3","time":"2018-10-20T17:10:05.327Z"},"basePath":".","book":{"language":""}});
         });
     </script>
 </div>
