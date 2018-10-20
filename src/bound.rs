@@ -26,12 +26,12 @@ pub fn without_defaults(generics: &syn::Generics) -> syn::Generics {
         params: generics
             .params
             .iter()
-            .map(|generic_param| match generic_param {
-                GenericParam::Type(ty_param) => syn::GenericParam::Type(syn::TypeParam {
+            .map(|generic_param| match *generic_param {
+                GenericParam::Type(ref ty_param) => syn::GenericParam::Type(syn::TypeParam {
                     default: None,
                     ..ty_param.clone()
                 }),
-                param @ _ => param.clone(),
+                ref param @ _ => param.clone(),
             })
             .collect(),
         ..generics.clone()
@@ -46,9 +46,9 @@ pub fn with_where_predicates(
 
     {
         let where_clause = cloned.make_where_clause();
-        predicates
-            .iter()
-            .for_each(|predicate| where_clause.predicates.push(predicate.clone()));
+        for predicate in predicates {
+            where_clause.predicates.push(predicate.clone());
+        }
     }
 
     cloned
@@ -71,9 +71,9 @@ where
             .flat_map(|predicates| predicates.to_vec());
 
         let where_clause = cloned.make_where_clause();
-        field_where_predicates
-            .into_iter()
-            .for_each(|predicate| where_clause.predicates.push(predicate.clone()));
+        for predicate in field_where_predicates {
+            where_clause.predicates.push(predicate.clone());
+        }
     }
     cloned
 }
@@ -137,7 +137,7 @@ where
         .all_fields()
         .into_iter()
         .filter(|field| {
-            if let syn::Type::Path(syn::TypePath { ref path, .. }) = field.ty {
+            if let syn::Type::Path(syn::TypePath { ref path, .. }) = *field.ty {
                 !is_phantom_data(path)
             } else {
                 true
@@ -163,9 +163,10 @@ where
             .map(|id| parse_quote!( #id : #bound ));
 
         let where_clause = cloned.make_where_clause();
-        relevant_where_predicates.for_each(|predicate: syn::WherePredicate| {
-            where_clause.predicates.push(predicate.clone())
-        });
+        for predicate in relevant_where_predicates {
+            let predicate: syn::WherePredicate = predicate;
+            where_clause.predicates.push(predicate.clone());
+        }
     }
     cloned
 }

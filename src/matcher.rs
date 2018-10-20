@@ -136,7 +136,7 @@ impl Matcher {
                             proc_macro2::Span::call_site(),
                         );
                         quote!(#binding #ident ,).to_tokens(&mut stream);
-                        matches.push(BindingInfo { ident, field });
+                        matches.push(BindingInfo { ident: ident, field: field });
 
                         (stream, matches)
                     },
