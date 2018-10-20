@@ -1,6 +1,6 @@
 #[derive(Default)]
 pub struct RegexOptions {
-    pub pats: Vec<String>,
+    pub pats: Vec&lt;String&gt;,
     pub size_limit: usize,
     pub dfa_size_limit: usize,
     pub case_insensitive: bool,
@@ -15,8 +15,8 @@ impl Default for RegexOptions {
     fn default() -> Self {
         RegexOptions {
             pats: vec![],
-            size_limit: 10 * (1<<20),
-            dfa_size_limit: 2 * (1<<20),
+            size_limit: 10 * (1&lt;&lt;20),
+            dfa_size_limit: 2 * (1&lt;&lt;20),
             case_insensitive: false,
             multi_line: false,
             dot_matches_new_line: false,

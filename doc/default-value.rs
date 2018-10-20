@@ -1,10 +1,10 @@
 #[derive(Derivative)]
 #[derivative(Default)]
 pub struct RegexOptions {
-    pub pats: Vec<String>,
-    #[derivative(Default(value="10 * (1<<20)"))]
+    pub pats: Vec&lt;String&gt;,
+    #[derivative(Default(value="10 * (1&lt;&lt;20)"))]
     pub size_limit: usize,
-    #[derivative(Default(value="2 * (1<<20)"))]
+    #[derivative(Default(value="2 * (1&lt;&lt;20)"))]
     pub dfa_size_limit: usize,
     pub case_insensitive: bool,
     pub multi_line: bool,
