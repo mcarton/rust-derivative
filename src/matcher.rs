@@ -128,7 +128,7 @@ impl Matcher {
         let (stream, matches) = match style {
             ast::Style::Unit => (proc_macro2::TokenStream::new(), Vec::new()),
             ast::Style::Tuple => {
-                let (mut stream, matches) = fields.iter().enumerate().fold(
+                let (stream, matches) = fields.iter().enumerate().fold(
                     (proc_macro2::TokenStream::new(), Vec::new()),
                     |(mut stream, mut matches), (i, field)| {
                         let ident: syn::Ident = syn::Ident::new(
@@ -145,7 +145,7 @@ impl Matcher {
                 (quote! { ( #stream ) }, matches)
             }
             ast::Style::Struct => {
-                let (mut stream, matches) = fields.iter().enumerate().fold(
+                let (stream, matches) = fields.iter().enumerate().fold(
                     (proc_macro2::TokenStream::new(), Vec::new()),
                     |(mut stream, mut matches), (i, field)| {
                         let ident: syn::Ident = syn::Ident::new(
