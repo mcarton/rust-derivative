@@ -44,15 +44,6 @@ struct OurOur1(Liar);
 #[derivative(Clone, Copy)]
 struct OurOur2(Liar);
 
-#[derive(Copy)]
-#[derive(Derivative)]
-#[derivative(Clone)]
-struct TheirOur1(Liar);
-#[derive(Copy)]
-#[derive(Derivative)]
-#[derivative(Clone)]
-struct TheirOur2(Liar);
-
 #[test]
 fn main() {
     let _ = TheirTheir(Liar).clone();
@@ -62,12 +53,4 @@ fn main() {
     assert!(!CLONED.load(Ordering::SeqCst), "OurOur1");
     let _ = OurOur2(Liar).clone();
     assert!(!CLONED.load(Ordering::SeqCst), "OurOur2");
-
-    // Ideally this would work the same, just testing that the behaviour does not change:
-    CLONED.store(false, Ordering::SeqCst);
-    let _ = TheirOur1(Liar).clone();
-    assert!(CLONED.load(Ordering::SeqCst), "TheirOur1");
-    CLONED.store(false, Ordering::SeqCst);
-    let _ = TheirOur2(Liar).clone();
-    assert!(CLONED.load(Ordering::SeqCst), "TheirOur2");
 }
