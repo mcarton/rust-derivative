@@ -513,11 +513,23 @@ just <code>derive</code>.</p>
 <td><pre><code class="lang-rs"><span class="hljs-meta">#[derive(Derivative)]</span>
 <span class="hljs-meta">#[derivative(Default)]</span>
 <span class="hljs-keyword">pub</span> <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">RegexOptions</span></span> {
-    <span class="hljs-keyword">pub</span> pats: <span class="hljs-built_in">Vec</span>,
-    <span class="hljs-meta">#[derivative(Default(value=<span class="hljs-meta-string">&quot;10 * (1&lt;</span></span></code></pre></td>
+    <span class="hljs-keyword">pub</span> pats: <span class="hljs-built_in">Vec</span>&lt;<span class="hljs-built_in">String</span>&gt;,
+    <span class="hljs-meta">#[derivative(Default(value=<span class="hljs-meta-string">&quot;10 * (1&lt;&lt;20)&quot;</span>))]</span>
+    <span class="hljs-keyword">pub</span> size_limit: usize,
+    <span class="hljs-meta">#[derivative(Default(value=<span class="hljs-meta-string">&quot;2 * (1&lt;&lt;20)&quot;</span>))]</span>
+    <span class="hljs-keyword">pub</span> dfa_size_limit: usize,
+    <span class="hljs-keyword">pub</span> case_insensitive: <span class="hljs-keyword">bool</span>,
+    <span class="hljs-keyword">pub</span> multi_line: <span class="hljs-keyword">bool</span>,
+    <span class="hljs-keyword">pub</span> dot_matches_new_line: <span class="hljs-keyword">bool</span>,
+    <span class="hljs-keyword">pub</span> swap_greed: <span class="hljs-keyword">bool</span>,
+    <span class="hljs-keyword">pub</span> ignore_whitespace: <span class="hljs-keyword">bool</span>,
+    <span class="hljs-meta">#[derivative(Default(value=<span class="hljs-meta-string">&quot;true&quot;</span>))]</span>
+    <span class="hljs-keyword">pub</span> unicode: <span class="hljs-keyword">bool</span>,
+}
+</code></pre></td>
 <td><pre><code class="lang-rs"><span class="hljs-meta">#[derive(Default)]</span>
 <span class="hljs-keyword">pub</span> <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">RegexOptions</span></span> {
-    <span class="hljs-keyword">pub</span> pats: <span class="hljs-built_in">Vec</span>,
+    <span class="hljs-keyword">pub</span> pats: <span class="hljs-built_in">Vec</span>&lt;<span class="hljs-built_in">String</span>&gt;,
     <span class="hljs-keyword">pub</span> size_limit: usize,
     <span class="hljs-keyword">pub</span> dfa_size_limit: usize,
     <span class="hljs-keyword">pub</span> case_insensitive: <span class="hljs-keyword">bool</span>,
@@ -532,7 +544,18 @@ just <code>derive</code>.</p>
     <span class="hljs-function"><span class="hljs-keyword">fn</span> <span class="hljs-title">default</span></span>() -&gt; <span class="hljs-keyword">Self</span> {
         RegexOptions {
             pats: <span class="hljs-built_in">vec!</span>[],
-            size_limit: <span class="hljs-number">10</span> * (<span class="hljs-number">1</span>&lt;</code></pre></td>
+            size_limit: <span class="hljs-number">10</span> * (<span class="hljs-number">1</span>&lt;&lt;<span class="hljs-number">20</span>),
+            dfa_size_limit: <span class="hljs-number">2</span> * (<span class="hljs-number">1</span>&lt;&lt;<span class="hljs-number">20</span>),
+            case_insensitive: <span class="hljs-literal">false</span>,
+            multi_line: <span class="hljs-literal">false</span>,
+            dot_matches_new_line: <span class="hljs-literal">false</span>,
+            swap_greed: <span class="hljs-literal">false</span>,
+            ignore_whitespace: <span class="hljs-literal">false</span>,
+            unicode: <span class="hljs-literal">true</span>,
+        }
+    }
+}
+</code></pre></td>
 </tr>
 </tbody>
 </table>
@@ -658,7 +681,7 @@ just <code>derive</code>.</p>
     <script>
         var gitbook = gitbook || [];
         gitbook.push(function() {
-            gitbook.page.hasChanged({"page":{"title":"Overview","level":"1.1","depth":1,"next":{"title":"Copy and Clone traits","level":"1.2","depth":1,"path":"Clone.md","ref":"Clone.md","articles":[{"title":"clone_from","level":"1.2.1","depth":2,"anchor":"#clone-from","path":"Clone.md","ref":"Clone.md#clone-from","articles":[]},{"title":"Custom bound","level":"1.2.2","depth":2,"anchor":"#custom-bound","path":"Clone.md","ref":"Clone.md#custom-bound","articles":[]}]},"dir":"ltr"},"config":{"plugins":["-search","-sharing","codesnippet","edit-link","anchors"],"root":"doc","styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"pluginsConfig":{"edit-link":{"label":"Edit","base":"https://github.com/mcarton/rust-derivative/tree/master/doc"},"codesnippet":{},"anchors":{},"highlight":{},"lunr":{"maxIndexSize":1000000,"ignoreSpecialCharacters":false},"fontsettings":{"theme":"white","family":"sans","size":2},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false}},"theme":"default","pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"variables":{},"title":"Derivative","language":"en","gitbook":"*"},"file":{"path":"README.md","mtime":"2018-10-20T13:28:51.674Z","type":"markdown"},"gitbook":{"version":"3.2.3","time":"2018-10-20T17:10:05.327Z"},"basePath":".","book":{"language":""}});
+            gitbook.page.hasChanged({"page":{"title":"Overview","level":"1.1","depth":1,"next":{"title":"Copy and Clone traits","level":"1.2","depth":1,"path":"Clone.md","ref":"Clone.md","articles":[{"title":"clone_from","level":"1.2.1","depth":2,"anchor":"#clone-from","path":"Clone.md","ref":"Clone.md#clone-from","articles":[]},{"title":"Custom bound","level":"1.2.2","depth":2,"anchor":"#custom-bound","path":"Clone.md","ref":"Clone.md#custom-bound","articles":[]}]},"dir":"ltr"},"config":{"plugins":["-search","-sharing","codesnippet","edit-link","anchors"],"root":"doc","styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"pluginsConfig":{"edit-link":{"label":"Edit","base":"https://github.com/mcarton/rust-derivative/tree/master/doc"},"codesnippet":{},"anchors":{},"highlight":{},"lunr":{"maxIndexSize":1000000,"ignoreSpecialCharacters":false},"fontsettings":{"theme":"white","family":"sans","size":2},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false}},"theme":"default","pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"variables":{},"title":"Derivative","language":"en","gitbook":"*"},"file":{"path":"README.md","mtime":"2018-10-20T17:32:18.898Z","type":"markdown"},"gitbook":{"version":"3.2.3","time":"2018-10-20T17:50:43.699Z"},"basePath":".","book":{"language":""}});
         });
     </script>
 </div>
