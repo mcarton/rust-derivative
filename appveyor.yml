@@ -12,6 +12,7 @@ environment:
       MSYS2_BITS: 64
 
 configuration:
+  - 1.15.0  # Minimum supported version
   - stable
   - nightly
   - beta
