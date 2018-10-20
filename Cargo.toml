@@ -17,7 +17,6 @@ appveyor = { repository = "mcarton/rust-derivative" }
 proc-macro = true
 
 [dependencies]
-itertools = "~0.7"
 quote = "^0.6"
 proc-macro2 = "0.4"
 syn = { version = "0.15", features = ["full", "visit", "extra-traits"] }
