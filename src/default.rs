@@ -8,7 +8,7 @@ use utils;
 /// Derive `Default` for `input`.
 pub fn derive(input: &ast::Input, default: &attr::InputDefault) -> proc_macro2::TokenStream {
     fn make_variant_data(
-        variant_name: proc_macro2::TokenStream,
+        variant_name: &proc_macro2::TokenStream,
         style: ast::Style,
         fields: &[ast::Field],
     ) -> proc_macro2::TokenStream {
@@ -67,7 +67,7 @@ pub fn derive(input: &ast::Input, default: &attr::InputDefault) -> proc_macro2::
                     let vname = &variant.ident;
 
                     Some(make_variant_data(
-                        quote!(#name::#vname),
+                        &quote!(#name::#vname),
                         variant.style,
                         &variant.fields,
                     ))
@@ -78,7 +78,7 @@ pub fn derive(input: &ast::Input, default: &attr::InputDefault) -> proc_macro2::
 
             quote!(#(#arms),*)
         }
-        ast::Body::Struct(style, ref vd) => make_variant_data(quote!(#name), style, vd),
+        ast::Body::Struct(style, ref vd) => make_variant_data(&quote!(#name), style, vd),
     };
 
     let new_fn = if default.new {

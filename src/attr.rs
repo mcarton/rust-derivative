@@ -279,7 +279,7 @@ impl Input {
     pub fn clone_bound(&self) -> Option<&[syn::WherePredicate]> {
         self.clone
             .as_ref()
-            .map_or(None, |d| d.bounds.as_ref().map(Vec::as_slice))
+            .and_then(|d| d.bounds.as_ref().map(Vec::as_slice))
     }
 
     pub fn clone_from(&self) -> bool {
@@ -289,13 +289,13 @@ impl Input {
     pub fn copy_bound(&self) -> Option<&[syn::WherePredicate]> {
         self.copy
             .as_ref()
-            .map_or(None, |d| d.bounds.as_ref().map(Vec::as_slice))
+            .and_then(|d| d.bounds.as_ref().map(Vec::as_slice))
     }
 
     pub fn debug_bound(&self) -> Option<&[syn::WherePredicate]> {
         self.debug
             .as_ref()
-            .map_or(None, |d| d.bounds.as_ref().map(Vec::as_slice))
+            .and_then(|d| d.bounds.as_ref().map(Vec::as_slice))
     }
 
     pub fn debug_transparent(&self) -> bool {
@@ -305,25 +305,25 @@ impl Input {
     pub fn default_bound(&self) -> Option<&[syn::WherePredicate]> {
         self.default
             .as_ref()
-            .map_or(None, |d| d.bounds.as_ref().map(Vec::as_slice))
+            .and_then(|d| d.bounds.as_ref().map(Vec::as_slice))
     }
 
     pub fn eq_bound(&self) -> Option<&[syn::WherePredicate]> {
         self.eq
             .as_ref()
-            .map_or(None, |d| d.bounds.as_ref().map(Vec::as_slice))
+            .and_then(|d| d.bounds.as_ref().map(Vec::as_slice))
     }
 
     pub fn hash_bound(&self) -> Option<&[syn::WherePredicate]> {
         self.hash
             .as_ref()
-            .map_or(None, |d| d.bounds.as_ref().map(Vec::as_slice))
+            .and_then(|d| d.bounds.as_ref().map(Vec::as_slice))
     }
 
     pub fn partial_eq_bound(&self) -> Option<&[syn::WherePredicate]> {
         self.partial_eq
             .as_ref()
-            .map_or(None, |d| d.bounds.as_ref().map(Vec::as_slice))
+            .and_then(|d| d.bounds.as_ref().map(Vec::as_slice))
     }
 
     pub fn partial_eq_on_enum(&self) -> bool {
@@ -540,7 +540,7 @@ fn derivative_attribute(
             nested: mis,
             ..
         })) => {
-            if name.to_string() == "derivative" {
+            if name == "derivative" {
                 Some(mis)
             } else {
                 None
@@ -558,7 +558,7 @@ fn parse_boolean_meta_item(item: &Option<&str>, default: bool, name: &str) -> Re
     match *item {
         Some("true") => Ok(true),
         Some("false") => Ok(false),
-        Some(val @ _) => {
+        Some(val) => {
             if val == name {
                 Ok(true)
             } else {
