@@ -19,9 +19,9 @@ use std::collections::hash_map::DefaultHasher;
 #[derive(Derivative)]
 #[derivative(Hash)]
 struct Person {
-    id: usize,
+    id: u16,
     name: String,
-    phone: usize,
+    phone: u64,
 }
 
 // test for hygiene name collisions
