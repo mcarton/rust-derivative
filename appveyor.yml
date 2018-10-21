@@ -28,6 +28,6 @@ install:
 build: false
 
 test_script:
-  - if %CONFIGURATION% == "nightly" set FEATURES="--features=nightly" else set FEATURES=
+  - if %CONFIGURATION% == "nightly" set FEATURES="--features=test-nightly" else set FEATURES=
   - cargo build --verbose %FEATURES%
   - cargo test --verbose %FEATURES%

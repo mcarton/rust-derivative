@@ -9,6 +9,6 @@ os:
   - linux
   - osx
 script:
-  - if [ ${TRAVIS_RUST_VERSION} = "nightly" ]; then export FEATURES="--features=nightly"; else export FEATURES= ; fi
+  - if [ ${TRAVIS_RUST_VERSION} = "nightly" ]; then export FEATURES="--features=test-nightly"; else export FEATURES= ; fi
   - cargo build --verbose ${FEATURES}
   - cargo test --verbose ${FEATURES}
