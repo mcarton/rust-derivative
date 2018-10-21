@@ -31,7 +31,7 @@ pub fn without_defaults(generics: &syn::Generics) -> syn::Generics {
                     default: None,
                     ..ty_param.clone()
                 }),
-                ref param @ _ => param.clone(),
+                ref param => param.clone(),
             })
             .collect(),
         ..generics.clone()
@@ -43,14 +43,7 @@ pub fn with_where_predicates(
     predicates: &[syn::WherePredicate],
 ) -> syn::Generics {
     let mut cloned = generics.clone();
-
-    {
-        let where_clause = cloned.make_where_clause();
-        for predicate in predicates {
-            where_clause.predicates.push(predicate.clone());
-        }
-    }
-
+    cloned.make_where_clause().predicates.extend(predicates.iter().cloned());
     cloned
 }
 
@@ -70,10 +63,7 @@ where
             .flat_map(|field| from_field(&field.attrs))
             .flat_map(|predicates| predicates.to_vec());
 
-        let where_clause = cloned.make_where_clause();
-        for predicate in field_where_predicates {
-            where_clause.predicates.push(predicate.clone());
-        }
+        cloned.make_where_clause().predicates.extend(field_where_predicates);
     }
     cloned
 }
@@ -118,9 +108,9 @@ where
                 return;
             }
             if path.leading_colon.is_none() && path.segments.len() == 1 {
-                let id = path.segments[0].ident.clone();
-                if self.all_ty_params.contains(&id) {
-                    self.relevant_ty_params.insert(id);
+                let id = &path.segments[0].ident;
+                if self.all_ty_params.contains(id) {
+                    self.relevant_ty_params.insert(id.clone());
                 }
             }
             visit::visit_path(self, path);
@@ -160,13 +150,9 @@ where
             .type_params()
             .map(|ty_param| &ty_param.ident)
             .filter(|id| visitor.relevant_ty_params.contains(id))
-            .map(|id| parse_quote!( #id : #bound ));
+            .map(|id| -> syn::WherePredicate { parse_quote!( #id : #bound ) });
 
-        let where_clause = cloned.make_where_clause();
-        for predicate in relevant_where_predicates {
-            let predicate: syn::WherePredicate = predicate;
-            where_clause.predicates.push(predicate.clone());
-        }
+        cloned.make_where_clause().predicates.extend(relevant_where_predicates);
     }
     cloned
 }

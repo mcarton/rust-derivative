@@ -28,7 +28,7 @@ fn hash<T: Hash>(_t: &T) {}
 fn main() {
     let a = Foo {bar: 4, baz: -3};
 
-    a == a;    // check for PartialEq impl w/o testing its correctness
-    a.clone(); // check for Clone impl w/o testing its correctness
+    let _ = a == a;    // check for PartialEq impl w/o testing its correctness
+    let _ = a.clone(); // check for Clone impl w/o testing its correctness
     hash(&a);  // check for Hash impl w/o testing its correctness
 }
