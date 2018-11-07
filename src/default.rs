@@ -12,6 +12,8 @@ pub fn derive(input: &ast::Input, default: &attr::InputDefault) -> proc_macro2::
         style: ast::Style,
         fields: &[ast::Field],
     ) -> proc_macro2::TokenStream {
+        let default_trait_path = default_trait_path();
+
         match style {
             ast::Style::Struct => {
                 let mut defaults = Vec::new();
@@ -22,7 +24,7 @@ pub fn derive(input: &ast::Input, default: &attr::InputDefault) -> proc_macro2::
                         .as_ref()
                         .expect("A structure field must have a name");
                     let default = f.attrs.default_value().map_or_else(
-                        || quote!(::std::default::Default::default()),
+                        || quote!(#default_trait_path::default()),
                         |v| quote!(#v),
                     );
 
@@ -36,7 +38,7 @@ pub fn derive(input: &ast::Input, default: &attr::InputDefault) -> proc_macro2::
 
                 for f in fields {
                     let default = f.attrs.default_value().map_or_else(
-                        || quote!(::std::default::Default::default()),
+                        || quote!(#default_trait_path::default()),
                         |v| quote!(#v),
                     );
 

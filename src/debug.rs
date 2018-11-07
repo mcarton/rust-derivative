@@ -7,6 +7,9 @@ use syn;
 use utils;
 
 pub fn derive(input: &ast::Input) -> proc_macro2::TokenStream {
+    let debug_trait_path = debug_trait_path();
+    let fmt_path = fmt_path();
+
     let body = matcher::Matcher::new(matcher::BindingStyle::Ref).build_arms(
         input,
         |_, arm_name, style, attrs, bis| {
@@ -17,7 +20,7 @@ pub fn derive(input: &ast::Input) -> proc_macro2::TokenStream {
 
                 if attrs.debug_transparent() {
                     return Some(quote!{
-                        ::std::fmt::Debug::fmt(__arg_0, __f)
+                        #debug_trait_path::fmt(__arg_0, __f)
                     });
                 }
 
@@ -66,7 +69,6 @@ pub fn derive(input: &ast::Input) -> proc_macro2::TokenStream {
 
     let name = &input.ident;
 
-    let debug_trait_path = debug_trait_path();
     let generics = utils::build_impl_generics(
         input,
         &debug_trait_path,
@@ -79,7 +81,7 @@ pub fn derive(input: &ast::Input) -> proc_macro2::TokenStream {
     quote! {
         #[allow(unused_qualifications)]
         impl #impl_generics #debug_trait_path for #name #ty_generics #where_clause {
-            fn fmt(&self, __f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
+            fn fmt(&self, __f: &mut #fmt_path::Formatter) -> #fmt_path::Result {
                 match *self {
                     #body
                 }
@@ -97,6 +99,16 @@ fn debug_trait_path() -> syn::Path {
     parse_quote!(::std::fmt::Debug)
 }
 
+/// Return the path of the `fmt` module, that is `::std::fmt`.
+fn fmt_path() -> syn::Path {
+    parse_quote!(::std::fmt)
+}
+
+/// Return the path of the `PhantomData` type, that is `::std::marker::PhantomData`.
+fn phantom_path() -> syn::Path {
+    parse_quote!(::std::marker::PhantomData)
+}
+
 fn format_with(
     f: &ast::Field,
     arg_n: &syn::Ident,
@@ -104,6 +116,8 @@ fn format_with(
     mut generics: syn::Generics,
 ) -> proc_macro2::TokenStream {
     let debug_trait_path = debug_trait_path();
+    let fmt_path = fmt_path();
+    let phantom_path = phantom_path();
 
     let ctor_generics = generics.clone();
     let (_, ctor_ty_generics, _) = ctor_generics.split_for_impl();
@@ -151,15 +165,15 @@ fn format_with(
 
     quote!(
         let #arg_n = {
-            struct Dummy #ty_generics (&'_derivative #ty, ::std::marker::PhantomData <(#(#phantom),*)>) #where_clause;
+            struct Dummy #ty_generics (&'_derivative #ty, #phantom_path <(#(#phantom),*)>) #where_clause;
 
             impl #impl_generics #debug_trait_path for Dummy #ty_generics #where_clause {
-                fn fmt(&self, __f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
+                fn fmt(&self, __f: &mut #fmt_path::Formatter) -> #fmt_path::Result {
                     #format_fn(&self.0, __f)
                 }
             }
 
-            Dummy:: #ctor_ty_generics (#arg_n, ::std::marker::PhantomData)
+            Dummy:: #ctor_ty_generics (#arg_n, #phantom_path)
         };
     )
 }
