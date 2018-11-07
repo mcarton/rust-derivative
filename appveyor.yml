@@ -35,6 +35,8 @@ test_script:
   - if "%CONFIGURATION%" == "nightly" (set FEATURES="--features=test-nightly") else (set FEATURES=)
   - cargo build --verbose %FEATURES%
   - cargo test --verbose %FEATURES%
+  - if "%CONFIGURATION%" == "nightly" (set FEATURES="--features=test-nightly,use_core") else (set FEATURES="--features=use_core")
+  - cargo test --verbose %FEATURES%
   - if defined HAS_CLIPPY cargo clippy --verbose %FEATURES%
 
   # `compiletest_rs` 0.3.14 is not compatible with `-Z minimal-versions`, so do
@@ -42,3 +44,4 @@ test_script:
   - if "%CONFIGURATION%" == "nightly" cargo update -Z minimal-versions
   - if "%CONFIGURATION%" == "nightly" cargo build --verbose
   - if "%CONFIGURATION%" == "nightly" cargo test --verbose
+  - if "%CONFIGURATION%" == "nightly" cargo test --verbose --features=use_core
