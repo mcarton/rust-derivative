@@ -8,6 +8,9 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
+#[cfg(feature = "use_core")]
+extern crate core;
+
 use std::cell::Cell;
 
 #[macro_use]

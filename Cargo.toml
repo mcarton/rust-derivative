@@ -24,3 +24,4 @@ syn = { version = "^0.15.10", features = ["full", "visit", "extra-traits"] }
 
 [features]
 test-nightly = ["compiletest_rs"]
+use_core = []

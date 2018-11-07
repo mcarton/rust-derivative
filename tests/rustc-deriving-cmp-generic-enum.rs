@@ -10,6 +10,9 @@
 
 // no-pretty-expanded FIXME #15189
 
+#[cfg(feature = "use_core")]
+extern crate core;
+
 #[macro_use]
 extern crate derivative;
 

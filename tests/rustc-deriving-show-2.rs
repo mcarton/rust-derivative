@@ -1,6 +1,9 @@
 #![allow(dead_code)]
 #![deny(unused_variables)] // We used to generate warning: unused variable: `f`
 
+#[cfg(feature = "use_core")]
+extern crate core;
+
 #[macro_use]
 extern crate derivative;
 

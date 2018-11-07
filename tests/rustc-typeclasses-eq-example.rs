@@ -11,6 +11,9 @@
 #![allow(non_snake_case)]
 #![allow(non_camel_case_types)]
 
+#[cfg(feature = "use_core")]
+extern crate core;
+
 #[macro_use]
 extern crate derivative;
 

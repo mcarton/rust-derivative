@@ -1,5 +1,8 @@
 //! This tests that we compute the same hash as `derive(Hash)`.
 
+#[cfg(feature = "use_core")]
+extern crate core;
+
 #[macro_use]
 extern crate derivative;
 

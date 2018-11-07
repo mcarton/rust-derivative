@@ -11,6 +11,9 @@
 //! Test that #[derive(Copy, Clone)] produces a shallow copy
 //! even when a member violates RFC 1521
 
+#[cfg(feature = "use_core")]
+extern crate core;
+
 #[macro_use]
 extern crate derivative;
 

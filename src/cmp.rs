@@ -108,10 +108,18 @@ fn needs_eq_bound(attrs: &attr::Field) -> bool {
 
 /// Return the path of the `Eq` trait, that is `::std::cmp::Eq`.
 fn eq_trait_path() -> syn::Path {
-    parse_quote!(::std::cmp::Eq)
+    if cfg!(feature = "use_core") {
+        parse_quote!(::core::cmp::Eq)
+    } else {
+        parse_quote!(::std::cmp::Eq)
+    }
 }
 
 /// Return the path of the `PartialEq` trait, that is `::std::cmp::PartialEq`.
 fn partial_eq_trait_path() -> syn::Path {
-    parse_quote!(::std::cmp::PartialEq)
+    if cfg!(feature = "use_core") {
+        parse_quote!(::core::cmp::PartialEq)
+    } else {
+        parse_quote!(::std::cmp::PartialEq)
+    }
 }

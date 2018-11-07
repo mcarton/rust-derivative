@@ -1,3 +1,6 @@
+#[cfg(feature = "use_core")]
+extern crate core;
+
 use std::marker::PhantomData;
 
 #[macro_use]

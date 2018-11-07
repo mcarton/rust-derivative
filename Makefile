@@ -1,5 +1,5 @@
 publish_doc:
-	gitbook build
+	./node_modules/gitbook-cli/bin/gitbook.js build
 	rm -fr /tmp/_book
 	git clone --branch gh-pages --single-branch git@github.com:mcarton/rust-derivative.git /tmp/_book
 	rm -rf /tmp/_book/*

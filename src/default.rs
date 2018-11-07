@@ -112,5 +112,9 @@ pub fn derive(input: &ast::Input, default: &attr::InputDefault) -> proc_macro2::
 
 /// Return the path of the `Default` trait, that is `::std::default::Default`.
 fn default_trait_path() -> syn::Path {
-    parse_quote!(::std::default::Default)
+    if cfg!(feature = "use_core") {
+        parse_quote!(::core::default::Default)
+    } else {
+        parse_quote!(::std::default::Default)
+    }
 }

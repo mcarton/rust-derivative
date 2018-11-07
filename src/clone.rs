@@ -174,10 +174,18 @@ fn needs_clone_bound(attrs: &attr::Field) -> bool {
 
 /// Return the path of the `Clone` trait, that is `::std::clone::Clone`.
 fn clone_trait_path() -> syn::Path {
-    parse_quote!(::std::clone::Clone)
+    if cfg!(feature = "use_core") {
+        parse_quote!(::core::clone::Clone)
+    } else {
+        parse_quote!(::std::clone::Clone)
+    }
 }
 
 /// Return the path of the `Copy` trait, that is `::std::marker::Copy`.
 fn copy_trait_path() -> syn::Path {
-    parse_quote!(::std::marker::Copy)
+    if cfg!(feature = "use_core") {
+        parse_quote!(::core::marker::Copy)
+    } else {
+        parse_quote!(::std::marker::Copy)
+    }
 }

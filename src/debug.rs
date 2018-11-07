@@ -96,17 +96,29 @@ fn needs_debug_bound(attrs: &attr::Field) -> bool {
 
 /// Return the path of the `Debug` trait, that is `::std::fmt::Debug`.
 fn debug_trait_path() -> syn::Path {
-    parse_quote!(::std::fmt::Debug)
+    if cfg!(feature = "use_core") {
+        parse_quote!(::core::fmt::Debug)
+    } else {
+        parse_quote!(::std::fmt::Debug)
+    }
 }
 
 /// Return the path of the `fmt` module, that is `::std::fmt`.
 fn fmt_path() -> syn::Path {
-    parse_quote!(::std::fmt)
+    if cfg!(feature = "use_core") {
+        parse_quote!(::core::fmt)
+    } else {
+        parse_quote!(::std::fmt)
+    }
 }
 
 /// Return the path of the `PhantomData` type, that is `::std::marker::PhantomData`.
 fn phantom_path() -> syn::Path {
-    parse_quote!(::std::marker::PhantomData)
+    if cfg!(feature = "use_core") {
+        parse_quote!(::core::marker::PhantomData)
+    } else {
+        parse_quote!(::std::marker::PhantomData)
+    }
 }
 
 fn format_with(

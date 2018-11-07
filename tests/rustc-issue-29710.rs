@@ -11,6 +11,9 @@
 #![deny(unused_results)]
 #![allow(dead_code)]
 
+#[cfg(feature = "use_core")]
+extern crate core;
+
 #[macro_use]
 extern crate derivative;
 

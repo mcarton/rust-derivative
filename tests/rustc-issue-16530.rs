@@ -10,6 +10,9 @@
 
 #![allow(deprecated)]
 
+#[cfg(feature = "use_core")]
+extern crate core;
+
 use std::hash::{SipHasher, Hasher, Hash};
 
 #[macro_use]

@@ -77,10 +77,18 @@ fn needs_hash_bound(attrs: &attr::Field) -> bool {
 
 /// Return the path of the `Hash` trait, that is `::std::hash::Hash`.
 fn hash_trait_path() -> syn::Path {
-    parse_quote!(::std::hash::Hash)
+    if cfg!(feature = "use_core") {
+        parse_quote!(::core::hash::Hash)
+    } else {
+        parse_quote!(::std::hash::Hash)
+    }
 }
 
 /// Return the path of the `Hasher` trait, that is `::std::hash::Hasher`.
 fn hasher_trait_path() -> syn::Path {
-    parse_quote!(::std::hash::Hasher)
+    if cfg!(feature = "use_core") {
+        parse_quote!(::core::hash::Hasher)
+    } else {
+        parse_quote!(::std::hash::Hasher)
+    }
 }
