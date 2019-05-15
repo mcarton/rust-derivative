@@ -90,7 +90,7 @@ pub fn derive(input: &ast::Input, default: &attr::InputDefault) -> proc_macro2::
                 /// Creates a default value for this type.
                 #[inline]
                 pub fn new() -> Self {
-                    #default_trait_path::default()
+                    Self::default()
                 }
             }
         ))
@@ -101,6 +101,7 @@ pub fn derive(input: &ast::Input, default: &attr::InputDefault) -> proc_macro2::
     quote!(
         #new_fn
 
+        #[allow(clippy::default_trait_access)]
         #[allow(unused_qualifications)]
         impl #impl_generics #default_trait_path for #name #ty_generics #where_clause {
             fn default() -> Self {
