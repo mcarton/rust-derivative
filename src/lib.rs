@@ -9,6 +9,9 @@
     redundant_field_names,
 ))]
 
+// https://github.com/rust-lang/rust/issues/62132
+#![recursion_limit="128"]
+
 extern crate proc_macro;
 extern crate proc_macro2;
 #[macro_use]
