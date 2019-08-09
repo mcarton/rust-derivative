@@ -43,7 +43,10 @@ pub fn with_where_predicates(
     predicates: &[syn::WherePredicate],
 ) -> syn::Generics {
     let mut cloned = generics.clone();
-    cloned.make_where_clause().predicates.extend(predicates.iter().cloned());
+    cloned
+        .make_where_clause()
+        .predicates
+        .extend(predicates.iter().cloned());
     cloned
 }
 
@@ -63,7 +66,10 @@ where
             .flat_map(|field| from_field(&field.attrs))
             .flat_map(|predicates| predicates.to_vec());
 
-        cloned.make_where_clause().predicates.extend(field_where_predicates);
+        cloned
+            .make_where_clause()
+            .predicates
+            .extend(field_where_predicates);
     }
     cloned
 }
@@ -152,7 +158,10 @@ where
             .filter(|id| visitor.relevant_ty_params.contains(id))
             .map(|id| -> syn::WherePredicate { parse_quote!( #id : #bound ) });
 
-        cloned.make_where_clause().predicates.extend(relevant_where_predicates);
+        cloned
+            .make_where_clause()
+            .predicates
+            .extend(relevant_where_predicates);
     }
     cloned
 }

@@ -68,8 +68,13 @@ impl Matcher {
 
     pub fn build_arms<F>(self, input: &ast::Input, f: F) -> proc_macro2::TokenStream
     where
-        F: Fn(syn::Path, &syn::Ident, ast::Style, &attr::Input, Vec<BindingInfo>)
-            -> proc_macro2::TokenStream,
+        F: Fn(
+            syn::Path,
+            &syn::Ident,
+            ast::Style,
+            &attr::Input,
+            Vec<BindingInfo>,
+        ) -> proc_macro2::TokenStream,
     {
         let ident = &input.ident;
         // Generate patterns for matching against all of the variants
@@ -136,7 +141,10 @@ impl Matcher {
                             proc_macro2::Span::call_site(),
                         );
                         quote!(#binding #ident ,).to_tokens(&mut stream);
-                        matches.push(BindingInfo { ident: ident, field: field });
+                        matches.push(BindingInfo {
+                            ident: ident,
+                            field: field,
+                        });
 
                         (stream, matches)
                     },

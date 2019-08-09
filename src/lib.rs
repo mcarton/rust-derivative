@@ -4,10 +4,10 @@
 // `allow(clippy::redundant_field_names)`.
 // Instead, we resort to using `allow(redundant_field_names)`, but this triggers
 // `renamed_and_removed_lints` which we also want to allow.
-#![cfg_attr(feature = "cargo-clippy", allow(
-    renamed_and_removed_lints,
-    redundant_field_names,
-))]
+#![cfg_attr(
+    feature = "cargo-clippy",
+    allow(renamed_and_removed_lints, redundant_field_names,)
+)]
 
 extern crate proc_macro;
 extern crate proc_macro2;
@@ -64,10 +64,7 @@ fn detail(input: TokenStream) -> Result<TokenStream, String> {
     Ok(output.into())
 }
 
-#[cfg_attr(
-    not(test),
-    proc_macro_derive(Derivative, attributes(derivative))
-)]
+#[cfg_attr(not(test), proc_macro_derive(Derivative, attributes(derivative)))]
 pub fn derivative(input: TokenStream) -> TokenStream {
     match detail(input) {
         Ok(output) => output,

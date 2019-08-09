@@ -19,7 +19,7 @@ pub fn derive(input: &ast::Input) -> proc_macro2::TokenStream {
                 }
 
                 if attrs.debug_transparent() {
-                    return Some(quote!{
+                    return Some(quote! {
                         #debug_trait_path::fmt(__arg_0, __f)
                     });
                 }
@@ -157,7 +157,10 @@ fn format_with(
 
             syn::WherePredicate::Type(syn::PredicateType {
                 lifetimes: None,
-                bounded_ty: syn::Type::Path(syn::TypePath { qself: None, path: path }),
+                bounded_ty: syn::Type::Path(syn::TypePath {
+                    qself: None,
+                    path: path,
+                }),
                 colon_token: Default::default(),
                 bounds: bounds,
             })
