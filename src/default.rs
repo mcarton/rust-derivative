@@ -23,10 +23,10 @@ pub fn derive(input: &ast::Input, default: &attr::InputDefault) -> proc_macro2::
                         .ident
                         .as_ref()
                         .expect("A structure field must have a name");
-                    let default = f.attrs.default_value().map_or_else(
-                        || quote!(#default_trait_path::default()),
-                        |v| quote!(#v),
-                    );
+                    let default = f
+                        .attrs
+                        .default_value()
+                        .map_or_else(|| quote!(#default_trait_path::default()), |v| quote!(#v));
 
                     defaults.push(quote!(#name: #default));
                 }
@@ -37,10 +37,10 @@ pub fn derive(input: &ast::Input, default: &attr::InputDefault) -> proc_macro2::
                 let mut defaults = Vec::new();
 
                 for f in fields {
-                    let default = f.attrs.default_value().map_or_else(
-                        || quote!(#default_trait_path::default()),
-                        |v| quote!(#v),
-                    );
+                    let default = f
+                        .attrs
+                        .default_value()
+                        .map_or_else(|| quote!(#default_trait_path::default()), |v| quote!(#v));
 
                     defaults.push(default);
                 }

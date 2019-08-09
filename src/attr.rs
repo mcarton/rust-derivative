@@ -496,25 +496,23 @@ fn read_items(item: &syn::NestedMeta) -> Result<MetaItem, String> {
             nested: ref values,
             ..
         }) => {
-            let values = try!(
-                values
-                    .iter()
-                    .map(|value| {
-                        if let syn::NestedMeta::Meta(syn::Meta::NameValue(syn::MetaNameValue {
-                            ident: ref name,
-                            lit: ref value,
-                            ..
-                        })) = *value
-                        {
-                            let value = try!(string_or_err(value));
+            let values = try!(values
+                .iter()
+                .map(|value| {
+                    if let syn::NestedMeta::Meta(syn::Meta::NameValue(syn::MetaNameValue {
+                        ident: ref name,
+                        lit: ref value,
+                        ..
+                    })) = *value
+                    {
+                        let value = try!(string_or_err(value));
 
-                            Ok((Some(name), Some(value)))
-                        } else {
-                            Err("Expected named value".to_string())
-                        }
-                    })
-                    .collect()
-            );
+                        Ok((Some(name), Some(value)))
+                    } else {
+                        Err("Expected named value".to_string())
+                    }
+                })
+                .collect());
 
             Ok(MetaItem(name, values))
         }
