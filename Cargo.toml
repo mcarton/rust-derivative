@@ -21,7 +21,7 @@ proc-macro = true
 compiletest_rs = { version = "^0.3.14", optional = true }
 proc-macro2 = "^0.4.13"
 quote = "^0.6.3"
-syn = { version = "^0.15.10", features = ["full", "visit", "extra-traits"] }
+syn = { version = "^0.15.10", features = ["visit", "extra-traits"] }
 
 [features]
 test-nightly = ["compiletest_rs"]
