@@ -178,6 +178,8 @@ fn format_with(
     // Leave off the type parameter bounds, defaults, and attributes
     let phantom = generics.type_params().map(|tp| &tp.ident);
 
+    let ctor_ty_generics = ctor_ty_generics.as_turbofish();
+
     quote!(
         let #arg_n = {
             struct Dummy #ty_generics (&'_derivative #ty, #phantom_path <(#(#phantom),*)>) #where_clause;
@@ -188,7 +190,7 @@ fn format_with(
                 }
             }
 
-            Dummy:: #ctor_ty_generics (#arg_n, #phantom_path)
+            Dummy #ctor_ty_generics (#arg_n, #phantom_path)
         };
     )
 }
