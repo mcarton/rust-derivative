@@ -13,13 +13,13 @@ pub struct Input {
     pub copy: Option<InputCopy>,
     /// Whether `Debug` is present and its specific attributes.
     pub debug: Option<InputDebug>,
-    /// Whether `Default` is present and its specitif attributes.
+    /// Whether `Default` is present and its specific attributes.
     pub default: Option<InputDefault>,
-    /// Whether `Eq` is present and its specitif attributes.
+    /// Whether `Eq` is present and its specific attributes.
     pub eq: Option<InputEq>,
     /// Whether `Hash` is present and its specific attributes.
     pub hash: Option<InputHash>,
-    /// Whether `Eq` is present and its specitif attributes.
+    /// Whether `Eq` is present and its specific attributes.
     pub partial_eq: Option<InputPartialEq>,
 }
 
@@ -100,16 +100,16 @@ pub struct InputPartialEq {
 }
 
 #[derive(Debug, Default)]
-/// Represents the `derivarive(Clone(…))` attributes on a field.
+/// Represents the `derivative(Clone(…))` attributes on a field.
 pub struct FieldClone {
     /// The `bound` attribute if present and the corresponding bounds.
     bounds: Option<Vec<syn::WherePredicate>>,
-    /// The `clone_with` attribute if present and the path to the clonning function.
+    /// The `clone_with` attribute if present and the path to the cloning function.
     clone_with: Option<syn::Path>,
 }
 
 #[derive(Debug, Default)]
-/// Represents the `derivarive(Debug(…))` attributes on a field.
+/// Represents the `derivative(Debug(…))` attributes on a field.
 pub struct FieldDebug {
     /// The `bound` attribute if present and the corresponding bounds.
     bounds: Option<Vec<syn::WherePredicate>>,
@@ -120,7 +120,7 @@ pub struct FieldDebug {
 }
 
 #[derive(Debug, Default)]
-/// Represent the `derivarive(Default(…))` attributes on a field.
+/// Represent the `derivative(Default(…))` attributes on a field.
 pub struct FieldDefault {
     /// The `bound` attribute if present and the corresponding bounds.
     bounds: Option<Vec<syn::WherePredicate>>,
@@ -129,7 +129,7 @@ pub struct FieldDefault {
 }
 
 #[derive(Debug, Default)]
-/// Represents the `derivarive(Hash(…))` attributes on a field.
+/// Represents the `derivative(Hash(…))` attributes on a field.
 pub struct FieldHash {
     /// The `bound` attribute if present and the corresponding bounds.
     bounds: Option<Vec<syn::WherePredicate>>,
@@ -140,7 +140,7 @@ pub struct FieldHash {
 }
 
 #[derive(Debug, Default)]
-/// Represent the `derivarive(PartialEq(…))` attributes on a field.
+/// Represent the `derivative(PartialEq(…))` attributes on a field.
 pub struct FieldPartialEq {
     /// The `bound` attribute if present and the corresponding bounds.
     bounds: Option<Vec<syn::WherePredicate>>,
