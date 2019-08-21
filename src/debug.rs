@@ -19,7 +19,7 @@ pub fn derive(input: &ast::Input) -> proc_macro2::TokenStream {
                 }
 
                 if attrs.debug_transparent() {
-                    return Some(quote! {
+                    return Some(quote_spanned! {arm_name.span()=>
                         #debug_trait_path::fmt(__arg_0, __f)
                     });
                 }
@@ -32,12 +32,12 @@ pub fn derive(input: &ast::Input) -> proc_macro2::TokenStream {
 
                 let builder = if let Some(ref name) = bi.field.ident {
                     let name = name.to_string();
-                    quote! {
+                    quote_spanned! {arm_name.span()=>
                         #dummy_debug
                         let _ = builder.field(#name, &#arg);
                     }
                 } else {
-                    quote! {
+                    quote_spanned! {arm_name.span()=>
                         #dummy_debug
                         let _ = builder.field(&#arg);
                     }
@@ -53,12 +53,12 @@ pub fn derive(input: &ast::Input) -> proc_macro2::TokenStream {
             let method = syn::Ident::new(method, proc_macro2::Span::call_site());
 
             if attrs.debug_transparent() {
-                quote! {
+                quote_spanned! {arm_name.span()=>
                     #(#field_prints)*
                 }
             } else {
                 let name = arm_name.to_string();
-                quote! {
+                quote_spanned! {arm_name.span()=>
                     let mut builder = __f.#method(#name);
                     #(#field_prints)*
                     builder.finish()
@@ -78,7 +78,7 @@ pub fn derive(input: &ast::Input) -> proc_macro2::TokenStream {
     );
     let (impl_generics, ty_generics, where_clause) = generics.split_for_impl();
 
-    quote! {
+    quote_spanned! {input.span=>
         #[allow(unused_qualifications)]
         impl #impl_generics #debug_trait_path for #name #ty_generics #where_clause {
             fn fmt(&self, __f: &mut #fmt_path::Formatter) -> #fmt_path::Result {
@@ -180,7 +180,7 @@ fn format_with(
 
     let ctor_ty_generics = ctor_ty_generics.as_turbofish();
 
-    quote!(
+    quote_spanned!(f.span=>
         let #arg_n = {
             struct Dummy #ty_generics (&'_derivative #ty, #phantom_path <(#(#phantom),*)>) #where_clause;
 

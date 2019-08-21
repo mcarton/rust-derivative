@@ -1,5 +1,6 @@
 use attr;
 use syn;
+use syn::spanned::Spanned as SynSpanned;
 
 #[derive(Debug)]
 pub struct Input<'a> {
@@ -7,6 +8,7 @@ pub struct Input<'a> {
     pub body: Body<'a>,
     pub generics: &'a syn::Generics,
     pub ident: syn::Ident,
+    pub span: proc_macro2::Span,
 }
 
 #[derive(Debug)]
@@ -28,6 +30,7 @@ pub struct Field<'a> {
     pub attrs: attr::Field,
     pub ident: Option<syn::Ident>,
     pub ty: &'a syn::Type,
+    pub span: proc_macro2::Span,
 }
 
 #[derive(Clone, Copy, Debug)]
@@ -57,6 +60,7 @@ impl<'a> Input<'a> {
             body: body,
             generics: &item.generics,
             ident: item.ident.clone(),
+            span: item.span(),
         })
     }
 }
@@ -110,6 +114,7 @@ fn fields_from_ast<'a>(
                 attrs: try!(attr::Field::from_ast(field)),
                 ident: field.ident.clone(),
                 ty: &field.ty,
+                span: field.span(),
             })
         })
         .collect()
