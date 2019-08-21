@@ -24,6 +24,7 @@ script:
   - cargo test --verbose ${FEATURES}
   - if [ ${TRAVIS_RUST_VERSION} = "nightly" ]; then export FEATURES="--features=test-nightly,use_core"; else export FEATURES="--features=use_core" ; fi
   - cargo clean
+  - cargo build --verbose ${FEATURES}
   - cargo test --verbose ${FEATURES}
   - if ${HAS_CLIPPY}; then cargo clippy --verbose ${FEATURES}; fi
 
@@ -32,4 +33,5 @@ script:
   - if [ ${TRAVIS_RUST_VERSION} = "nightly" ]; then cargo update -Z minimal-versions; fi
   - if [ ${TRAVIS_RUST_VERSION} = "nightly" ]; then cargo build --verbose; fi
   - if [ ${TRAVIS_RUST_VERSION} = "nightly" ]; then cargo test --verbose; fi
+  - if [ ${TRAVIS_RUST_VERSION} = "nightly" ]; then cargo build --features=use_core; fi
   - if [ ${TRAVIS_RUST_VERSION} = "nightly" ]; then cargo test --verbose --features=use_core; fi
