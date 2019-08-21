@@ -1,4 +1,5 @@
 use attr;
+use proc_macro2;
 use syn;
 use syn::spanned::Spanned as SynSpanned;
 
