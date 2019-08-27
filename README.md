@@ -1,7 +1,7 @@
 # Derivative
 
-[![Travis](https://img.shields.io/travis/mcarton/rust-derivative.svg?maxAge=3600)](https://travis-ci.org/mcarton/rust-derivative)
-[![Build status](https://img.shields.io/appveyor/ci/mcarton/rust-derivative.svg?maxAge=3600)](https://ci.appveyor.com/project/mcarton/rust-derivative)
+[![Travis](https://travis-ci.org/mcarton/rust-derivative.svg?branch=master)](https://travis-ci.org/mcarton/rust-derivative)
+[![Build status](https://ci.appveyor.com/api/projects/status/github/mcarton/rust-derivative?svg=true&branch=master)](https://ci.appveyor.com/project/mcarton/rust-derivative)
 [![Crates.io](https://img.shields.io/crates/v/derivative.svg?maxAge=3600)](https://crates.io/crates/derivative)
 [![Crates.io](https://img.shields.io/crates/l/derivative.svg?maxAge=3600)](https://github.com/mcarton/rust-derivative#license)
 

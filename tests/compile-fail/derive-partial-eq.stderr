@@ -1,0 +1,7 @@
+error: proc-macro derive panicked
+ --> $DIR/derive-partial-eq.rs:4:10
+  |
+4 | #[derive(Derivative)]
+  |          ^^^^^^^^^^
+  |
+  = help: message: can't use `#[derivative(PartialEq)]` on an enumeration without `feature_allow_slow_enum`; see the documentation for more details
