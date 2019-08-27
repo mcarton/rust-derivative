@@ -9,6 +9,9 @@
     allow(renamed_and_removed_lints, redundant_field_names,)
 )]
 
+// We need to support Rust 1.15 to stable
+#![allow(deprecated)]
+
 extern crate proc_macro;
 extern crate proc_macro2;
 #[macro_use]

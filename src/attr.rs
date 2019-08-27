@@ -205,7 +205,7 @@ impl Input {
                     for value in values;
                     "bound" => try!(parse_bound(&mut clone.bounds, value)),
                     "clone_from" => {
-                        clone.clone_from = try!(parse_boolean_meta_item(&value, true, "clone_from"));
+                        clone.clone_from = try!(parse_boolean_meta_item(value, true, "clone_from"));
                     }
                 }
             }
@@ -222,7 +222,7 @@ impl Input {
                     for value in values;
                     "bound" => try!(parse_bound(&mut debug.bounds, value)),
                     "transparent" => {
-                        debug.transparent = try!(parse_boolean_meta_item(&value, true, "transparent"));
+                        debug.transparent = try!(parse_boolean_meta_item(value, true, "transparent"));
                     }
                 }
             }
@@ -232,7 +232,7 @@ impl Input {
                     for value in values;
                     "bound" => try!(parse_bound(&mut default.bounds, value)),
                     "new" => {
-                        default.new = try!(parse_boolean_meta_item(&value, true, "new"));
+                        default.new = try!(parse_boolean_meta_item(value, true, "new"));
                     }
                 }
             }
@@ -256,7 +256,7 @@ impl Input {
                     for value in values;
                     "bound" => try!(parse_bound(&mut partial_eq.bounds, value)),
                     "feature_allow_slow_enum" => {
-                        partial_eq.on_enum = try!(parse_boolean_meta_item(&value, true, "feature_allow_slow_enum"));
+                        partial_eq.on_enum = try!(parse_boolean_meta_item(value, true, "feature_allow_slow_enum"));
                     }
                 }
             }
@@ -346,7 +346,7 @@ impl Field {
                         out.debug.format_with = Some(try!(parse_str_lit(&path)));
                     }
                     "ignore" => {
-                        out.debug.ignore = try!(parse_boolean_meta_item(&value, true, "ignore"));
+                        out.debug.ignore = try!(parse_boolean_meta_item(value, true, "ignore"));
                     }
                 }
             }
@@ -375,7 +375,7 @@ impl Field {
                         out.hash.hash_with = Some(try!(parse_str_lit(&path)));
                     }
                     "ignore" => {
-                        out.hash.ignore = try!(parse_boolean_meta_item(&value, true, "ignore"));
+                        out.hash.ignore = try!(parse_boolean_meta_item(value, true, "ignore"));
                     }
                 }
             }
@@ -388,7 +388,7 @@ impl Field {
                         out.partial_eq.compare_with = Some(try!(parse_str_lit(&path)));
                     }
                     "ignore" => {
-                        out.partial_eq.ignore = try!(parse_boolean_meta_item(&value, true, "ignore"));
+                        out.partial_eq.ignore = try!(parse_boolean_meta_item(value, true, "ignore"));
                     }
                 }
             }
@@ -542,7 +542,7 @@ fn derivative_attribute(
 /// name is specified (eg. `Debug="ignore"` is equivalent to `Debug(ignore="true")`). The `name`
 /// parameter is used for error reporting.
 fn parse_boolean_meta_item(
-    item: &Option<&syn::LitStr>,
+    item: Option<&syn::LitStr>,
     default: bool,
     name: &str,
 ) -> Result<bool, String> {
@@ -575,7 +575,7 @@ fn parse_bound(
 
         let bounds = parse_str_lit::<syn::WhereClause>(&where_string)
             .map(|wh| wh.predicates.into_iter().collect())
-            .map_err(|_| format!("Could not parse `bound`"));
+            .map_err(|_| "Could not parse `bound`".to_string());
 
         Some(try!(bounds))
     } else {
