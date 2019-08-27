@@ -1,3 +1,4 @@
+use proc_macro2;
 use syn;
 
 /// Represent the `derivative` attributes on the input type (`struct`/`enum`).
@@ -121,7 +122,7 @@ pub struct FieldDefault {
     /// The `bound` attribute if present and the corresponding bounds.
     bounds: Option<Vec<syn::WherePredicate>>,
     /// The default value for the field if present.
-    pub value: Option<syn::Expr>,
+    pub value: Option<proc_macro2::TokenStream>,
 }
 
 #[derive(Debug, Default)]
@@ -429,7 +430,7 @@ impl Field {
         self.default.bounds.as_ref().map(Vec::as_slice)
     }
 
-    pub fn default_value(&self) -> Option<&syn::Expr> {
+    pub fn default_value(&self) -> Option<&proc_macro2::TokenStream> {
         self.default.value.as_ref()
     }
 
