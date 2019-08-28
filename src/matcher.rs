@@ -70,6 +70,7 @@ impl Matcher {
     where
         F: Fn(
             syn::Path,
+            usize,
             &syn::Ident,
             ast::Style,
             &attr::Input,
@@ -112,8 +113,8 @@ impl Matcher {
         // Now that we have the patterns, generate the actual branches of the match
         // expression
         let mut t = proc_macro2::TokenStream::new();
-        for (path, name, style, attrs, (pat, bindings)) in variants {
-            let body = f(path, name, style, attrs, bindings);
+        for (i, (path, name, style, attrs, (pat, bindings))) in variants.into_iter().enumerate() {
+            let body = f(path, i, name, style, attrs, bindings);
             quote!(#pat => { #body }).to_tokens(&mut t);
         }
 

@@ -16,8 +16,10 @@ pub struct Input {
     pub eq: Option<InputEq>,
     /// Whether `Hash` is present and its specific attributes.
     pub hash: Option<InputHash>,
-    /// Whether `Eq` is present and its specific attributes.
+    /// Whether `PartialEq` is present and its specific attributes.
     pub partial_eq: Option<InputPartialEq>,
+    /// Whether `PartialOrd` is present and its specific attributes.
+    pub partial_ord: Option<InputPartialOrd>,
 }
 
 #[derive(Debug, Default)]
@@ -35,8 +37,10 @@ pub struct Field {
     eq_bound: Option<Vec<syn::WherePredicate>>,
     /// The parameters for `Hash`.
     hash: FieldHash,
-    /// The parameters for `Eq`.
+    /// The parameters for `PartialEq`.
     partial_eq: FieldPartialEq,
+    /// The parameters for `PartialOrd`.
+    partial_ord: FieldPartialOrd,
 }
 
 #[derive(Debug, Default)]
@@ -97,6 +101,15 @@ pub struct InputPartialEq {
 }
 
 #[derive(Debug, Default)]
+/// Represent the `derivative(PartialOrd(…))` attributes on an input.
+pub struct InputPartialOrd {
+    /// The `bound` attribute if present and the corresponding bounds.
+    bounds: Option<Vec<syn::WherePredicate>>,
+    /// Allow `derivative(PartialOrd)` on enums:
+    on_enum: bool,
+}
+
+#[derive(Debug, Default)]
 /// Represents the `derivative(Clone(…))` attributes on a field.
 pub struct FieldClone {
     /// The `bound` attribute if present and the corresponding bounds.
@@ -139,6 +152,17 @@ pub struct FieldHash {
 #[derive(Debug, Default)]
 /// Represent the `derivative(PartialEq(…))` attributes on a field.
 pub struct FieldPartialEq {
+    /// The `bound` attribute if present and the corresponding bounds.
+    bounds: Option<Vec<syn::WherePredicate>>,
+    /// The `compare_with` attribute if present and the path to the comparison function.
+    compare_with: Option<syn::Path>,
+    /// Whether the field is to be ignored when comparing.
+    ignore: bool,
+}
+
+#[derive(Debug, Default)]
+/// Represent the `derivative(PartialOrd(…))` attributes on a field.
+pub struct FieldPartialOrd {
     /// The `bound` attribute if present and the corresponding bounds.
     bounds: Option<Vec<syn::WherePredicate>>,
     /// The `compare_with` attribute if present and the path to the comparison function.
@@ -261,6 +285,16 @@ impl Input {
                     }
                 }
             }
+            "PartialOrd" => {
+                match_attributes! {
+                    let Some(partial_ord) = input.partial_ord;
+                    for value in values;
+                    "bound" => try!(parse_bound(&mut partial_ord.bounds, value)),
+                    "feature_allow_slow_enum" => {
+                        partial_ord.on_enum = try!(parse_boolean_meta_item(value, true, "feature_allow_slow_enum"));
+                    }
+                }
+            }
         }
 
         Ok(input)
@@ -316,8 +350,18 @@ impl Input {
             .and_then(|d| d.bounds.as_ref().map(Vec::as_slice))
     }
 
+    pub fn partial_ord_bound(&self) -> Option<&[syn::WherePredicate]> {
+        self.partial_ord
+            .as_ref()
+            .and_then(|d| d.bounds.as_ref().map(Vec::as_slice))
+    }
+
     pub fn partial_eq_on_enum(&self) -> bool {
         self.partial_eq.as_ref().map_or(false, |d| d.on_enum)
+    }
+
+    pub fn partial_ord_on_enum(&self) -> bool {
+        self.partial_ord.as_ref().map_or(false, |d| d.on_enum)
     }
 }
 
@@ -393,6 +437,19 @@ impl Field {
                     }
                 }
             }
+            "PartialOrd" => {
+                match_attributes! {
+                    for value in values;
+                    "bound" => try!(parse_bound(&mut out.partial_ord.bounds, value)),
+                    "compare_with" => {
+                        let path = try!(value.ok_or_else(|| "`compare_with` needs a value".to_string()));
+                        out.partial_ord.compare_with = Some(try!(parse_str_lit(&path)));
+                    }
+                    "ignore" => {
+                        out.partial_ord.ignore = try!(parse_boolean_meta_item(value, true, "ignore"));
+                    }
+                }
+            }
         }
 
         Ok(out)
@@ -450,12 +507,24 @@ impl Field {
         self.partial_eq.bounds.as_ref().map(Vec::as_slice)
     }
 
+    pub fn partial_ord_bound(&self) -> Option<&[syn::WherePredicate]> {
+        self.partial_ord.bounds.as_ref().map(Vec::as_slice)
+    }
+
     pub fn partial_eq_compare_with(&self) -> Option<&syn::Path> {
         self.partial_eq.compare_with.as_ref()
     }
 
+    pub fn partial_ord_compare_with(&self) -> Option<&syn::Path> {
+        self.partial_ord.compare_with.as_ref()
+    }
+
     pub fn ignore_partial_eq(&self) -> bool {
         self.partial_eq.ignore
+    }
+
+    pub fn ignore_partial_ord(&self) -> bool {
+        self.partial_ord.ignore
     }
 }
 
