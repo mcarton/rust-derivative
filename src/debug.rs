@@ -34,12 +34,12 @@ pub fn derive(input: &ast::Input) -> proc_macro2::TokenStream {
                     let name = name.to_string();
                     quote_spanned! {arm_name.span()=>
                         #dummy_debug
-                        let _ = builder.field(#name, &#arg);
+                        let _ = __debug_trait_builder.field(#name, &#arg);
                     }
                 } else {
                     quote_spanned! {arm_name.span()=>
                         #dummy_debug
-                        let _ = builder.field(&#arg);
+                        let _ = __debug_trait_builder.field(&#arg);
                     }
                 };
 
@@ -59,9 +59,9 @@ pub fn derive(input: &ast::Input) -> proc_macro2::TokenStream {
             } else {
                 let name = arm_name.to_string();
                 quote_spanned! {arm_name.span()=>
-                    let mut builder = __f.#method(#name);
+                    let mut __debug_trait_builder = __f.#method(#name);
                     #(#field_prints)*
-                    builder.finish()
+                    __debug_trait_builder.finish()
                 }
             }
         },

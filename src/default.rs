@@ -90,7 +90,7 @@ pub fn derive(input: &ast::Input, default: &attr::InputDefault) -> proc_macro2::
                 /// Creates a default value for this type.
                 #[inline]
                 pub fn new() -> Self {
-                    #default_trait_path::default()
+                    <Self as #default_trait_path>::default()
                 }
             }
         ))
