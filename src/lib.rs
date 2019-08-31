@@ -57,6 +57,12 @@ fn derive_impls(input: &ast::Input) -> Result<proc_macro2::TokenStream, String> 
     if input.attrs.partial_eq.is_some() {
         tokens.extend(cmp::derive_partial_eq(input)?);
     }
+    if input.attrs.partial_ord.is_some() {
+        tokens.extend(cmp::derive_partial_ord(input)?);
+    }
+    if input.attrs.ord.is_some() {
+        tokens.extend(cmp::derive_ord(input)?);
+    }
 
     Ok(tokens)
 }

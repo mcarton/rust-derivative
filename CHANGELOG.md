@@ -1,6 +1,9 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## 1.0.4 (Not released yet)
+* Implement `PartialOrd` and `Ord` deriving
+
 ## 1.0.3
 * Do not require `syn`'s `full` feature anymore. ([#38], [#45])
 * Fix an issue with using `#[derivative(Debug(format_with = "…"))]` on non-generic types. ([#40])

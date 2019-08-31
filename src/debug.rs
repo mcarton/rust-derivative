@@ -12,7 +12,7 @@ pub fn derive(input: &ast::Input) -> proc_macro2::TokenStream {
 
     let body = matcher::Matcher::new(matcher::BindingStyle::Ref).build_arms(
         input,
-        |_, arm_name, style, attrs, bis| {
+        |_, _, arm_name, style, attrs, bis| {
             let field_prints = bis.iter().filter_map(|bi| {
                 if bi.field.attrs.ignore_debug() {
                     return None;
