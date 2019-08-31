@@ -17,26 +17,25 @@ extern crate core;
 extern crate derivative;
 
 #[derive(Derivative)]
-#[derivative(PartialEq = "feature_allow_slow_enum", Eq, PartialOrd = "feature_allow_slow_enum")]
-#[derive(Ord)]
+#[derivative(
+    PartialEq = "feature_allow_slow_enum",
+    Eq,
+    PartialOrd = "feature_allow_slow_enum",
+    Ord = "feature_allow_slow_enum"
+)]
 enum ES<T> {
     ES1 { x: T },
-    ES2 { x: T, y: T }
+    ES2 { x: T, y: T },
 }
 
 
 pub fn main() {
-    let (es11, es12, es21, es22) = (ES::ES1 {
-        x: 1
-    }, ES::ES1 {
-        x: 2
-    }, ES::ES2 {
-        x: 1,
-        y: 1
-    }, ES::ES2 {
-        x: 1,
-        y: 2
-    });
+    let (es11, es12, es21, es22) = (
+        ES::ES1 { x: 1 },
+        ES::ES1 { x: 2 },
+        ES::ES2 { x: 1, y: 1 },
+        ES::ES2 { x: 1, y: 2 },
+    );
 
     // in order for both PartialOrd and Ord
     let ess = [es11, es12, es21, es22];

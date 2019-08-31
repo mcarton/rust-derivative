@@ -16,11 +16,9 @@ extern crate core;
 #[macro_use]
 extern crate derivative;
 
-#[derive(Ord)]
 #[derive(Derivative)]
-#[derivative(PartialEq, Eq, PartialOrd)]
-struct TS<T>(T,T);
-
+#[derivative(PartialEq, Eq, PartialOrd, Ord)]
+struct TS<T>(T, T);
 
 pub fn main() {
     let ts1 = TS(1, 1);

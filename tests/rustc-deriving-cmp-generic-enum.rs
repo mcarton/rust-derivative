@@ -17,8 +17,12 @@ extern crate core;
 extern crate derivative;
 
 #[derive(Derivative)]
-#[derivative(PartialEq = "feature_allow_slow_enum", Eq, PartialOrd = "feature_allow_slow_enum")]
-#[derive(Ord)]
+#[derivative(
+    PartialEq = "feature_allow_slow_enum",
+    Eq,
+    PartialOrd = "feature_allow_slow_enum",
+    Ord = "feature_allow_slow_enum"
+)]
 enum E<T> {
     E0,
     E1(T),
