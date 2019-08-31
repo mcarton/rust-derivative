@@ -16,7 +16,7 @@ The `PartialEq` trait also supports the following attributes:
 
 # Enumerations
 
-Unfortunatelly, there is no way for derivative to derive `PartialEq` on
+Unfortunately, there is no way for derivative to derive `PartialEq` on
 enumerations as efficiently as the built-in `derive(PartialEq)`
 [yet][discriminant].
 
@@ -70,7 +70,7 @@ fn my_cmp_fn(&T, &T) -> bool;
 # Custom bound
 
 Usually a `T: Eq` bound is added for each type parameter `T`. You can use
-override this behaviour if the infered bound is not correct for you.
+override this behavior if the inferred bound is not correct for you.
 
 Eg. comparing raw pointers does not require the type to be `Eq`, so you could
 use:

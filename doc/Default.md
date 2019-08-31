@@ -80,7 +80,7 @@ Foo::<NonDefault>::default() // gives:
 ```
 
 That bound however is useless as `Option<T>: Default` for any `T`.
-`derivative` allows you to explicitly specify a bound if the infered one is not
+`derivative` allows you to explicitly specify a bound if the inferred one is not
 correct:
 
 ```rust
