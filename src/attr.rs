@@ -613,14 +613,16 @@ struct MetaItem<'a>(
 fn read_items(item: &syn::NestedMeta) -> Result<MetaItem, String> {
     let item = match *item {
         syn::NestedMeta::Meta(ref item) => item,
-        syn::NestedMeta::Literal(..) => {
+        syn::NestedMeta::Lit(..) => {
             return Err("Expected meta-item but found literal".to_string());
         }
     };
     match *item {
-        syn::Meta::Word(ref name) => Ok(MetaItem(name, Vec::new())),
+        syn::Meta::Path(ref path) => path.get_ident()
+            .ok_or_else(|| "expected derivative attribute to be a string, found a path".to_string())
+            .map(|name| MetaItem(name, Vec::new())),
         syn::Meta::List(syn::MetaList {
-            ident: ref name,
+            ref path,
             nested: ref values,
             ..
         }) => {
@@ -628,12 +630,12 @@ fn read_items(item: &syn::NestedMeta) -> Result<MetaItem, String> {
                 .iter()
                 .map(|value| {
                     if let syn::NestedMeta::Meta(syn::Meta::NameValue(syn::MetaNameValue {
-                        ident: ref name,
-                        lit: ref value,
+                        path,
+                        lit: value,
                         ..
-                    })) = *value
+                    })) = value
                     {
-                        let value = try!(ensure_str_lit(&name.to_string(), value));
+                        let (name, value) = try!(ensure_str_lit(&path, &value));
 
                         Ok((Some(name), Some(value)))
                     } else {
@@ -642,14 +644,16 @@ fn read_items(item: &syn::NestedMeta) -> Result<MetaItem, String> {
                 })
                 .collect());
 
+            let name = path.get_ident().ok_or_else(|| "expected derivative attribute to be a string, found a path".to_string())?;
+
             Ok(MetaItem(name, values))
         }
         syn::Meta::NameValue(syn::MetaNameValue {
-            ident: ref name,
+            ref path,
             lit: ref value,
             ..
         }) => {
-            let value = try!(ensure_str_lit(&name.to_string(), value));
+            let (name, value) = try!(ensure_str_lit(path, value));
 
             Ok(MetaItem(name, vec![(None, Some(value))]))
         }
@@ -662,11 +666,11 @@ fn derivative_attribute(
 ) -> Option<syn::punctuated::Punctuated<syn::NestedMeta, syn::token::Comma>> {
     match meta {
         Ok(syn::Meta::List(syn::MetaList {
-            ident: name,
+            path,
             nested: mis,
             ..
         })) => {
-            if name == "derivative" {
+            if path.get_ident().map_or(false, |ident| ident == "derivative") {
                 Some(mis)
             } else {
                 None
@@ -731,13 +735,14 @@ where
     value.parse().map_err(|e| e.to_string())
 }
 
-fn ensure_str_lit<'a>(attr_name: &str, lit: &'a syn::Lit) -> Result<&'a syn::LitStr, String> {
-    if let syn::Lit::Str(ref lit) = *lit {
-        Ok(lit)
+fn ensure_str_lit<'a>(path: &'a syn::Path, lit: &'a syn::Lit) -> Result<(&'a syn::Ident, &'a syn::LitStr), String> {
+    let ident = path.get_ident().ok_or_else(|| "expected derivative attribute to be a string, found a path".to_string())?;
+    if let syn::Lit::Str(lit) = lit {
+        Ok((ident, lit))
     } else {
         Err(format!(
             "expected derivative {} attribute to be a string: `{} = \"...\"`",
-            attr_name, attr_name
+            ident, ident
         ))
     }
 }

@@ -18,14 +18,12 @@ appveyor = { repository = "mcarton/rust-derivative" }
 proc-macro = true
 
 [dependencies]
-proc-macro2 = "^0.4.13"
-quote = "^0.6.3"
-syn = { version = "^0.15.10", features = ["visit", "extra-traits"] }
+proc-macro2 = "1.0"
+quote = "1.0"
+syn = { version = "1.0", features = ["visit", "extra-traits"] }
 
- # This really should be [dev-dependencies] but is not available on 1.15,
- # and [dev-dependencies] cannot be optionnal
-trybuild = { version = "1.0", optional = true }
+[dev-dependencies]
+trybuild = "1.0"
 
 [features]
-test-nightly = ["trybuild"]
 use_core = []

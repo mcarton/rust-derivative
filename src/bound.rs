@@ -167,8 +167,5 @@ where
 }
 
 fn is_phantom_data(path: &syn::Path) -> bool {
-    match path.segments.last() {
-        Some(syn::punctuated::Pair::End(seg)) if seg.ident == "PhantomData" => true,
-        _ => false,
-    }
+    path.segments.last().map_or(false, |path| path.ident == "PhantomData")
 }
