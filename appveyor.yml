@@ -11,7 +11,7 @@ environment:
       MSYS2_BITS: 32
 
 configuration:
-  - 1.15.0  # Minimum supported version
+  - 1.31.0  # Minimum supported version
   - stable
   - nightly
   - beta
@@ -24,7 +24,7 @@ install:
   - if defined MSYS2_BITS set PATH=%PATH%;C:\msys64\mingw%MSYS2_BITS%\bin
   # Only install `clippy` for 64-bit targets; for reasoning see
   # <https://github.com/rust-lang-nursery/rust-clippy/issues/3202#issuecomment-431641932>
-  - if not "%CONFIGURATION%" == "1.15.0" if not "x%TARGET:x86_64=%" == "x%TARGET%" rustup component add clippy-preview && set HAS_CLIPPY=y
+  - if not "x%TARGET:x86_64=%" == "x%TARGET%" rustup component add clippy-preview && set HAS_CLIPPY=y
   - rustc -V
   - cargo -V
   - if defined HAS_CLIPPY cargo clippy -V
@@ -32,13 +32,11 @@ install:
 build: false
 
 test_script:
-  - if "%CONFIGURATION%" == "nightly" (set FEATURES="--features=test-nightly") else (set FEATURES=)
-  - cargo build --verbose %FEATURES%
-  - cargo test --verbose %FEATURES%
+  - cargo build --verbose
+  - cargo test --verbose
   - cargo clean
-  - if "%CONFIGURATION%" == "nightly" (set FEATURES="--features=test-nightly,use_core") else (set FEATURES="--features=use_core")
-  - cargo test --verbose %FEATURES%
-  - if defined HAS_CLIPPY cargo clippy --verbose %FEATURES%
+  - cargo test --verbose --features use_core
+  - if defined HAS_CLIPPY cargo clippy --verbose --features use_core
 
   # `compiletest_rs` 0.3.14 is not compatible with `-Z minimal-versions`, so do
   # not use the "test-nightly" feature

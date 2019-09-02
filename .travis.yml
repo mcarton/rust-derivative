@@ -2,7 +2,7 @@ language: rust
 sudo: false
 
 rust:
-  - 1.15.0  # Minimum supported version
+  - 1.31.0  # Minimum supported version
   - stable
   - beta
   - nightly
@@ -12,21 +12,18 @@ os:
   - osx
 
 install:
-  # Some toolchains don't ship clippy, so handle this case to not break the build
-  - if [ ${TRAVIS_RUST_VERSION} != "1.15.0" ] && rustup component add clippy-preview; then export HAS_CLIPPY=true; else export HAS_CLIPPY=false; fi
+  - rustup component add clippy-preview
   - rustc -V
   - cargo -V
-  - if ${HAS_CLIPPY}; then cargo clippy -V; fi
+  - cargo clippy -V
 
 script:
-  - if [ ${TRAVIS_RUST_VERSION} = "nightly" ]; then export FEATURES="--features=test-nightly"; else export FEATURES= ; fi
-  - cargo build --verbose ${FEATURES}
-  - cargo test --verbose ${FEATURES}
-  - if [ ${TRAVIS_RUST_VERSION} = "nightly" ]; then export FEATURES="--features=test-nightly,use_core"; else export FEATURES="--features=use_core" ; fi
+  - cargo build --verbose
+  - cargo test --verbose
   - cargo clean
-  - cargo build --verbose ${FEATURES}
-  - cargo test --verbose ${FEATURES}
-  - if ${HAS_CLIPPY}; then cargo clippy --verbose ${FEATURES}; fi
+  - cargo build --verbose --features use_core
+  - cargo test --verbose --features use_core
+  - cargo clippy --verbose --features use_core
 
   # `compiletest_rs` 0.3.14 is not compatible with `-Z minimal-versions`, so do
   # not use the "test-nightly" feature
