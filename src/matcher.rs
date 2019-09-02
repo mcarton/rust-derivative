@@ -6,13 +6,10 @@
 //     * not generic, we use our own `ast`, `synstructure` only knows about `syn`
 //     * missing information (what arm are we in?, what attributes? etc.)
 
-use proc_macro2;
-use quote::ToTokens;
-use syn;
+use quote::{ToTokens, quote};
+use syn::parse_quote;
 
-use ast;
-use attr;
-use quote;
+use crate::{ast, attr};
 
 /// The type of binding to use when generating a pattern.
 #[derive(Debug, Copy, Clone)]
@@ -143,8 +140,8 @@ impl Matcher {
                         );
                         quote!(#binding #ident ,).to_tokens(&mut stream);
                         matches.push(BindingInfo {
-                            ident: ident,
-                            field: field,
+                            ident,
+                            field,
                         });
 
                         (stream, matches)
@@ -166,8 +163,8 @@ impl Matcher {
                             quote!(#field_name : #binding #ident ,).to_tokens(&mut stream);
                         }
                         matches.push(BindingInfo {
-                            ident: ident,
-                            field: field,
+                            ident,
+                            field,
                         });
 
                         (stream, matches)

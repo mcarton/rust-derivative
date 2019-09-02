@@ -1,9 +1,7 @@
-use proc_macro2;
+use quote::quote;
+use syn::parse_quote;
 
-use ast;
-use attr;
-use syn;
-use utils;
+use crate::{ast, attr, utils};
 
 /// Derive `Default` for `input`.
 pub fn derive(input: &ast::Input, default: &attr::InputDefault) -> proc_macro2::TokenStream {

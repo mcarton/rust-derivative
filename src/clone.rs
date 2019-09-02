@@ -1,10 +1,7 @@
-use proc_macro2;
+use quote::quote;
+use syn::parse_quote;
 
-use ast;
-use attr;
-use matcher;
-use syn;
-use utils;
+use crate::{ast, attr, matcher, utils};
 
 /// Derive `Copy` for `input`.
 pub fn derive_copy(input: &ast::Input) -> proc_macro2::TokenStream {

@@ -199,7 +199,7 @@ macro_rules! for_all_attr {
     (for ($name:ident, $value:ident) in $attrs:expr; $($body:tt)*) => {
         for meta_items in $attrs.iter().filter_map(|attr| derivative_attribute(attr.parse_meta())) {
             for meta_item in meta_items.iter().map(read_items) {
-                let MetaItem($name, $value) = try!(meta_item);
+                let MetaItem($name, $value) = meta_item?;
                 match $name.to_string().as_ref() {
                     $($body)*
                     _ => return Err(format!("unknown trait `{}`", $name)),
@@ -252,9 +252,9 @@ impl Input {
                 match_attributes! {
                     let Some(clone) = input.clone;
                     for value in values;
-                    "bound" => try!(parse_bound(&mut clone.bounds, value)),
+                    "bound" => parse_bound(&mut clone.bounds, value)?,
                     "clone_from" => {
-                        clone.clone_from = try!(parse_boolean_meta_item(value, true, "clone_from"));
+                        clone.clone_from = parse_boolean_meta_item(value, true, "clone_from")?;
                     }
                 }
             }
@@ -262,16 +262,16 @@ impl Input {
                 match_attributes! {
                     let Some(copy) = input.copy;
                     for value in values;
-                    "bound" => try!(parse_bound(&mut copy.bounds, value)),
+                    "bound" => parse_bound(&mut copy.bounds, value)?,
                 }
             }
             "Debug" => {
                 match_attributes! {
                     let Some(debug) = input.debug;
                     for value in values;
-                    "bound" => try!(parse_bound(&mut debug.bounds, value)),
+                    "bound" => parse_bound(&mut debug.bounds, value)?,
                     "transparent" => {
-                        debug.transparent = try!(parse_boolean_meta_item(value, true, "transparent"));
+                        debug.transparent = parse_boolean_meta_item(value, true, "transparent")?;
                     }
                 }
             }
@@ -279,9 +279,9 @@ impl Input {
                 match_attributes! {
                     let Some(default) = input.default;
                     for value in values;
-                    "bound" => try!(parse_bound(&mut default.bounds, value)),
+                    "bound" => parse_bound(&mut default.bounds, value)?,
                     "new" => {
-                        default.new = try!(parse_boolean_meta_item(value, true, "new"));
+                        default.new = parse_boolean_meta_item(value, true, "new")?;
                     }
                 }
             }
@@ -289,23 +289,23 @@ impl Input {
                 match_attributes! {
                     let Some(eq) = input.eq;
                     for value in values;
-                    "bound" => try!(parse_bound(&mut eq.bounds, value)),
+                    "bound" => parse_bound(&mut eq.bounds, value)?,
                 }
             }
             "Hash" => {
                 match_attributes! {
                     let Some(hash) = input.hash;
                     for value in values;
-                    "bound" => try!(parse_bound(&mut hash.bounds, value)),
+                    "bound" => parse_bound(&mut hash.bounds, value)?,
                 }
             }
             "PartialEq" => {
                 match_attributes! {
                     let Some(partial_eq) = input.partial_eq;
                     for value in values;
-                    "bound" => try!(parse_bound(&mut partial_eq.bounds, value)),
+                    "bound" => parse_bound(&mut partial_eq.bounds, value)?,
                     "feature_allow_slow_enum" => {
-                        partial_eq.on_enum = try!(parse_boolean_meta_item(value, true, "feature_allow_slow_enum"));
+                        partial_eq.on_enum = parse_boolean_meta_item(value, true, "feature_allow_slow_enum")?;
                     }
                 }
             }
@@ -313,9 +313,9 @@ impl Input {
                 match_attributes! {
                     let Some(partial_ord) = input.partial_ord;
                     for value in values;
-                    "bound" => try!(parse_bound(&mut partial_ord.bounds, value)),
+                    "bound" => parse_bound(&mut partial_ord.bounds, value)?,
                     "feature_allow_slow_enum" => {
-                        partial_ord.on_enum = try!(parse_boolean_meta_item(value, true, "feature_allow_slow_enum"));
+                        partial_ord.on_enum = parse_boolean_meta_item(value, true, "feature_allow_slow_enum")?;
                     }
                 }
             }
@@ -323,9 +323,9 @@ impl Input {
                 match_attributes! {
                     let Some(ord) = input.ord;
                     for value in values;
-                    "bound" => try!(parse_bound(&mut ord.bounds, value)),
+                    "bound" => parse_bound(&mut ord.bounds, value)?,
                     "feature_allow_slow_enum" => {
-                        ord.on_enum = try!(parse_boolean_meta_item(value, true, "feature_allow_slow_enum"));
+                        ord.on_enum = parse_boolean_meta_item(value, true, "feature_allow_slow_enum")?;
                     }
                 }
             }
@@ -419,91 +419,91 @@ impl Field {
             "Clone" => {
                 match_attributes! {
                     for value in values;
-                    "bound" => try!(parse_bound(&mut out.clone.bounds, value)),
+                    "bound" => parse_bound(&mut out.clone.bounds, value)?,
                     "clone_with" => {
-                        let path = try!(value.ok_or_else(|| "`clone_with` needs a value".to_string()));
-                        out.clone.clone_with = Some(try!(parse_str_lit(&path)));
+                        let path = value.ok_or_else(|| "`clone_with` needs a value".to_string())?;
+                        out.clone.clone_with = Some(parse_str_lit(&path)?);
                     }
                 }
             }
             "Debug" => {
                 match_attributes! {
                     for value in values;
-                    "bound" => try!(parse_bound(&mut out.debug.bounds, value)),
+                    "bound" => parse_bound(&mut out.debug.bounds, value)?,
                     "format_with" => {
-                        let path = try!(value.ok_or_else(|| "`format_with` needs a value".to_string()));
-                        out.debug.format_with = Some(try!(parse_str_lit(&path)));
+                        let path = value.ok_or_else(|| "`format_with` needs a value".to_string())?;
+                        out.debug.format_with = Some(parse_str_lit(&path)?);
                     }
                     "ignore" => {
-                        out.debug.ignore = try!(parse_boolean_meta_item(value, true, "ignore"));
+                        out.debug.ignore = parse_boolean_meta_item(value, true, "ignore")?;
                     }
                 }
             }
             "Default" => {
                 match_attributes! {
                     for value in values;
-                    "bound" => try!(parse_bound(&mut out.default.bounds, value)),
+                    "bound" => parse_bound(&mut out.default.bounds, value)?,
                     "value" => {
-                        let value = try!(value.ok_or_else(|| "`value` needs a value".to_string()));
-                        out.default.value = Some(try!(parse_str_lit(&value)));
+                        let value = value.ok_or_else(|| "`value` needs a value".to_string())?;
+                        out.default.value = Some(parse_str_lit(&value)?);
                     }
                 }
             }
             "Eq" => {
                 match_attributes! {
                     for value in values;
-                    "bound" => try!(parse_bound(&mut out.eq_bound, value)),
+                    "bound" => parse_bound(&mut out.eq_bound, value)?,
                 }
             }
             "Hash" => {
                 match_attributes! {
                     for value in values;
-                    "bound" => try!(parse_bound(&mut out.hash.bounds, value)),
+                    "bound" => parse_bound(&mut out.hash.bounds, value)?,
                     "hash_with" => {
-                        let path = try!(value.ok_or_else(|| "`hash_with` needs a value".to_string()));
-                        out.hash.hash_with = Some(try!(parse_str_lit(&path)));
+                        let path = value.ok_or_else(|| "`hash_with` needs a value".to_string())?;
+                        out.hash.hash_with = Some(parse_str_lit(&path)?);
                     }
                     "ignore" => {
-                        out.hash.ignore = try!(parse_boolean_meta_item(value, true, "ignore"));
+                        out.hash.ignore = parse_boolean_meta_item(value, true, "ignore")?;
                     }
                 }
             }
             "PartialEq" => {
                 match_attributes! {
                     for value in values;
-                    "bound" => try!(parse_bound(&mut out.partial_eq.bounds, value)),
+                    "bound" => parse_bound(&mut out.partial_eq.bounds, value)?,
                     "compare_with" => {
-                        let path = try!(value.ok_or_else(|| "`compare_with` needs a value".to_string()));
-                        out.partial_eq.compare_with = Some(try!(parse_str_lit(&path)));
+                        let path = value.ok_or_else(|| "`compare_with` needs a value".to_string())?;
+                        out.partial_eq.compare_with = Some(parse_str_lit(&path)?);
                     }
                     "ignore" => {
-                        out.partial_eq.ignore = try!(parse_boolean_meta_item(value, true, "ignore"));
+                        out.partial_eq.ignore = parse_boolean_meta_item(value, true, "ignore")?;
                     }
                 }
             }
             "PartialOrd" => {
                 match_attributes! {
                     for value in values;
-                    "bound" => try!(parse_bound(&mut out.partial_ord.bounds, value)),
+                    "bound" => parse_bound(&mut out.partial_ord.bounds, value)?,
                     "compare_with" => {
-                        let path = try!(value.ok_or_else(|| "`compare_with` needs a value".to_string()));
-                        out.partial_ord.compare_with = Some(try!(parse_str_lit(&path)));
+                        let path = value.ok_or_else(|| "`compare_with` needs a value".to_string())?;
+                        out.partial_ord.compare_with = Some(parse_str_lit(&path)?);
                     }
                     "ignore" => {
-                        out.partial_ord.ignore = try!(parse_boolean_meta_item(value, true, "ignore"));
+                        out.partial_ord.ignore = parse_boolean_meta_item(value, true, "ignore")?;
                     }
                 }
             }
             "Ord" => {
                 match_attributes! {
                     for value in values;
-                    "bound" => try!(parse_bound(&mut out.ord.bounds, value)),
+                    "bound" => parse_bound(&mut out.ord.bounds, value)?,
                     "compare_with" => {
-                        let path = try!(value.ok_or_else(|| "`compare_with` needs a value".to_string()));
-                        out.ord.compare_with = Some(try!(parse_str_lit(&path)));
+                        let path = value.ok_or_else(|| "`compare_with` needs a value".to_string())?;
+                        out.ord.compare_with = Some(parse_str_lit(&path)?);
                     }
                     "ignore" => {
-                        out.ord.ignore = try!(parse_boolean_meta_item(value, true, "ignore"));
+                        out.ord.ignore = parse_boolean_meta_item(value, true, "ignore")?;
                     }
                 }
             }
@@ -611,22 +611,22 @@ struct MetaItem<'a>(
 
 /// Parse an arbitrary item for our limited `MetaItem` subset.
 fn read_items(item: &syn::NestedMeta) -> Result<MetaItem, String> {
-    let item = match *item {
-        syn::NestedMeta::Meta(ref item) => item,
+    let item = match item {
+        syn::NestedMeta::Meta(item) => item,
         syn::NestedMeta::Lit(..) => {
             return Err("Expected meta-item but found literal".to_string());
         }
     };
-    match *item {
-        syn::Meta::Path(ref path) => path.get_ident()
+    match item {
+        syn::Meta::Path(path) => path.get_ident()
             .ok_or_else(|| "expected derivative attribute to be a string, found a path".to_string())
             .map(|name| MetaItem(name, Vec::new())),
         syn::Meta::List(syn::MetaList {
-            ref path,
-            nested: ref values,
+            path,
+            nested: values,
             ..
         }) => {
-            let values = try!(values
+            let values = values
                 .iter()
                 .map(|value| {
                     if let syn::NestedMeta::Meta(syn::Meta::NameValue(syn::MetaNameValue {
@@ -635,25 +635,25 @@ fn read_items(item: &syn::NestedMeta) -> Result<MetaItem, String> {
                         ..
                     })) = value
                     {
-                        let (name, value) = try!(ensure_str_lit(&path, &value));
+                        let (name, value) = ensure_str_lit(&path, &value)?;
 
                         Ok((Some(name), Some(value)))
                     } else {
                         Err("Expected named value".to_string())
                     }
                 })
-                .collect());
+                .collect::<Result<_, _>>()?;
 
             let name = path.get_ident().ok_or_else(|| "expected derivative attribute to be a string, found a path".to_string())?;
 
             Ok(MetaItem(name, values))
         }
         syn::Meta::NameValue(syn::MetaNameValue {
-            ref path,
-            lit: ref value,
+            path,
+            lit: value,
             ..
         }) => {
-            let (name, value) = try!(ensure_str_lit(path, value));
+            let (name, value) = ensure_str_lit(path, value)?;
 
             Ok(MetaItem(name, vec![(None, Some(value))]))
         }
@@ -709,7 +709,7 @@ fn parse_bound(
     opt_bounds: &mut Option<Vec<syn::WherePredicate>>,
     value: Option<&syn::LitStr>,
 ) -> Result<(), String> {
-    let bound = try!(value.ok_or_else(|| "`bound` needs a value".to_string()));
+    let bound = value.ok_or_else(|| "`bound` needs a value".to_string())?;
 
     let bound_value = bound.value();
 
@@ -720,7 +720,7 @@ fn parse_bound(
             .map(|wh| wh.predicates.into_iter().collect())
             .map_err(|_| "Could not parse `bound`".to_string());
 
-        Some(try!(bounds))
+        Some(bounds?)
     } else {
         Some(vec![])
     };

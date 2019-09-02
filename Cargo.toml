@@ -9,6 +9,7 @@ repository = "https://github.com/mcarton/rust-derivative"
 description = "A set of alternative `derive` attributes for Rust"
 keywords = ["derive", "macro", "macro1-1", "plugin"]
 categories = ["rust-patterns"]
+edition = "2018"
 
 [badges]
 travis-ci = { repository = "mcarton/rust-derivative" }

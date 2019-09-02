@@ -15,8 +15,8 @@ extern crate core;
 
 use std::hash::{SipHasher, Hasher, Hash};
 
-#[macro_use]
-extern crate derivative;
+
+use derivative::Derivative;
 
 #[derive(Derivative)]
 #[derivative(Hash)]

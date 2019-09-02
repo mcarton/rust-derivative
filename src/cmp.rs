@@ -1,12 +1,9 @@
 // https://github.com/rust-lang/rust/issues/13101
 
-use proc_macro2;
+use quote::quote;
+use syn::parse_quote;
 
-use ast;
-use attr;
-use matcher;
-use syn;
-use utils;
+use crate::{ast, attr, matcher, utils};
 
 /// Derive `Eq` for `input`.
 pub fn derive_eq(input: &ast::Input) -> proc_macro2::TokenStream {

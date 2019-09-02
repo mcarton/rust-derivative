@@ -13,8 +13,8 @@ extern crate core;
 
 trait Trait { fn dummy(&self) { } }
 
-#[macro_use]
-extern crate derivative;
+
+use derivative::Derivative;
 
 #[derive(Derivative)]
 #[derivative(Debug)]

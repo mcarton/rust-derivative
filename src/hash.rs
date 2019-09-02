@@ -1,10 +1,7 @@
-use proc_macro2;
+use quote::quote;
+use syn::parse_quote;
 
-use ast;
-use attr;
-use matcher;
-use syn;
-use utils;
+use crate::{ast, attr, matcher, utils};
 
 pub fn derive(input: &ast::Input) -> proc_macro2::TokenStream {
     let hasher_trait_path = hasher_trait_path();

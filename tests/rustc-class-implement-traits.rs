@@ -13,8 +13,8 @@
 #[cfg(feature = "use_core")]
 extern crate core;
 
-#[macro_use]
-extern crate derivative;
+
+use derivative::Derivative;
 
 trait noisy {
     fn speak(&mut self);

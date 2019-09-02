@@ -3,8 +3,8 @@ extern crate core;
 
 use std::marker::PhantomData;
 
-#[macro_use]
-extern crate derivative;
+
+use derivative::Derivative;
 
 #[derive(Derivative)]
 #[derivative(PartialEq)]
@@ -83,8 +83,8 @@ fn main() {
     assert!(Foo { foo: 7 } == Foo { foo: 7 });
     assert!(Foo { foo: 7 } != Foo { foo: 42 });
 
-    let ptr1: *const SomeTrait = &SomeType { foo: 0 };
-    let ptr2: *const SomeTrait = &SomeType { foo: 1 };
+    let ptr1: *const dyn SomeTrait = &SomeType { foo: 0 };
+    let ptr2: *const dyn SomeTrait = &SomeType { foo: 1 };
     assert!(WithPtr { foo: ptr1 } == WithPtr { foo: ptr1 });
     assert!(WithPtr { foo: ptr1 } != WithPtr { foo: ptr2 });
 

@@ -10,10 +10,9 @@
  *   except according to those terms.
  */
 
-use ast;
-use attr;
+use crate::{ast, attr};
 use std::collections::HashSet;
-use syn::{self, visit, GenericParam};
+use syn::{parse_quote, visit, GenericParam};
 
 // use internals::ast::Item;
 // use internals::attr;
@@ -26,12 +25,12 @@ pub fn without_defaults(generics: &syn::Generics) -> syn::Generics {
         params: generics
             .params
             .iter()
-            .map(|generic_param| match *generic_param {
-                GenericParam::Type(ref ty_param) => syn::GenericParam::Type(syn::TypeParam {
+            .map(|generic_param| match generic_param {
+                GenericParam::Type(ty_param) => syn::GenericParam::Type(syn::TypeParam {
                     default: None,
                     ..ty_param.clone()
                 }),
-                ref param => param.clone(),
+                param => param.clone(),
             })
             .collect(),
         ..generics.clone()
@@ -133,7 +132,7 @@ where
         .all_fields()
         .into_iter()
         .filter(|field| {
-            if let syn::Type::Path(syn::TypePath { ref path, .. }) = *field.ty {
+            if let syn::Type::Path(syn::TypePath { path, .. }) = field.ty {
                 !is_phantom_data(path)
             } else {
                 true
@@ -143,7 +142,7 @@ where
         .map(|field| &field.ty);
 
     let mut visitor = FindTyParams {
-        all_ty_params: all_ty_params,
+        all_ty_params,
         relevant_ty_params: HashSet::new(),
     };
     for ty in relevant_tys {

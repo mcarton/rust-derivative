@@ -14,8 +14,8 @@
 #[cfg(feature = "use_core")]
 extern crate core;
 
-#[macro_use]
-extern crate derivative;
+
+use derivative::Derivative;
 
 // Example from lkuper's intern talk, August 2012.
 use Color::{cyan, magenta, yellow, black};

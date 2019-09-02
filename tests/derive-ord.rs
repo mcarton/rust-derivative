@@ -3,8 +3,8 @@ extern crate core;
 
 use std::marker::PhantomData;
 
-#[macro_use]
-extern crate derivative;
+
+use derivative::Derivative;
 
 #[derive(PartialEq, Eq, Derivative)]
 #[derivative(PartialOrd, Ord)]
@@ -131,9 +131,9 @@ fn main() {
     assert_eq!(Foo { foo: 42 }.cmp(&Foo { foo: 42 }), Ordering::Equal);
     assert_eq!(Foo { foo: 42 }.cmp(&Foo { foo: 7 }), Ordering::Greater);
 
-    let pointers: [*const SomeTrait; 2] = [&SomeType { foo: 1 }, &SomeType { foo: 0 }];
-    let ptr1: *const SomeTrait = pointers[0];
-    let ptr2: *const SomeTrait = pointers[1];
+    let pointers: [*const dyn SomeTrait; 2] = [&SomeType { foo: 1 }, &SomeType { foo: 0 }];
+    let ptr1: *const dyn SomeTrait = pointers[0];
+    let ptr2: *const dyn SomeTrait = pointers[1];
     let (ptr1, ptr2) = (std::cmp::min(ptr1, ptr2), std::cmp::max(ptr1, ptr2));
     assert_eq!(
         WithPtr { foo: ptr1 }.partial_cmp(&WithPtr { foo: ptr1 }),

@@ -13,8 +13,8 @@ extern crate core;
 
 use std::marker::PhantomData;
 
-#[macro_use]
-extern crate derivative;
+
+use derivative::Derivative;
 
 #[derive(Derivative)]
 #[derivative(Debug)]

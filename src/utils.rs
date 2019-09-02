@@ -1,9 +1,4 @@
-use proc_macro2;
-
-use ast;
-use attr;
-use bound;
-use syn;
+use crate::{bound, attr, ast};
 
 /// Make generic with all the generics in the input, plus a bound `T: <trait_path>` for each
 /// generic field type that will be shown.
@@ -34,7 +29,7 @@ where
 pub fn hygienic_type_parameter(item: &ast::Input, base: &str) -> syn::Ident {
     let mut typaram = String::with_capacity(150);
     typaram.push_str(base);
-    let typaram = item.generics.type_params().fold(typaram, |mut acc, ty| {
+    let typaram = item.generics.type_params().fold(typaram, |mut acc: String, ty| {
         acc.push_str(&format!("{}", &ty.ident));
         acc
     });
