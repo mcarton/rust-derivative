@@ -2,7 +2,7 @@ language: rust
 sudo: false
 
 rust:
-  - 1.31.0  # Minimum supported version
+  - 1.34.0  # Minimum supported version
   - stable
   - beta
   - nightly
@@ -19,17 +19,13 @@ install:
   - if ${HAS_CLIPPY}; then cargo clippy -V; fi
 
 script:
-  - if [ ${TRAVIS_RUST_VERSION} = "nightly" ]; then export FEATURES="--features=test-nightly"; else export FEATURES= ; fi
-  - cargo build --verbose ${FEATURES}
-  - cargo test --verbose ${FEATURES}
-  - if [ ${TRAVIS_RUST_VERSION} = "nightly" ]; then export FEATURES="--features=test-nightly,use_core"; else export FEATURES="--features=use_core" ; fi
+  - cargo build --verbose
+  - cargo test --verbose
   - cargo clean
-  - cargo build --verbose ${FEATURES}
-  - cargo test --verbose ${FEATURES}
-  - if ${HAS_CLIPPY}; then cargo clippy --verbose ${FEATURES}; fi
+  - cargo build --verbose --features=use_core
+  - cargo test --verbose --features=use_core
+  - if ${HAS_CLIPPY}; then cargo clippy --verbose --features=use_core; fi
 
-  # trybuild is not compatible with `-Z minimal-versions`, so do
-  # not use the "test-nightly" feature
   - if [ ${TRAVIS_RUST_VERSION} = "nightly" ]; then cargo update -Z minimal-versions; fi
   - if [ ${TRAVIS_RUST_VERSION} = "nightly" ]; then cargo build --verbose; fi
   - if [ ${TRAVIS_RUST_VERSION} = "nightly" ]; then cargo test --verbose; fi
