@@ -1,8 +1,14 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
-## 1.0.4 (Not released yet)
-* Implement `PartialOrd` and `Ord` deriving
+## 2.0.0
+This release should be compatible with version 1.*, but now requires rustc version 1.34 or later.
+* Update `syn`, `quote`, and `proc-macro2` dependencies. ([#59])
+
+## 1.0.4
+This is the last version to support rustc versions 1.15 to 1.33.
+
+* Implement `PartialOrd` and `Ord` deriving.
 
 ## 1.0.3
 * Do not require `syn`'s `full` feature anymore. ([#38], [#45])
@@ -29,3 +35,4 @@ All notable changes to this project will be documented in this file.
 [#40]: https://github.com/mcarton/rust-derivative/pull/40
 [#45]: https://github.com/mcarton/rust-derivative/pull/45
 [#46]: https://github.com/mcarton/rust-derivative/pull/46
+[#59]: https://github.com/mcarton/rust-derivative/pull/59
