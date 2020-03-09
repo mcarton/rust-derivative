@@ -10,6 +10,8 @@ pub fn derive(input: &ast::Input) -> proc_macro2::TokenStream {
     let debug_trait_path = debug_trait_path();
     let fmt_path = fmt_path();
 
+    let formatter = quote_spanned! {input.span=> __f};
+
     let body = matcher::Matcher::new(matcher::BindingStyle::Ref).build_arms(
         input,
         |_, _, arm_name, style, attrs, bis| {
@@ -20,7 +22,7 @@ pub fn derive(input: &ast::Input) -> proc_macro2::TokenStream {
 
                 if attrs.debug_transparent() {
                     return Some(quote_spanned! {arm_name.span()=>
-                        #debug_trait_path::fmt(__arg_0, __f)
+                        #debug_trait_path::fmt(__arg_0, #formatter)
                     });
                 }
 
@@ -59,7 +61,7 @@ pub fn derive(input: &ast::Input) -> proc_macro2::TokenStream {
             } else {
                 let name = arm_name.to_string();
                 quote_spanned! {arm_name.span()=>
-                    let mut __debug_trait_builder = __f.#method(#name);
+                    let mut __debug_trait_builder = #formatter.#method(#name);
                     #(#field_prints)*
                     __debug_trait_builder.finish()
                 }
@@ -81,7 +83,7 @@ pub fn derive(input: &ast::Input) -> proc_macro2::TokenStream {
     quote_spanned! {input.span=>
         #[allow(unused_qualifications)]
         impl #impl_generics #debug_trait_path for #name #ty_generics #where_clause {
-            fn fmt(&self, __f: &mut #fmt_path::Formatter) -> #fmt_path::Result {
+            fn fmt(&self, #formatter: &mut #fmt_path::Formatter) -> #fmt_path::Result {
                 match *self {
                     #body
                 }
