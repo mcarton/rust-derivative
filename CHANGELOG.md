@@ -1,6 +1,9 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## 2.0.2
+* Fix a bug with `format_with` on `Debug` derives with generic types with trait bounds.
+
 ## 2.0.1
 * Fix a hygiene bug with `Debug`. ([#60])
 
@@ -40,3 +43,4 @@ This is the last version to support rustc versions 1.15 to 1.33.
 [#46]: https://github.com/mcarton/rust-derivative/pull/46
 [#59]: https://github.com/mcarton/rust-derivative/pull/59
 [#60]: https://github.com/mcarton/rust-derivative/pull/60
+[#61]: https://github.com/mcarton/rust-derivative/pull/61
