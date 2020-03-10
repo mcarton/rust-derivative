@@ -116,7 +116,7 @@ struct Fn<A, B, C, D, E, F, G, H, I, J, K, L> {
 // TODO: Ord, PartialOrd
 struct Tuple<A, B, C, D, E, F, G, H, I, J, K, L> {
     f00: (),
-    f01: (A),
+    f01: (A,),
     f02: (A, B),
     f03: (A, B, C),
     f04: (A, B, C, D),
