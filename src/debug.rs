@@ -133,9 +133,6 @@ fn format_with(
     let fmt_path = fmt_path();
     let phantom_path = phantom_path();
 
-    let ctor_generics = generics.clone();
-    let (_, ctor_ty_generics, _) = ctor_generics.split_for_impl();
-
     generics
         .make_where_clause()
         .predicates
@@ -179,12 +176,16 @@ fn format_with(
 
     // Leave off the type parameter bounds, defaults, and attributes
     let phantom = generics.type_params().map(|tp| &tp.ident);
-
+    
+    let mut ctor_generics = generics.clone();
+    *ctor_generics.lifetimes_mut().last().expect("There must be a '_derivative lifetime")
+        = syn::LifetimeDef::new(parse_quote!('_));
+    let (_, ctor_ty_generics, _) = ctor_generics.split_for_impl();
     let ctor_ty_generics = ctor_ty_generics.as_turbofish();
 
     quote_spanned!(f.span=>
         let #arg_n = {
-            struct Dummy #ty_generics (&'_derivative #ty, #phantom_path <(#(#phantom),*)>) #where_clause;
+            struct Dummy #impl_generics (&'_derivative #ty, #phantom_path <(#(#phantom,)*)>) #where_clause;
 
             impl #impl_generics #debug_trait_path for Dummy #ty_generics #where_clause {
                 fn fmt(&self, __f: &mut #fmt_path::Formatter) -> #fmt_path::Result {
