@@ -1,6 +1,9 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## 2.0.1
+* Fix a hygiene bug with `Debug`. ([#60])
+
 ## 2.0.0
 This release should be compatible with version 1.*, but now requires rustc version 1.34 or later.
 * Update `syn`, `quote`, and `proc-macro2` dependencies. ([#59])
@@ -36,3 +39,4 @@ This is the last version to support rustc versions 1.15 to 1.33.
 [#45]: https://github.com/mcarton/rust-derivative/pull/45
 [#46]: https://github.com/mcarton/rust-derivative/pull/46
 [#59]: https://github.com/mcarton/rust-derivative/pull/59
+[#60]: https://github.com/mcarton/rust-derivative/pull/60
