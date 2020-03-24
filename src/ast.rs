@@ -64,6 +64,14 @@ impl<'a> Input<'a> {
             span: item.span(),
         })
     }
+
+    /// Checks whether this type is an enum with only unit variants.
+    pub fn is_trivial_enum(&self) -> bool {
+        match &self.body {
+            Body::Enum(e) => e.iter().all(|v| v.is_unit()),
+            Body::Struct(..) => false,
+        }
+    }
 }
 
 impl<'a> Body<'a> {
@@ -75,6 +83,13 @@ impl<'a> Body<'a> {
                 .collect(),
             Body::Struct(_, ref fields) => fields.iter().collect(),
         }
+    }
+}
+
+impl<'a> Variant<'a> {
+    /// Checks whether this variant is a unit variant.
+    pub fn is_unit(&self) -> bool {
+        self.fields.is_empty()
     }
 }
 
