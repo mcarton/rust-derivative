@@ -25,7 +25,8 @@ struct Foo {
     bar: u8,
 }
 
-println!("{:?}", Foo { foo: 42, bar: 1 }); // Foo { foo: 42 }
+// Prints `Foo { foo: 42 }`
+println!("{:?}", Foo { foo: 42, bar: 1 });
 ```
 
 Check the [documentation] for more!
