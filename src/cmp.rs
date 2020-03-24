@@ -70,14 +70,22 @@ pub fn derive_partial_eq(input: &ast::Input) -> Result<proc_macro2::TokenStream,
     );
     let (impl_generics, ty_generics, where_clause) = generics.split_for_impl();
 
+    let match_fields = if input.is_trivial_enum() {
+        quote!(true)
+    } else {
+        quote! {
+            match (&*self, &*other) {
+                #body
+                _ => unreachable!(),
+            }
+        }
+    };
+
     Ok(quote! {
         #[allow(unused_qualifications)]
         impl #impl_generics #partial_eq_trait_path for #name #ty_generics #where_clause {
             fn eq(&self, other: &Self) -> bool {
-                #discriminant_cmp && match (&*self, &*other) {
-                    #body
-                    _ => unreachable!(),
-                }
+                #discriminant_cmp && #match_fields
             }
         }
     })
