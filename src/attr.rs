@@ -100,8 +100,6 @@ pub struct InputHash {
 pub struct InputPartialEq {
     /// The `bound` attribute if present and the corresponding bounds.
     bounds: Option<Vec<syn::WherePredicate>>,
-    /// Allow `derivative(PartialEq)` on enums:
-    on_enum: bool,
 }
 
 #[derive(Debug, Default)]
@@ -304,9 +302,7 @@ impl Input {
                     let Some(partial_eq) = input.partial_eq;
                     for value in values;
                     "bound" => try!(parse_bound(&mut partial_eq.bounds, value)),
-                    "feature_allow_slow_enum" => {
-                        partial_eq.on_enum = try!(parse_boolean_meta_item(value, true, "feature_allow_slow_enum"));
-                    }
+                    "feature_allow_slow_enum" => (), // backward compatibility, now unnecessary
                 }
             }
             "PartialOrd" => {
@@ -394,10 +390,6 @@ impl Input {
         self.ord
             .as_ref()
             .and_then(|d| d.bounds.as_ref().map(Vec::as_slice))
-    }
-
-    pub fn partial_eq_on_enum(&self) -> bool {
-        self.partial_eq.as_ref().map_or(false, |d| d.on_enum)
     }
 
     pub fn partial_ord_on_enum(&self) -> bool {

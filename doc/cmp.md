@@ -18,17 +18,19 @@ The `PartialEq`, `PartialOrd` and `Ord` traits also supports the following attri
 
 # Enumerations
 
-Unfortunately, there is no way for derivative to derive `PartialEq`, `PartialOrd` or `Ord` on
-enumerations as efficiently as the built-in `derive(…)`
-[yet][discriminant].
+Unfortunately, there is no way for derivative to derive `PartialOrd` or `Ord` on
+enumerations as efficiently as the built-in `derive(…)` yet.
 
 If you want to use derivative on enumerations anyway, you can add
 
 ```rust
-#[derivative(PartialEq="feature_allow_slow_enum")]
+#[derivative(PartialOrd="feature_allow_slow_enum")]
 ```
 
 to your enumeration. This acts as a “feature-gate”.
+
+This attribute is also allowed for `PartialEq` for historical reason. It is not
+necessary anymore as of v2.1.0. It was never necessary nor allowed for `Eq`.
 
 # Ignoring a field
 
@@ -89,5 +91,3 @@ struct WithPtr<T: ?Sized> {
 ```
 
 See [`Default`'s documentation](./Default.md#custom-bound) for more details.
-
-[discriminant]: https://github.com/rust-lang/rfcs/pull/1696

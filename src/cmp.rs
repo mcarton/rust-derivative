@@ -30,49 +30,33 @@ pub fn derive_eq(input: &ast::Input) -> proc_macro2::TokenStream {
 
 /// Derive `PartialEq` for `input`.
 pub fn derive_partial_eq(input: &ast::Input) -> Result<proc_macro2::TokenStream, String> {
-    if let ast::Body::Enum(_) = input.body {
-        if !input.attrs.partial_eq_on_enum() {
-            return Err(
-                "can't use `#[derivative(PartialEq)]` on an enumeration without \
-                 `feature_allow_slow_enum`; see the documentation for more details"
-                    .into(),
-            );
-        }
-    }
+    let discriminant_cmp = if let ast::Body::Enum(_) = input.body {
+        let discriminant_path = discriminant_path();
 
-    let body = matcher::Matcher::new(matcher::BindingStyle::Ref)
-        .with_name("__self".into())
-        .build_arms(input, |_, _, outer_arm_name, _, _, outer_bis| {
-            let body = matcher::Matcher::new(matcher::BindingStyle::Ref)
-                .with_name("__other".into())
-                .build_arms(input, |_, _, inner_arm_name, _, _, inner_bis| {
-                    if outer_arm_name == inner_arm_name {
-                        let cmp = outer_bis.iter().zip(inner_bis).map(|(o, i)| {
-                            let outer_name = &o.ident;
-                            let inner_name = &i.ident;
+        quote!((#discriminant_path(&*self) == #discriminant_path(&*other)))
+    } else {
+        quote!(true)
+    };
+    let body = matcher::Matcher::new(matcher::BindingStyle::Ref).build_2_arms(
+        (input, "__self"),
+        (input, "__other"),
+        |_, _, _, (left_variant, right_variant)| {
+            let cmp = left_variant.iter().zip(&right_variant).map(|(o, i)| {
+                let outer_name = &o.ident;
+                let inner_name = &i.ident;
 
-                            if o.field.attrs.ignore_partial_eq() {
-                                None
-                            } else if let Some(compare_fn) = o.field.attrs.partial_eq_compare_with()
-                            {
-                                Some(quote!(&& #compare_fn(#outer_name, #inner_name)))
-                            } else {
-                                Some(quote!(&& #outer_name == #inner_name))
-                            }
-                        });
-
-                        quote!(true #(#cmp)*)
-                    } else {
-                        quote!(false)
-                    }
-                });
-
-            quote! {
-                match *other {
-                    #body
+                if o.field.attrs.ignore_partial_eq() {
+                    None
+                } else if let Some(compare_fn) = o.field.attrs.partial_eq_compare_with() {
+                    Some(quote!(&& #compare_fn(#outer_name, #inner_name)))
+                } else {
+                    Some(quote!(&& #outer_name == #inner_name))
                 }
-            }
-        });
+            });
+
+            quote!(true #(#cmp)*)
+        },
+    );
 
     let name = &input.ident;
 
@@ -90,8 +74,9 @@ pub fn derive_partial_eq(input: &ast::Input) -> Result<proc_macro2::TokenStream,
         #[allow(unused_qualifications)]
         impl #impl_generics #partial_eq_trait_path for #name #ty_generics #where_clause {
             fn eq(&self, other: &Self) -> bool {
-                match *self {
+                #discriminant_cmp && match (&*self, &*other) {
                     #body
+                    _ => unreachable!(),
                 }
             }
         }
@@ -113,12 +98,14 @@ pub fn derive_partial_ord(input: &ast::Input) -> Result<proc_macro2::TokenStream
     let option_path = option_path();
     let ordering_path = ordering_path();
 
-    let body = matcher::Matcher::new(matcher::BindingStyle::Ref)
-        .with_name("__self".into())
-        .build_arms(input, |_, n, _, _, _, outer_bis| {
-            let body = matcher::Matcher::new(matcher::BindingStyle::Ref)
-                .with_name("__other".into())
-                .build_arms(input, |_, m, _, _, _, inner_bis| match n.cmp(&m) {
+    let body = matcher::Matcher::new(matcher::BindingStyle::Ref).build_arms(
+        input,
+        "__self",
+        |_, n, _, _, _, outer_bis| {
+            let body = matcher::Matcher::new(matcher::BindingStyle::Ref).build_arms(
+                input,
+                "__other",
+                |_, m, _, _, _, inner_bis| match n.cmp(&m) {
                     ::std::cmp::Ordering::Less => quote!(#option_path::Some(#ordering_path::Less)),
                     ::std::cmp::Ordering::Greater => {
                         quote!(#option_path::Some(#ordering_path::Greater))
@@ -153,7 +140,8 @@ pub fn derive_partial_ord(input: &ast::Input) -> Result<proc_macro2::TokenStream
                                 }
                             })
                     }
-                });
+                },
+            );
 
             quote! {
                 match *other {
@@ -161,7 +149,8 @@ pub fn derive_partial_ord(input: &ast::Input) -> Result<proc_macro2::TokenStream
                 }
 
             }
-        });
+        },
+    );
 
     let name = &input.ident;
 
@@ -199,12 +188,14 @@ pub fn derive_ord(input: &ast::Input) -> Result<proc_macro2::TokenStream, String
 
     let ordering_path = ordering_path();
 
-    let body = matcher::Matcher::new(matcher::BindingStyle::Ref)
-        .with_name("__self".into())
-        .build_arms(input, |_, n, _, _, _, outer_bis| {
-            let body = matcher::Matcher::new(matcher::BindingStyle::Ref)
-                .with_name("__other".into())
-                .build_arms(input, |_, m, _, _, _, inner_bis| match n.cmp(&m) {
+    let body = matcher::Matcher::new(matcher::BindingStyle::Ref).build_arms(
+        input,
+        "__self",
+        |_, n, _, _, _, outer_bis| {
+            let body = matcher::Matcher::new(matcher::BindingStyle::Ref).build_arms(
+                input,
+                "__other",
+                |_, m, _, _, _, inner_bis| match n.cmp(&m) {
                     ::std::cmp::Ordering::Less => quote!(#ordering_path::Less),
                     ::std::cmp::Ordering::Greater => quote!(#ordering_path::Greater),
                     ::std::cmp::Ordering::Equal => {
@@ -237,7 +228,8 @@ pub fn derive_ord(input: &ast::Input) -> Result<proc_macro2::TokenStream, String
                                 }
                             })
                     }
-                });
+                },
+            );
 
             quote! {
                 match *other {
@@ -245,7 +237,8 @@ pub fn derive_ord(input: &ast::Input) -> Result<proc_macro2::TokenStream, String
                 }
 
             }
-        });
+        },
+    );
 
     let name = &input.ident;
 
@@ -338,5 +331,14 @@ fn ordering_path() -> syn::Path {
         parse_quote!(::core::cmp::Ordering)
     } else {
         parse_quote!(::std::cmp::Ordering)
+    }
+}
+
+/// Return the path of the `discriminant` function, that is `::std::mem::discriminant`.
+fn discriminant_path() -> syn::Path {
+    if cfg!(feature = "use_core") {
+        parse_quote!(::core::mem::discriminant)
+    } else {
+        parse_quote!(::std::mem::discriminant)
     }
 }

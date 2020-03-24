@@ -1,6 +1,9 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## Unreleased - 2.1.0
+* `feature_allow_slow_enum` is not required anymore on `enum` with `PartialEq`.
+
 ## 2.0.2
 * Fix a bug with `format_with` on `Debug` derives with generic types with trait bounds.
 
