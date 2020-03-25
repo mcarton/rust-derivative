@@ -8,7 +8,6 @@
     feature = "cargo-clippy",
     allow(renamed_and_removed_lints, redundant_field_names,)
 )]
-
 // We need to support Rust 1.34 to stable
 #![allow(deprecated)]
 

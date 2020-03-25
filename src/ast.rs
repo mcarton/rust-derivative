@@ -43,14 +43,14 @@ pub enum Style {
 
 impl<'a> Input<'a> {
     pub fn from_ast(item: &'a syn::DeriveInput) -> Result<Input<'a>, String> {
-        let attrs = try!(attr::Input::from_ast(&item.attrs));
+        let attrs = attr::Input::from_ast(&item.attrs)?;
 
         let body = match item.data {
             syn::Data::Enum(syn::DataEnum { ref variants, .. }) => {
-                Body::Enum(try!(enum_from_ast(variants)))
+                Body::Enum(enum_from_ast(variants)?)
             }
             syn::Data::Struct(syn::DataStruct { ref fields, .. }) => {
-                let (style, fields) = try!(struct_from_ast(fields));
+                let (style, fields) = struct_from_ast(fields)?;
                 Body::Struct(style, fields)
             }
             _ => panic!("Unsupported data type"),
@@ -99,9 +99,9 @@ fn enum_from_ast<'a>(
     variants
         .iter()
         .map(|variant| {
-            let (style, fields) = try!(struct_from_ast(&variant.fields));
+            let (style, fields) = struct_from_ast(&variant.fields)?;
             Ok(Variant {
-                attrs: try!(attr::Input::from_ast(&variant.attrs)),
+                attrs: attr::Input::from_ast(&variant.attrs)?,
                 fields: fields,
                 ident: variant.ident.clone(),
                 style: style,
@@ -112,10 +112,8 @@ fn enum_from_ast<'a>(
 
 fn struct_from_ast<'a>(fields: &'a syn::Fields) -> Result<(Style, Vec<Field<'a>>), String> {
     match *fields {
-        syn::Fields::Named(ref fields) => Ok((Style::Struct, try!(fields_from_ast(&fields.named)))),
-        syn::Fields::Unnamed(ref fields) => {
-            Ok((Style::Tuple, try!(fields_from_ast(&fields.unnamed))))
-        }
+        syn::Fields::Named(ref fields) => Ok((Style::Struct, fields_from_ast(&fields.named)?)),
+        syn::Fields::Unnamed(ref fields) => Ok((Style::Tuple, fields_from_ast(&fields.unnamed)?)),
         syn::Fields::Unit => Ok((Style::Unit, Vec::new())),
     }
 }
@@ -127,7 +125,7 @@ fn fields_from_ast<'a>(
         .iter()
         .map(|field| {
             Ok(Field {
-                attrs: try!(attr::Field::from_ast(field)),
+                attrs: attr::Field::from_ast(field)?,
                 ident: field.ident.clone(),
                 ty: &field.ty,
                 span: field.span(),

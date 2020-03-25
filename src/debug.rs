@@ -177,10 +177,12 @@ fn format_with(
 
     // Leave off the type parameter bounds, defaults, and attributes
     let phantom = generics.type_params().map(|tp| &tp.ident);
-    
+
     let mut ctor_generics = generics.clone();
-    *ctor_generics.lifetimes_mut().last().expect("There must be a '_derivative lifetime")
-        = syn::LifetimeDef::new(parse_quote!('_));
+    *ctor_generics
+        .lifetimes_mut()
+        .last()
+        .expect("There must be a '_derivative lifetime") = syn::LifetimeDef::new(parse_quote!('_));
     let (_, ctor_ty_generics, _) = ctor_generics.split_for_impl();
     let ctor_ty_generics = ctor_ty_generics.as_turbofish();
 

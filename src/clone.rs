@@ -101,8 +101,10 @@ pub fn derive_clone(input: &ast::Input) -> proc_macro2::TokenStream {
                     input,
                     "__arg",
                     |outer_arm_path, _, _, _, _, outer_bis| {
-                        let body = matcher::Matcher::new(matcher::BindingStyle::Ref)
-                            .build_arms(input, "__other", |inner_arm_path, _, _, _, _, inner_bis| {
+                        let body = matcher::Matcher::new(matcher::BindingStyle::Ref).build_arms(
+                            input,
+                            "__other",
+                            |inner_arm_path, _, _, _, _, inner_bis| {
                                 if outer_arm_path == inner_arm_path {
                                     let field_clones = outer_bis.iter().zip(inner_bis).map(
                                         |(outer_bi, inner_bi)| {
@@ -120,7 +122,8 @@ pub fn derive_clone(input: &ast::Input) -> proc_macro2::TokenStream {
                                 } else {
                                     quote!()
                                 }
-                            });
+                            },
+                        );
 
                         quote! {
                             match *other {
