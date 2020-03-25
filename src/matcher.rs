@@ -105,7 +105,12 @@ impl Matcher {
         t
     }
 
-    pub fn build_2_arms<F>(self, left: (&ast::Input, &str), right: (&ast::Input, &str), f: F) -> TokenStream
+    pub fn build_2_arms<F>(
+        self,
+        left: (&ast::Input, &str),
+        right: (&ast::Input, &str),
+        f: F,
+    ) -> TokenStream
     where
         F: Fn(
             usize,

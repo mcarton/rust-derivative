@@ -621,7 +621,7 @@ fn read_items(item: &syn::NestedMeta) -> Result<MetaItem, String> {
             nested: ref values,
             ..
         }) => {
-            let values = try!(values
+            let values = values
                 .iter()
                 .map(|value| {
                     if let syn::NestedMeta::Meta(syn::Meta::NameValue(syn::MetaNameValue {
@@ -630,14 +630,14 @@ fn read_items(item: &syn::NestedMeta) -> Result<MetaItem, String> {
                         ..
                     })) = *value
                     {
-                        let (name, value) = try!(ensure_str_lit(&path, &value));
+                        let (name, value) = ensure_str_lit(&path, &value)?;
 
                         Ok((Some(name), Some(value)))
                     } else {
                         Err("Expected named value".to_string())
                     }
                 })
-                .collect());
+                .collect::<Result<_, _>>()?;
 
             let name = match path.get_ident() {
                 Some(name) => name,
@@ -655,7 +655,7 @@ fn read_items(item: &syn::NestedMeta) -> Result<MetaItem, String> {
             lit: ref value,
             ..
         }) => {
-            let (name, value) = try!(ensure_str_lit(&path, &value));
+            let (name, value) = ensure_str_lit(&path, &value)?;
 
             Ok(MetaItem(name, vec![(None, Some(value))]))
         }
@@ -712,7 +712,7 @@ fn parse_bound(
     opt_bounds: &mut Option<Vec<syn::WherePredicate>>,
     value: Option<&syn::LitStr>,
 ) -> Result<(), String> {
-    let bound = try!(value.ok_or_else(|| "`bound` needs a value".to_string()));
+    let bound = value.ok_or_else(|| "`bound` needs a value".to_string())?;
 
     let bound_value = bound.value();
 
@@ -723,7 +723,7 @@ fn parse_bound(
             .map(|wh| wh.predicates.into_iter().collect())
             .map_err(|_| "Could not parse `bound`".to_string());
 
-        Some(try!(bounds))
+        Some(bounds?)
     } else {
         Some(vec![])
     };
