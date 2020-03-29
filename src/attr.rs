@@ -207,10 +207,11 @@ macro_rules! for_all_attr {
 }
 
 macro_rules! match_attributes {
-    (let Some($name:ident) = $unwrapped:expr; for $value:ident in $values:expr; $($body:tt)* ) => {
+    ($errors:ident for $trait:expr; let Some($name:ident) = $unwrapped:expr; for $value:ident in $values:expr; $($body:tt)* ) => {
         let mut $name = $unwrapped.take().unwrap_or_default();
 
         match_attributes! {
+            $errors for $trait;
             for $value in $values;
             $($body)*
         }
@@ -218,19 +219,31 @@ macro_rules! match_attributes {
         $unwrapped = Some($name);
     };
 
-    (for $value:ident in $values:expr; $($body:tt)* ) => {
+    ($errors:ident for $trait:expr; for $value:ident in $values:expr; $($body:tt)* ) => {
         for (name, $value) in $values {
             match name {
                 Some(ident) => {
                     match ident.to_string().as_ref() {
                         $($body)*
-                        _ => return Err(format!("unknown attribute `{}`", ident)),
+                        unknown => {
+                            let message = format!("Unknown attribute `{}` for trait `{}`", unknown, $trait);
+                            $errors.extend(quote_spanned! {ident.span()=>
+                                compile_error!(#message);
+                            });
+                        }
                     }
                 }
                 None => {
-                    match $value.expect("Expected value to be passed").value().as_ref() {
+                    let value = $value.expect("Expected value to be passed");
+                    match value.value().as_ref() {
                         $($body)*
-                        _ => return Err("unknown attribute".to_string()),
+                        unknown => {
+                            let message = format!("Unknown attribute `{}` for trait `{}`", unknown, $trait);
+                            let span = value.span();
+                            $errors.extend(quote_spanned! {span=>
+                                compile_error!(#message);
+                            });
+                        }
                     }
                 }
             }
@@ -250,6 +263,7 @@ impl Input {
             for (name, values) in attrs;
             "Clone" => {
                 match_attributes! {
+                    errors for "Clone";
                     let Some(clone) = input.clone;
                     for value in values;
                     "bound" => try!(parse_bound(&mut clone.bounds, value)),
@@ -260,6 +274,7 @@ impl Input {
             }
             "Copy" => {
                 match_attributes! {
+                    errors for "Copy";
                     let Some(copy) = input.copy;
                     for value in values;
                     "bound" => try!(parse_bound(&mut copy.bounds, value)),
@@ -267,6 +282,7 @@ impl Input {
             }
             "Debug" => {
                 match_attributes! {
+                    errors for "Debug";
                     let Some(debug) = input.debug;
                     for value in values;
                     "bound" => try!(parse_bound(&mut debug.bounds, value)),
@@ -277,6 +293,7 @@ impl Input {
             }
             "Default" => {
                 match_attributes! {
+                    errors for "Default";
                     let Some(default) = input.default;
                     for value in values;
                     "bound" => try!(parse_bound(&mut default.bounds, value)),
@@ -287,6 +304,7 @@ impl Input {
             }
             "Eq" => {
                 match_attributes! {
+                    errors for "Eq";
                     let Some(eq) = input.eq;
                     for value in values;
                     "bound" => try!(parse_bound(&mut eq.bounds, value)),
@@ -294,6 +312,7 @@ impl Input {
             }
             "Hash" => {
                 match_attributes! {
+                    errors for "Hash";
                     let Some(hash) = input.hash;
                     for value in values;
                     "bound" => try!(parse_bound(&mut hash.bounds, value)),
@@ -301,6 +320,7 @@ impl Input {
             }
             "PartialEq" => {
                 match_attributes! {
+                    errors for "PartialEq";
                     let Some(partial_eq) = input.partial_eq;
                     for value in values;
                     "bound" => try!(parse_bound(&mut partial_eq.bounds, value)),
@@ -309,6 +329,7 @@ impl Input {
             }
             "PartialOrd" => {
                 match_attributes! {
+                    errors for "PartialOrd";
                     let Some(partial_ord) = input.partial_ord;
                     for value in values;
                     "bound" => try!(parse_bound(&mut partial_ord.bounds, value)),
@@ -319,6 +340,7 @@ impl Input {
             }
             "Ord" => {
                 match_attributes! {
+                    errors for "Ord";
                     let Some(ord) = input.ord;
                     for value in values;
                     "bound" => try!(parse_bound(&mut ord.bounds, value)),
@@ -421,6 +443,7 @@ impl Field {
             for (name, values) in field.attrs;
             "Clone" => {
                 match_attributes! {
+                    errors for "Clone";
                     for value in values;
                     "bound" => try!(parse_bound(&mut out.clone.bounds, value)),
                     "clone_with" => {
@@ -431,6 +454,7 @@ impl Field {
             }
             "Debug" => {
                 match_attributes! {
+                    errors for "Debug";
                     for value in values;
                     "bound" => try!(parse_bound(&mut out.debug.bounds, value)),
                     "format_with" => {
@@ -444,6 +468,7 @@ impl Field {
             }
             "Default" => {
                 match_attributes! {
+                    errors for "Default";
                     for value in values;
                     "bound" => try!(parse_bound(&mut out.default.bounds, value)),
                     "value" => {
@@ -454,12 +479,14 @@ impl Field {
             }
             "Eq" => {
                 match_attributes! {
+                    errors for "Eq";
                     for value in values;
                     "bound" => try!(parse_bound(&mut out.eq_bound, value)),
                 }
             }
             "Hash" => {
                 match_attributes! {
+                    errors for "Hash";
                     for value in values;
                     "bound" => try!(parse_bound(&mut out.hash.bounds, value)),
                     "hash_with" => {
@@ -473,6 +500,7 @@ impl Field {
             }
             "PartialEq" => {
                 match_attributes! {
+                    errors for "PartialEq";
                     for value in values;
                     "bound" => try!(parse_bound(&mut out.partial_eq.bounds, value)),
                     "compare_with" => {
@@ -486,6 +514,7 @@ impl Field {
             }
             "PartialOrd" => {
                 match_attributes! {
+                    errors for "PartialOrd";
                     for value in values;
                     "bound" => try!(parse_bound(&mut out.partial_ord.bounds, value)),
                     "compare_with" => {
@@ -499,6 +528,7 @@ impl Field {
             }
             "Ord" => {
                 match_attributes! {
+                    errors for "Ord";
                     for value in values;
                     "bound" => try!(parse_bound(&mut out.ord.bounds, value)),
                     "compare_with" => {
