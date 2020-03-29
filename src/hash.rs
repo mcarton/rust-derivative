@@ -10,10 +10,18 @@ pub fn derive(input: &ast::Input) -> proc_macro2::TokenStream {
     let hasher_trait_path = hasher_trait_path();
     let hash_trait_path = hash_trait_path();
 
+    let discriminant = if let ast::Body::Enum(_) = input.body {
+        Some(quote!(
+            #hash_trait_path::hash(&std::mem::discriminant(self), __state);
+        ))
+    } else {
+        None
+    };
+
     let body = matcher::Matcher::new(matcher::BindingStyle::Ref).build_arms(
         input,
         "__arg",
-        |arm_path, _, _, _, _, bis| {
+        |_, _, _, _, _, bis| {
             let field_prints = bis.iter().filter_map(|bi| {
                 if bi.field.attrs.ignore_hash() {
                     return None;
@@ -32,16 +40,7 @@ pub fn derive(input: &ast::Input) -> proc_macro2::TokenStream {
                 }
             });
 
-            let variant = if let ast::Body::Enum(_) = input.body {
-                Some(quote!(
-                    #hash_trait_path::hash(&(#arm_path as u64), __state);
-                ))
-            } else {
-                None
-            };
-
             quote! {
-                #variant
                 #(#field_prints)*
             }
         },
@@ -64,6 +63,7 @@ pub fn derive(input: &ast::Input) -> proc_macro2::TokenStream {
             fn hash<#hasher_ty_parameter>(&self, __state: &mut #hasher_ty_parameter)
                 where #hasher_ty_parameter: #hasher_trait_path
             {
+                #discriminant
                 match *self {
                     #body
                 }
