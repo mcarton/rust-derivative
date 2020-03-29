@@ -39,8 +39,8 @@ fn main() {
 
     assert_eq(Foo { foo: 7 });
 
-    let ptr1: *const SomeTrait = &SomeType { foo: 0 };
-    let ptr2: *const SomeTrait = &SomeType { foo: 1 };
+    let ptr1: *const dyn SomeTrait = &SomeType { foo: 0 };
+    let ptr2: *const dyn SomeTrait = &SomeType { foo: 1 };
     assert!(WithPtr { foo: ptr1 } == WithPtr { foo: ptr1 });
     assert!(WithPtr { foo: ptr1 } != WithPtr { foo: ptr2 });
 
