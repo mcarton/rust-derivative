@@ -23,7 +23,10 @@ mod utils;
 
 use proc_macro::TokenStream;
 
-fn derive_impls(input: &mut ast::Input) -> Result<proc_macro2::TokenStream, String> {
+fn derive_impls(
+    input: &mut ast::Input,
+    errors: &mut proc_macro2::TokenStream,
+) -> Result<proc_macro2::TokenStream, String> {
     let mut tokens = proc_macro2::TokenStream::new();
 
     if input.attrs.clone.is_some() {
@@ -54,15 +57,23 @@ fn derive_impls(input: &mut ast::Input) -> Result<proc_macro2::TokenStream, Stri
         tokens.extend(cmp::derive_ord(input)?);
     }
 
-    tokens.extend(std::mem::replace(&mut input.attrs.errors, Default::default()));
+    tokens.extend(std::mem::replace(
+        errors,
+        Default::default(),
+    ));
 
     Ok(tokens)
 }
 
 fn detail(input: TokenStream) -> Result<TokenStream, String> {
+    let mut errors = proc_macro2::TokenStream::new();
     let parsed = syn::parse::<syn::DeriveInput>(input).map_err(|e| e.to_string())?;
-    let output = derive_impls(&mut ast::Input::from_ast(&parsed)?)?;
-    Ok(output.into())
+    let output = derive_impls(&mut ast::Input::from_ast(&parsed, &mut errors)?, &mut errors)?;
+    Ok(quote! {
+        #output
+        #errors
+    }
+    .into())
 }
 
 #[cfg_attr(not(test), proc_macro_derive(Derivative, attributes(derivative)))]

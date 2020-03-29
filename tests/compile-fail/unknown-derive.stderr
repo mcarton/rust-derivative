@@ -9,3 +9,9 @@ error: Deriving `DoesNotExist2` is not supported by derivative
    |
 12 | #[derivative(DoesNotExist2(with_some="argument"))]
    |              ^^^^^^^^^^^^^
+
+error: Deriving `DoesNotExist3` is not supported by derivative
+  --> $DIR/unknown-derive.rs:18:18
+   |
+18 |     #[derivative(DoesNotExist3)]
+   |                  ^^^^^^^^^^^^^
