@@ -143,7 +143,7 @@ where
         .map(|field| &field.ty);
 
     let mut visitor = FindTyParams {
-        all_ty_params: all_ty_params,
+        all_ty_params,
         relevant_ty_params: HashSet::new(),
     };
     for ty in relevant_tys {

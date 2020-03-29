@@ -1,13 +1,3 @@
-// We support Rust 1.15 and struct initialization shorthand syntax is a Rust 1.17 feature
-//
-// NOTE: Rust 1.17 and older cannot parse `::` in attributes so we can't use
-// `allow(clippy::redundant_field_names)`.
-// Instead, we resort to using `allow(redundant_field_names)`, but this triggers
-// `renamed_and_removed_lints` which we also want to allow.
-#![cfg_attr(
-    feature = "cargo-clippy",
-    allow(renamed_and_removed_lints, redundant_field_names,)
-)]
 // We need to support Rust 1.34 to stable
 #![allow(deprecated)]
 

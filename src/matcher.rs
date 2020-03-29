@@ -257,8 +257,8 @@ impl Matcher {
         f(field, &ident, binding_style).to_tokens(&mut stream);
 
         matches.push(BindingInfo {
-            ident: ident,
-            field: field,
+            ident,
+            field,
         });
 
         (stream, matches)

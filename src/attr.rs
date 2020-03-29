@@ -613,7 +613,7 @@ fn read_items(item: &syn::NestedMeta) -> Result<MetaItem, String> {
         syn::Meta::Path(ref path) => match path.get_ident() {
             Some(name) => Ok(MetaItem(name, Vec::new())),
             None => {
-                return Err("expected derivative attribute to be a string, but found a path".into())
+                Err("expected derivative attribute to be a string, but found a path".into())
             }
         },
         syn::Meta::List(syn::MetaList {
