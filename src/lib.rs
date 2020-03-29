@@ -23,7 +23,7 @@ mod utils;
 
 use proc_macro::TokenStream;
 
-fn derive_impls(input: &ast::Input) -> Result<proc_macro2::TokenStream, String> {
+fn derive_impls(input: &mut ast::Input) -> Result<proc_macro2::TokenStream, String> {
     let mut tokens = proc_macro2::TokenStream::new();
 
     if input.attrs.clone.is_some() {
@@ -54,12 +54,14 @@ fn derive_impls(input: &ast::Input) -> Result<proc_macro2::TokenStream, String> 
         tokens.extend(cmp::derive_ord(input)?);
     }
 
+    tokens.extend(std::mem::replace(&mut input.attrs.errors, Default::default()));
+
     Ok(tokens)
 }
 
 fn detail(input: TokenStream) -> Result<TokenStream, String> {
     let parsed = syn::parse::<syn::DeriveInput>(input).map_err(|e| e.to_string())?;
-    let output = derive_impls(&ast::Input::from_ast(&parsed)?)?;
+    let output = derive_impls(&mut ast::Input::from_ast(&parsed)?)?;
     Ok(output.into())
 }
 
