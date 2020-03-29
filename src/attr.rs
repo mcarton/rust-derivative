@@ -22,6 +22,8 @@ pub struct Input {
     pub partial_ord: Option<InputPartialOrd>,
     /// Whether `Ord` is present and its specific attributes.
     pub ord: Option<InputOrd>,
+    /// A stream for errors found during parsing.
+    pub errors: proc_macro2::TokenStream,
 }
 
 #[derive(Debug, Default)]
@@ -200,7 +202,6 @@ macro_rules! for_all_attr {
                 let MetaItem($name, $value) = try!(meta_item);
                 match $name.to_string().as_ref() {
                     $($body)*
-                    _ => return Err(format!("unknown trait `{}`", $name)),
                 }
             }
         }
@@ -324,6 +325,12 @@ impl Input {
                         ord.on_enum = try!(parse_boolean_meta_item(value, true, "feature_allow_slow_enum"));
                     }
                 }
+            }
+            unknown => {
+                let message = format!("Deriving `{}` is not supported by derivative", unknown);
+                input.errors.extend(quote_spanned! {name.span()=>
+                    compile_error!(#message);
+                });
             }
         }
 
@@ -498,6 +505,9 @@ impl Field {
                         out.ord.ignore = try!(parse_boolean_meta_item(value, true, "ignore"));
                     }
                 }
+            }
+            _ => {
+                // TODO
             }
         }
 
