@@ -6,10 +6,14 @@ extern crate derivative;
 
 #[derive(Derivative)]
 #[derivative(Clone = not_a_string)]
-struct Foo;
+struct Foo1;
 
 #[derive(Derivative)]
 #[derivative(Clone = 1+2)]
-struct Bar;
+struct Foo2;
+
+#[derive(Derivative)]
+#[derivative(Default(new = "True"))]
+struct Foo3;
 
 fn main() {}

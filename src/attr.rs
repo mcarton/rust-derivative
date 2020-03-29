@@ -271,7 +271,7 @@ impl Input {
                     for value in values;
                     "bound" => try!(parse_bound(&mut clone.bounds, value, errors)),
                     "clone_from" => {
-                        clone.clone_from = try!(parse_boolean_meta_item(value, true, "clone_from", errors));
+                        clone.clone_from = parse_boolean_meta_item(value, true, "clone_from", errors);
                     }
                 }
             }
@@ -290,7 +290,7 @@ impl Input {
                     for value in values;
                     "bound" => try!(parse_bound(&mut debug.bounds, value, errors)),
                     "transparent" => {
-                        debug.transparent = try!(parse_boolean_meta_item(value, true, "transparent", errors));
+                        debug.transparent = parse_boolean_meta_item(value, true, "transparent", errors);
                     }
                 }
             }
@@ -301,7 +301,7 @@ impl Input {
                     for value in values;
                     "bound" => try!(parse_bound(&mut default.bounds, value, errors)),
                     "new" => {
-                        default.new = try!(parse_boolean_meta_item(value, true, "new", errors));
+                        default.new = parse_boolean_meta_item(value, true, "new", errors);
                     }
                 }
             }
@@ -337,7 +337,7 @@ impl Input {
                     for value in values;
                     "bound" => try!(parse_bound(&mut partial_ord.bounds, value, errors)),
                     "feature_allow_slow_enum" => {
-                        partial_ord.on_enum = try!(parse_boolean_meta_item(value, true, "feature_allow_slow_enum", errors));
+                        partial_ord.on_enum = parse_boolean_meta_item(value, true, "feature_allow_slow_enum", errors);
                     }
                 }
             }
@@ -348,7 +348,7 @@ impl Input {
                     for value in values;
                     "bound" => try!(parse_bound(&mut ord.bounds, value, errors)),
                     "feature_allow_slow_enum" => {
-                        ord.on_enum = try!(parse_boolean_meta_item(value, true, "feature_allow_slow_enum", errors));
+                        ord.on_enum = parse_boolean_meta_item(value, true, "feature_allow_slow_enum", errors);
                     }
                 }
             }
@@ -466,7 +466,7 @@ impl Field {
                         out.debug.format_with = parse_str_lit(&path, errors).ok();
                     }
                     "ignore" => {
-                        out.debug.ignore = try!(parse_boolean_meta_item(value, true, "ignore", errors));
+                        out.debug.ignore = parse_boolean_meta_item(value, true, "ignore", errors);
                     }
                 }
             }
@@ -498,7 +498,7 @@ impl Field {
                         out.hash.hash_with = parse_str_lit(&path, errors).ok();
                     }
                     "ignore" => {
-                        out.hash.ignore = try!(parse_boolean_meta_item(value, true, "ignore", errors));
+                        out.hash.ignore = parse_boolean_meta_item(value, true, "ignore", errors);
                     }
                 }
             }
@@ -512,7 +512,7 @@ impl Field {
                         out.partial_eq.compare_with = parse_str_lit(&path, errors).ok();
                     }
                     "ignore" => {
-                        out.partial_eq.ignore = try!(parse_boolean_meta_item(value, true, "ignore", errors));
+                        out.partial_eq.ignore = parse_boolean_meta_item(value, true, "ignore", errors);
                     }
                 }
             }
@@ -526,7 +526,7 @@ impl Field {
                         out.partial_ord.compare_with = parse_str_lit(&path, errors).ok();
                     }
                     "ignore" => {
-                        out.partial_ord.ignore = try!(parse_boolean_meta_item(value, true, "ignore", errors));
+                        out.partial_ord.ignore = parse_boolean_meta_item(value, true, "ignore", errors);
                     }
                 }
             }
@@ -540,7 +540,7 @@ impl Field {
                         out.ord.compare_with = parse_str_lit(&path, errors).ok();
                     }
                     "ignore" => {
-                        out.ord.ignore = try!(parse_boolean_meta_item(value, true, "ignore", errors));
+                        out.ord.ignore = parse_boolean_meta_item(value, true, "ignore", errors);
                     }
                 }
             }
@@ -739,7 +739,7 @@ fn derivative_attribute(
             });
 
             None
-        },
+        }
     }
 }
 
@@ -751,20 +751,30 @@ fn parse_boolean_meta_item(
     item: Option<&syn::LitStr>,
     default: bool,
     name: &str,
-    _errors: &mut proc_macro2::TokenStream, // TODO
-) -> Result<bool, String> {
-    let item = item.map(|item| item.value());
-    match item.as_ref().map(|item| item.as_ref()) {
-        Some("true") => Ok(true),
-        Some("false") => Ok(false),
-        Some(val) => {
-            if val == name {
-                Ok(true)
-            } else {
-                Err(format!("Invalid value for `{}`: `{}`", name, val))
+    errors: &mut proc_macro2::TokenStream,
+) -> bool {
+    if let Some(item) = item.as_ref() {
+        match item.value().as_ref() {
+            "true" => true,
+            "false" => false,
+            val => {
+                if val == name {
+                    true
+                } else {
+                    let message = format!(
+                        r#"expected `"true"` or `"false"` for `{}`, got `{}`"#,
+                        name, val
+                    );
+                    errors.extend(quote_spanned! {item.span()=>
+                        compile_error!(#message);
+                    });
+
+                    default
+                }
             }
         }
-        None => Ok(default),
+    } else {
+        default
     }
 }
 
