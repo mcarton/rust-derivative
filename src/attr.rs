@@ -22,8 +22,6 @@ pub struct Input {
     pub partial_ord: Option<InputPartialOrd>,
     /// Whether `Ord` is present and its specific attributes.
     pub ord: Option<InputOrd>,
-    /// A stream for errors found during parsing.
-    pub errors: proc_macro2::TokenStream,
 }
 
 #[derive(Debug, Default)]
@@ -242,7 +240,10 @@ macro_rules! match_attributes {
 
 impl Input {
     /// Parse the `derivative` attributes on a type.
-    pub fn from_ast(attrs: &[syn::Attribute]) -> Result<Input, String> {
+    pub fn from_ast(
+        attrs: &[syn::Attribute],
+        errors: &mut proc_macro2::TokenStream,
+    ) -> Result<Input, String> {
         let mut input = Input::default();
 
         for_all_attr! {
@@ -328,7 +329,7 @@ impl Input {
             }
             unknown => {
                 let message = format!("Deriving `{}` is not supported by derivative", unknown);
-                input.errors.extend(quote_spanned! {name.span()=>
+                errors.extend(quote_spanned! {name.span()=>
                     compile_error!(#message);
                 });
             }
@@ -410,7 +411,10 @@ impl Input {
 
 impl Field {
     /// Parse the `derivative` attributes on a type.
-    pub fn from_ast(field: &syn::Field) -> Result<Field, String> {
+    pub fn from_ast(
+        field: &syn::Field,
+        errors: &mut proc_macro2::TokenStream,
+    ) -> Result<Field, String> {
         let mut out = Field::default();
 
         for_all_attr! {
@@ -506,8 +510,11 @@ impl Field {
                     }
                 }
             }
-            _ => {
-                // TODO
+            unknown => {
+                let message = format!("Deriving `{}` is not supported by derivative", unknown);
+                errors.extend(quote_spanned! {name.span()=>
+                    compile_error!(#message);
+                });
             }
         }
 

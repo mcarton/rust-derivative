@@ -12,4 +12,11 @@ struct Foo;
 #[derivative(DoesNotExist2(with_some="argument"))]
 struct Bar;
 
+#[derive(Derivative)]
+#[derivative(Debug)]
+struct Baz {
+    #[derivative(DoesNotExist3)]
+    _baz: (),
+}
+
 fn main() {}
