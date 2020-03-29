@@ -1,8 +1,10 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
-## Unreleased - 2.1.0
-* `feature_allow_slow_enum` is not required anymore on `enum` with `PartialEq`.
+## 2.1.0
+* `feature_allow_slow_enum` is not required anymore on `enum` with `PartialEq`. ([#64])
+* `PartialEq` generates more efficient code for C-like `enum`. ([#65])
+* Fix issue with deriving `Hash` on generic `enums` #68. ([#68])
 
 ## 2.0.2
 * Fix a bug with `format_with` on `Debug` derives with generic types with trait bounds.
@@ -33,11 +35,11 @@ This is the last version to support rustc versions 1.15 to 1.33.
 * Updated `quote` to `0.6`. ([#25])
 
 ## 1.0.0
-* Make stable
+* Make stable.
 
 ## 0.3.1
-* Fix a warning in `derivative(Debug)`
-* Remove all `feature`s, this makes the crate usable on `beta`
+* Fix a warning in `derivative(Debug)`.
+* Remove all `feature`s, this makes the crate usable on `beta`.
 
 [#25]: https://github.com/mcarton/rust-derivative/issues/25
 [#38]: https://github.com/mcarton/rust-derivative/pull/38
@@ -47,3 +49,6 @@ This is the last version to support rustc versions 1.15 to 1.33.
 [#59]: https://github.com/mcarton/rust-derivative/pull/59
 [#60]: https://github.com/mcarton/rust-derivative/pull/60
 [#61]: https://github.com/mcarton/rust-derivative/pull/61
+[#64]: https://github.com/mcarton/rust-derivative/pull/64
+[#65]: https://github.com/mcarton/rust-derivative/pull/65
+[#68]: https://github.com/mcarton/rust-derivative/pull/68
