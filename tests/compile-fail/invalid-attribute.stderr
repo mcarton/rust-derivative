@@ -1,0 +1,11 @@
+error: invalid attribute: expected literal
+ --> $DIR/invalid-attribute.rs:8:22
+  |
+8 | #[derivative(Clone = not_a_string)]
+  |                      ^^^^^^^^^^^^
+
+error: invalid attribute: expected `,`
+  --> $DIR/invalid-attribute.rs:12:23
+   |
+12 | #[derivative(Clone = 1+2)]
+   |                       ^
