@@ -57,8 +57,8 @@ impl<'a> Input<'a> {
         };
 
         Ok(Input {
-            attrs: attrs,
-            body: body,
+            attrs,
+            body,
             generics: &item.generics,
             ident: item.ident.clone(),
             span: item.span(),
@@ -102,9 +102,9 @@ fn enum_from_ast<'a>(
             let (style, fields) = struct_from_ast(&variant.fields)?;
             Ok(Variant {
                 attrs: attr::Input::from_ast(&variant.attrs)?,
-                fields: fields,
+                fields,
                 ident: variant.ident.clone(),
-                style: style,
+                style,
             })
         })
         .collect()

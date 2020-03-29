@@ -159,10 +159,10 @@ fn format_with(
                 lifetimes: None,
                 bounded_ty: syn::Type::Path(syn::TypePath {
                     qself: None,
-                    path: path,
+                    path,
                 }),
                 colon_token: Default::default(),
-                bounds: bounds,
+                bounds,
             })
         })
         .collect::<Vec<_>>();
