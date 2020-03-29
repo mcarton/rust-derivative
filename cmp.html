@@ -459,37 +459,39 @@
                                 <section class="normal markdown-section">
                                 
                                 <h1 id="custom-attributes"><a name="custom-attributes" class="plugin-anchor" href="#custom-attributes"><i class="fa fa-link" aria-hidden="true"></i></a>Custom attributes</h1>
-<p>The <code>Eq</code> and <code>PartialEq</code> traits support the following attributes:</p>
+<p>The <code>PartialEq</code>, <code>Eq</code>, <code>PartialOrd</code> and <code>Eq</code> and traits support the following attributes:</p>
 <ul>
 <li><strong>Container attributes</strong><ul>
-<li><a href="#custom-bound"><code>&lt;Trait&gt;(bound=&quot;&lt;where-clause or empty&gt;&quot;)</code></a></li>
+<li><a href="#custom-bound"><code>&lt;CmpTrait&gt;(bound=&quot;&lt;where-clause or empty&gt;&quot;)</code></a></li>
 </ul>
 </li>
 <li><strong>Field attributes</strong><ul>
-<li><a href="#custom-bound"><code>&lt;Trait&gt;(bound=&quot;&lt;where-clause or empty&gt;&quot;)</code></a></li>
+<li><a href="#custom-bound"><code>&lt;CmpTrait&gt;(bound=&quot;&lt;where-clause or empty&gt;&quot;)</code></a></li>
 </ul>
 </li>
 </ul>
-<p>The <code>PartialEq</code> trait also supports the following attributes:</p>
+<p>The <code>PartialEq</code>, <code>PartialOrd</code> and <code>Ord</code> traits also supports the following attributes:</p>
 <ul>
 <li><strong>Container attributes</strong><ul>
-<li><a href="#enumerations"><code>PartialEq=&quot;feature_allow_slow_enum&quot;</code></a></li>
+<li><a href="#enumerations"><code>&lt;CmpTrait&gt;=&quot;feature_allow_slow_enum&quot;</code></a></li>
 </ul>
 </li>
 <li><strong>Field attributes</strong><ul>
-<li><a href="#ignoring-a-field"><code>PartialEq=&quot;ignore&quot;</code></a></li>
-<li><a href="#compare-with"><code>PartialEq(compare_with=&quot;&lt;path&gt;&quot;)</code></a></li>
+<li><a href="#ignoring-a-field"><code>&lt;CmpTrait&gt;=&quot;ignore&quot;</code></a></li>
+<li><a href="#compare-with"><code>&lt;CmpTrait&gt;(compare_with=&quot;&lt;path&gt;&quot;)</code></a></li>
 </ul>
 </li>
 </ul>
+<p>(These attributes are not relevant for <code>Eq</code> which is just a marker trait.)</p>
 <h1 id="enumerations"><a name="enumerations" class="plugin-anchor" href="#enumerations"><i class="fa fa-link" aria-hidden="true"></i></a>Enumerations</h1>
-<p>Unfortunatelly, there is no way for derivative to derive <code>PartialEq</code> on
-enumerations as efficiently as the built-in <code>derive(PartialEq)</code>
-<a href="https://github.com/rust-lang/rfcs/pull/1696" target="_blank">yet</a>.</p>
+<p>Unfortunately, there is no way for derivative to derive <code>PartialOrd</code> or <code>Ord</code> on
+enumerations as efficiently as the built-in <code>derive(&#x2026;)</code> yet.</p>
 <p>If you want to use derivative on enumerations anyway, you can add</p>
-<pre><code class="lang-rust"><span class="hljs-meta">#[derivative(PartialEq=<span class="hljs-meta-string">&quot;feature_allow_slow_enum&quot;</span>)]</span>
+<pre><code class="lang-rust"><span class="hljs-meta">#[derivative(PartialOrd=<span class="hljs-meta-string">&quot;feature_allow_slow_enum&quot;</span>)]</span>
 </code></pre>
 <p>to your enumeration. This acts as a &#x201C;feature-gate&#x201D;.</p>
+<p>This attribute is also allowed for <code>PartialEq</code> for historical reason. It is not
+necessary anymore as of v2.1.0. It was never necessary nor allowed for <code>Eq</code>.</p>
 <h1 id="ignoring-a-field"><a name="ignoring-a-field" class="plugin-anchor" href="#ignoring-a-field"><i class="fa fa-link" aria-hidden="true"></i></a>Ignoring a field</h1>
 <p>You can use <em>derivative</em> to ignore a field when comparing:</p>
 <pre><code class="lang-rust"><span class="hljs-meta">#[derive(Derivative)]</span>
@@ -504,7 +506,7 @@ enumerations as efficiently as the built-in <code>derive(PartialEq)</code>
 <span class="hljs-built_in">assert!</span>(Foo { foo: <span class="hljs-number">42</span>, bar: <span class="hljs-number">0</span> } != Foo { foo: <span class="hljs-number">7</span>, bar: <span class="hljs-number">0</span>});
 </code></pre>
 <h1 id="compare-with"><a name="compare-with" class="plugin-anchor" href="#compare-with"><i class="fa fa-link" aria-hidden="true"></i></a>Compare with</h1>
-<p>Usually fields are compared using <code>==</code>. You can use an alternative comparison
+<p>Usually fields are compared using <code>==</code>, <code>PartialOrd::partial_cmp</code> or <code>Ord::cmp</code>. You can use an alternative comparison
 function if you like:</p>
 <pre><code class="lang-rust"><span class="hljs-meta">#[derive(Derivative)]</span>
 <span class="hljs-meta">#[derivative(PartialEq)]</span>
@@ -516,11 +518,31 @@ function if you like:</p>
 </code></pre>
 <p><code>foo</code> will be compared with <code>==</code> and <code>bar</code> will be compared with
 <code>path::to::my_cmp_fn</code> which must have the following prototype:</p>
-<pre><code class="lang-rust"><span class="hljs-function"><span class="hljs-keyword">fn</span> <span class="hljs-title">my_cmp_fn</span></span>(&amp;T, &amp;T) -&gt; <span class="hljs-keyword">bool</span>;
-</code></pre>
+<table>
+<thead>
+<tr>
+<th>Trait</th>
+<th>Signature</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>PartialEq</code></td>
+<td><code>fn my_cmp_fn(&amp;T, &amp;T) -&gt; bool;</code></td>
+</tr>
+<tr>
+<td><code>PartialOrd</code></td>
+<td><code>fn my_cmp_fn(&amp;T, &amp;T) -&gt; std::option::Option&lt;std::cmp::Ordering&gt;;</code></td>
+</tr>
+<tr>
+<td><code>Ord</code></td>
+<td><code>fn my_cmp_fn(&amp;T, &amp;T) -&gt; std::cmp::Ordering;</code></td>
+</tr>
+</tbody>
+</table>
 <h1 id="custom-bound"><a name="custom-bound" class="plugin-anchor" href="#custom-bound"><i class="fa fa-link" aria-hidden="true"></i></a>Custom bound</h1>
-<p>Usually a <code>T: Eq</code> bound is added for each type parameter <code>T</code>. You can use
-override this behaviour if the infered bound is not correct for you.</p>
+<p>Usually if you derive <code>CmpTrait</code>, a <code>T: CmpTrait</code> bound is added for each type parameter <code>T</code>. You can use
+override this behavior if the inferred bound is not correct for you.</p>
 <p>Eg. comparing raw pointers does not require the type to be <code>Eq</code>, so you could
 use:</p>
 <pre><code class="lang-rust"><span class="hljs-meta">#[derive(Derivative)]</span>
@@ -558,7 +580,7 @@ use:</p>
     <script>
         var gitbook = gitbook || [];
         gitbook.push(function() {
-            gitbook.page.hasChanged({"page":{"title":"Comparison traits","level":"1.6","depth":1,"next":{"title":"Note about enumerations","level":"1.6.1","depth":2,"anchor":"#enumerations","path":"cmp.md","ref":"cmp.md#enumerations","articles":[]},"previous":{"title":"Custom bound","level":"1.5.3","depth":2,"anchor":"#custom-bound","path":"Hash.md","ref":"Hash.md#custom-bound","articles":[]},"dir":"ltr"},"config":{"plugins":["-search","-sharing","codesnippet","edit-link","anchors"],"root":"doc","styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"pluginsConfig":{"edit-link":{"label":"Edit","base":"https://github.com/mcarton/rust-derivative/tree/master/doc"},"codesnippet":{},"anchors":{},"highlight":{},"lunr":{"maxIndexSize":1000000,"ignoreSpecialCharacters":false},"fontsettings":{"theme":"white","family":"sans","size":2},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false}},"theme":"default","pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"variables":{},"title":"Derivative","language":"en","gitbook":"*"},"file":{"path":"cmp.md","mtime":"2018-10-20T13:28:47.784Z","type":"markdown"},"gitbook":{"version":"3.2.3","time":"2018-10-20T17:50:43.699Z"},"basePath":".","book":{"language":""}});
+            gitbook.page.hasChanged({"page":{"title":"Comparison traits","level":"1.6","depth":1,"next":{"title":"Note about enumerations","level":"1.6.1","depth":2,"anchor":"#enumerations","path":"cmp.md","ref":"cmp.md#enumerations","articles":[]},"previous":{"title":"Custom bound","level":"1.5.3","depth":2,"anchor":"#custom-bound","path":"Hash.md","ref":"Hash.md#custom-bound","articles":[]},"dir":"ltr"},"config":{"plugins":["-search","-sharing","codesnippet","edit-link","anchors"],"root":"doc","styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"pluginsConfig":{"edit-link":{"label":"Edit","base":"https://github.com/mcarton/rust-derivative/tree/master/doc"},"codesnippet":{},"anchors":{},"highlight":{},"lunr":{"maxIndexSize":1000000,"ignoreSpecialCharacters":false},"fontsettings":{"theme":"white","family":"sans","size":2},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false}},"theme":"default","pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"variables":{},"title":"Derivative","language":"en","gitbook":"*"},"file":{"path":"cmp.md","mtime":"2020-03-29T20:30:52.099Z","type":"markdown"},"gitbook":{"version":"3.2.3","time":"2020-03-29T20:31:46.320Z"},"basePath":".","book":{"language":""}});
         });
     </script>
 </div>
