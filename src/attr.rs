@@ -194,12 +194,14 @@ pub struct FieldOrd {
 }
 
 macro_rules! for_all_attr {
-    (for ($name:ident, $value:ident) in $attrs:expr; $($body:tt)*) => {
-        for meta_items in $attrs.iter().filter_map(|attr| derivative_attribute(attr.parse_meta())) {
-            for meta_item in meta_items.iter().map(read_items) {
-                let MetaItem($name, $value) = try!(meta_item);
-                match $name.to_string().as_ref() {
-                    $($body)*
+    ($errors:ident; for ($name:ident, $value:ident) in $attrs:expr; $($body:tt)*) => {
+        for meta_items in $attrs.iter() {
+            if let Some(meta_items) = derivative_attribute(meta_items.parse_meta(), $errors) {
+                for meta_item in meta_items.iter().map(read_items) {
+                    let MetaItem($name, $value) = try!(meta_item);
+                    match $name.to_string().as_ref() {
+                        $($body)*
+                    }
                 }
             }
         }
@@ -260,15 +262,16 @@ impl Input {
         let mut input = Input::default();
 
         for_all_attr! {
+            errors;
             for (name, values) in attrs;
             "Clone" => {
                 match_attributes! {
                     errors for "Clone";
                     let Some(clone) = input.clone;
                     for value in values;
-                    "bound" => try!(parse_bound(&mut clone.bounds, value)),
+                    "bound" => try!(parse_bound(&mut clone.bounds, value, errors)),
                     "clone_from" => {
-                        clone.clone_from = try!(parse_boolean_meta_item(value, true, "clone_from"));
+                        clone.clone_from = try!(parse_boolean_meta_item(value, true, "clone_from", errors));
                     }
                 }
             }
@@ -277,7 +280,7 @@ impl Input {
                     errors for "Copy";
                     let Some(copy) = input.copy;
                     for value in values;
-                    "bound" => try!(parse_bound(&mut copy.bounds, value)),
+                    "bound" => try!(parse_bound(&mut copy.bounds, value, errors)),
                 }
             }
             "Debug" => {
@@ -285,9 +288,9 @@ impl Input {
                     errors for "Debug";
                     let Some(debug) = input.debug;
                     for value in values;
-                    "bound" => try!(parse_bound(&mut debug.bounds, value)),
+                    "bound" => try!(parse_bound(&mut debug.bounds, value, errors)),
                     "transparent" => {
-                        debug.transparent = try!(parse_boolean_meta_item(value, true, "transparent"));
+                        debug.transparent = try!(parse_boolean_meta_item(value, true, "transparent", errors));
                     }
                 }
             }
@@ -296,9 +299,9 @@ impl Input {
                     errors for "Default";
                     let Some(default) = input.default;
                     for value in values;
-                    "bound" => try!(parse_bound(&mut default.bounds, value)),
+                    "bound" => try!(parse_bound(&mut default.bounds, value, errors)),
                     "new" => {
-                        default.new = try!(parse_boolean_meta_item(value, true, "new"));
+                        default.new = try!(parse_boolean_meta_item(value, true, "new", errors));
                     }
                 }
             }
@@ -307,7 +310,7 @@ impl Input {
                     errors for "Eq";
                     let Some(eq) = input.eq;
                     for value in values;
-                    "bound" => try!(parse_bound(&mut eq.bounds, value)),
+                    "bound" => try!(parse_bound(&mut eq.bounds, value, errors)),
                 }
             }
             "Hash" => {
@@ -315,7 +318,7 @@ impl Input {
                     errors for "Hash";
                     let Some(hash) = input.hash;
                     for value in values;
-                    "bound" => try!(parse_bound(&mut hash.bounds, value)),
+                    "bound" => try!(parse_bound(&mut hash.bounds, value, errors)),
                 }
             }
             "PartialEq" => {
@@ -323,7 +326,7 @@ impl Input {
                     errors for "PartialEq";
                     let Some(partial_eq) = input.partial_eq;
                     for value in values;
-                    "bound" => try!(parse_bound(&mut partial_eq.bounds, value)),
+                    "bound" => try!(parse_bound(&mut partial_eq.bounds, value, errors)),
                     "feature_allow_slow_enum" => (), // backward compatibility, now unnecessary
                 }
             }
@@ -332,9 +335,9 @@ impl Input {
                     errors for "PartialOrd";
                     let Some(partial_ord) = input.partial_ord;
                     for value in values;
-                    "bound" => try!(parse_bound(&mut partial_ord.bounds, value)),
+                    "bound" => try!(parse_bound(&mut partial_ord.bounds, value, errors)),
                     "feature_allow_slow_enum" => {
-                        partial_ord.on_enum = try!(parse_boolean_meta_item(value, true, "feature_allow_slow_enum"));
+                        partial_ord.on_enum = try!(parse_boolean_meta_item(value, true, "feature_allow_slow_enum", errors));
                     }
                 }
             }
@@ -343,9 +346,9 @@ impl Input {
                     errors for "Ord";
                     let Some(ord) = input.ord;
                     for value in values;
-                    "bound" => try!(parse_bound(&mut ord.bounds, value)),
+                    "bound" => try!(parse_bound(&mut ord.bounds, value, errors)),
                     "feature_allow_slow_enum" => {
-                        ord.on_enum = try!(parse_boolean_meta_item(value, true, "feature_allow_slow_enum"));
+                        ord.on_enum = try!(parse_boolean_meta_item(value, true, "feature_allow_slow_enum", errors));
                     }
                 }
             }
@@ -440,15 +443,16 @@ impl Field {
         let mut out = Field::default();
 
         for_all_attr! {
+            errors;
             for (name, values) in field.attrs;
             "Clone" => {
                 match_attributes! {
                     errors for "Clone";
                     for value in values;
-                    "bound" => try!(parse_bound(&mut out.clone.bounds, value)),
+                    "bound" => try!(parse_bound(&mut out.clone.bounds, value, errors)),
                     "clone_with" => {
                         let path = try!(value.ok_or_else(|| "`clone_with` needs a value".to_string()));
-                        out.clone.clone_with = Some(try!(parse_str_lit(&path)));
+                        out.clone.clone_with = parse_str_lit(&path, errors).ok();
                     }
                 }
             }
@@ -456,13 +460,13 @@ impl Field {
                 match_attributes! {
                     errors for "Debug";
                     for value in values;
-                    "bound" => try!(parse_bound(&mut out.debug.bounds, value)),
+                    "bound" => try!(parse_bound(&mut out.debug.bounds, value, errors)),
                     "format_with" => {
                         let path = try!(value.ok_or_else(|| "`format_with` needs a value".to_string()));
-                        out.debug.format_with = Some(try!(parse_str_lit(&path)));
+                        out.debug.format_with = parse_str_lit(&path, errors).ok();
                     }
                     "ignore" => {
-                        out.debug.ignore = try!(parse_boolean_meta_item(value, true, "ignore"));
+                        out.debug.ignore = try!(parse_boolean_meta_item(value, true, "ignore", errors));
                     }
                 }
             }
@@ -470,10 +474,10 @@ impl Field {
                 match_attributes! {
                     errors for "Default";
                     for value in values;
-                    "bound" => try!(parse_bound(&mut out.default.bounds, value)),
+                    "bound" => try!(parse_bound(&mut out.default.bounds, value, errors)),
                     "value" => {
                         let value = try!(value.ok_or_else(|| "`value` needs a value".to_string()));
-                        out.default.value = Some(try!(parse_str_lit(&value)));
+                        out.default.value = parse_str_lit(&value, errors).ok();
                     }
                 }
             }
@@ -481,20 +485,20 @@ impl Field {
                 match_attributes! {
                     errors for "Eq";
                     for value in values;
-                    "bound" => try!(parse_bound(&mut out.eq_bound, value)),
+                    "bound" => try!(parse_bound(&mut out.eq_bound, value, errors)),
                 }
             }
             "Hash" => {
                 match_attributes! {
                     errors for "Hash";
                     for value in values;
-                    "bound" => try!(parse_bound(&mut out.hash.bounds, value)),
+                    "bound" => try!(parse_bound(&mut out.hash.bounds, value, errors)),
                     "hash_with" => {
                         let path = try!(value.ok_or_else(|| "`hash_with` needs a value".to_string()));
-                        out.hash.hash_with = Some(try!(parse_str_lit(&path)));
+                        out.hash.hash_with = parse_str_lit(&path, errors).ok();
                     }
                     "ignore" => {
-                        out.hash.ignore = try!(parse_boolean_meta_item(value, true, "ignore"));
+                        out.hash.ignore = try!(parse_boolean_meta_item(value, true, "ignore", errors));
                     }
                 }
             }
@@ -502,13 +506,13 @@ impl Field {
                 match_attributes! {
                     errors for "PartialEq";
                     for value in values;
-                    "bound" => try!(parse_bound(&mut out.partial_eq.bounds, value)),
+                    "bound" => try!(parse_bound(&mut out.partial_eq.bounds, value, errors)),
                     "compare_with" => {
                         let path = try!(value.ok_or_else(|| "`compare_with` needs a value".to_string()));
-                        out.partial_eq.compare_with = Some(try!(parse_str_lit(&path)));
+                        out.partial_eq.compare_with = parse_str_lit(&path, errors).ok();
                     }
                     "ignore" => {
-                        out.partial_eq.ignore = try!(parse_boolean_meta_item(value, true, "ignore"));
+                        out.partial_eq.ignore = try!(parse_boolean_meta_item(value, true, "ignore", errors));
                     }
                 }
             }
@@ -516,13 +520,13 @@ impl Field {
                 match_attributes! {
                     errors for "PartialOrd";
                     for value in values;
-                    "bound" => try!(parse_bound(&mut out.partial_ord.bounds, value)),
+                    "bound" => try!(parse_bound(&mut out.partial_ord.bounds, value, errors)),
                     "compare_with" => {
                         let path = try!(value.ok_or_else(|| "`compare_with` needs a value".to_string()));
-                        out.partial_ord.compare_with = Some(try!(parse_str_lit(&path)));
+                        out.partial_ord.compare_with = parse_str_lit(&path, errors).ok();
                     }
                     "ignore" => {
-                        out.partial_ord.ignore = try!(parse_boolean_meta_item(value, true, "ignore"));
+                        out.partial_ord.ignore = try!(parse_boolean_meta_item(value, true, "ignore", errors));
                     }
                 }
             }
@@ -530,13 +534,13 @@ impl Field {
                 match_attributes! {
                     errors for "Ord";
                     for value in values;
-                    "bound" => try!(parse_bound(&mut out.ord.bounds, value)),
+                    "bound" => try!(parse_bound(&mut out.ord.bounds, value, errors)),
                     "compare_with" => {
                         let path = try!(value.ok_or_else(|| "`compare_with` needs a value".to_string()));
-                        out.ord.compare_with = Some(try!(parse_str_lit(&path)));
+                        out.ord.compare_with = parse_str_lit(&path, errors).ok();
                     }
                     "ignore" => {
-                        out.ord.ignore = try!(parse_boolean_meta_item(value, true, "ignore"));
+                        out.ord.ignore = try!(parse_boolean_meta_item(value, true, "ignore", errors));
                     }
                 }
             }
@@ -712,6 +716,7 @@ fn read_items(item: &syn::NestedMeta) -> Result<MetaItem, String> {
 /// Filter the `derivative` items from an attribute.
 fn derivative_attribute(
     meta: syn::parse::Result<syn::Meta>,
+    errors: &mut proc_macro2::TokenStream,
 ) -> Option<syn::punctuated::Punctuated<syn::NestedMeta, syn::token::Comma>> {
     match meta {
         Ok(syn::Meta::List(syn::MetaList {
@@ -726,7 +731,15 @@ fn derivative_attribute(
                 None
             }
         }
-        _ => None,
+        Ok(_) => None,
+        Err(e) => {
+            let message = format!("invalid attribute: {}", e);
+            errors.extend(quote_spanned! {e.span()=>
+                compile_error!(#message);
+            });
+
+            None
+        },
     }
 }
 
@@ -738,6 +751,7 @@ fn parse_boolean_meta_item(
     item: Option<&syn::LitStr>,
     default: bool,
     name: &str,
+    _errors: &mut proc_macro2::TokenStream, // TODO
 ) -> Result<bool, String> {
     let item = item.map(|item| item.value());
     match item.as_ref().map(|item| item.as_ref()) {
@@ -758,6 +772,7 @@ fn parse_boolean_meta_item(
 fn parse_bound(
     opt_bounds: &mut Option<Vec<syn::WherePredicate>>,
     value: Option<&syn::LitStr>,
+    errors: &mut proc_macro2::TokenStream,
 ) -> Result<(), String> {
     let bound = value.ok_or_else(|| "`bound` needs a value".to_string())?;
 
@@ -766,7 +781,7 @@ fn parse_bound(
     *opt_bounds = if !bound_value.is_empty() {
         let where_string = syn::LitStr::new(&format!("where {}", bound_value), bound.span());
 
-        let bounds = parse_str_lit::<syn::WhereClause>(&where_string)
+        let bounds = parse_str_lit::<syn::WhereClause>(&where_string, errors)
             .map(|wh| wh.predicates.into_iter().collect())
             .map_err(|_| "Could not parse `bound`".to_string());
 
@@ -778,11 +793,20 @@ fn parse_bound(
     Ok(())
 }
 
-fn parse_str_lit<T>(value: &syn::LitStr) -> Result<T, String>
+fn parse_str_lit<T>(value: &syn::LitStr, errors: &mut proc_macro2::TokenStream) -> Result<T, ()>
 where
     T: syn::parse::Parse,
 {
-    value.parse().map_err(|e| e.to_string())
+    match value.parse() {
+        Ok(value) => Ok(value),
+        Err(e) => {
+            let message = format!("could not parse string literal: {}", e);
+            errors.extend(quote_spanned! {value.span()=>
+                compile_error!(#message);
+            });
+            Err(())
+        }
+    }
 }
 
 fn ensure_str_lit<'a>(
