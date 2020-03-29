@@ -28,6 +28,7 @@ mod debug;
 mod default;
 mod hash;
 mod matcher;
+mod paths;
 mod utils;
 
 use proc_macro::TokenStream;

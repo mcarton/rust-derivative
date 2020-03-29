@@ -3,6 +3,7 @@ use proc_macro2;
 use ast;
 use attr;
 use matcher;
+use paths;
 use syn;
 use utils;
 
@@ -11,8 +12,9 @@ pub fn derive(input: &ast::Input) -> proc_macro2::TokenStream {
     let hash_trait_path = hash_trait_path();
 
     let discriminant = if let ast::Body::Enum(_) = input.body {
+        let discriminant = paths::discriminant_path();
         Some(quote!(
-            #hash_trait_path::hash(&std::mem::discriminant(self), __state);
+            #hash_trait_path::hash(&#discriminant(self), __state);
         ))
     } else {
         None

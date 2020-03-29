@@ -5,6 +5,7 @@ use proc_macro2;
 use ast;
 use attr;
 use matcher;
+use paths;
 use syn;
 use utils;
 
@@ -31,7 +32,7 @@ pub fn derive_eq(input: &ast::Input) -> proc_macro2::TokenStream {
 /// Derive `PartialEq` for `input`.
 pub fn derive_partial_eq(input: &ast::Input) -> Result<proc_macro2::TokenStream, String> {
     let discriminant_cmp = if let ast::Body::Enum(_) = input.body {
-        let discriminant_path = discriminant_path();
+        let discriminant_path = paths::discriminant_path();
 
         quote!((#discriminant_path(&*self) == #discriminant_path(&*other)))
     } else {
@@ -339,14 +340,5 @@ fn ordering_path() -> syn::Path {
         parse_quote!(::core::cmp::Ordering)
     } else {
         parse_quote!(::std::cmp::Ordering)
-    }
-}
-
-/// Return the path of the `discriminant` function, that is `::std::mem::discriminant`.
-fn discriminant_path() -> syn::Path {
-    if cfg!(feature = "use_core") {
-        parse_quote!(::core::mem::discriminant)
-    } else {
-        parse_quote!(::std::mem::discriminant)
     }
 }
