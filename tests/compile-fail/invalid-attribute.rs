@@ -16,4 +16,8 @@ struct Foo2;
 #[derivative(Default(new = "True"))]
 struct Foo3;
 
+#[derive(Derivative)]
+#[derivative(Debug(bound))]
+struct Foo4;
+
 fn main() {}

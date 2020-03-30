@@ -26,7 +26,7 @@ use proc_macro::TokenStream;
 fn derive_impls(
     input: &mut ast::Input,
     errors: &mut proc_macro2::TokenStream,
-) -> Result<proc_macro2::TokenStream, String> {
+) -> proc_macro2::TokenStream {
     let mut tokens = proc_macro2::TokenStream::new();
 
     if input.attrs.clone.is_some() {
@@ -48,13 +48,13 @@ fn derive_impls(
         tokens.extend(hash::derive(input));
     }
     if input.attrs.partial_eq.is_some() {
-        tokens.extend(cmp::derive_partial_eq(input)?);
+        tokens.extend(cmp::derive_partial_eq(input));
     }
     if input.attrs.partial_ord.is_some() {
-        tokens.extend(cmp::derive_partial_ord(input)?);
+        tokens.extend(cmp::derive_partial_ord(input, errors));
     }
     if input.attrs.ord.is_some() {
-        tokens.extend(cmp::derive_ord(input)?);
+        tokens.extend(cmp::derive_ord(input, errors));
     }
 
     tokens.extend(std::mem::replace(
@@ -62,24 +62,25 @@ fn derive_impls(
         Default::default(),
     ));
 
-    Ok(tokens)
-}
-
-fn detail(input: TokenStream) -> Result<TokenStream, String> {
-    let mut errors = proc_macro2::TokenStream::new();
-    let parsed = syn::parse::<syn::DeriveInput>(input).map_err(|e| e.to_string())?;
-    let output = derive_impls(&mut ast::Input::from_ast(&parsed, &mut errors)?, &mut errors)?;
-    Ok(quote! {
-        #output
-        #errors
-    }
-    .into())
+    tokens
 }
 
 #[cfg_attr(not(test), proc_macro_derive(Derivative, attributes(derivative)))]
 pub fn derivative(input: TokenStream) -> TokenStream {
-    match detail(input) {
-        Ok(output) => output,
-        Err(e) => panic!(e),
-    }
+    let mut errors = proc_macro2::TokenStream::new();
+
+    let mut output = match syn::parse::<syn::DeriveInput>(input) {
+        Ok(parsed) => {
+            ast::Input::from_ast(&parsed, &mut errors)
+                .map(|mut input| derive_impls(&mut input, &mut errors))
+                .unwrap_or_default()
+        },
+        Err(error) => {
+            errors.extend(error.to_compile_error());
+            Default::default()
+        }
+    };
+
+    output.extend(errors);
+    output.into()
 }

@@ -4,6 +4,7 @@ use ast;
 use attr;
 use matcher;
 use syn;
+use syn::spanned::Spanned;
 use utils;
 
 pub fn derive(input: &ast::Input) -> proc_macro2::TokenStream {
@@ -186,7 +187,7 @@ fn format_with(
     let (_, ctor_ty_generics, _) = ctor_generics.split_for_impl();
     let ctor_ty_generics = ctor_ty_generics.as_turbofish();
 
-    quote_spanned!(f.span=>
+    quote_spanned!(format_fn.span()=>
         let #arg_n = {
             struct Dummy #impl_generics (&'_derivative #ty, #phantom_path <(#(#phantom,)*)>) #where_clause;
 

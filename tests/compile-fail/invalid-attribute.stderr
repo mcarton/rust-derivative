@@ -15,3 +15,9 @@ error: expected `"true"` or `"false"` for `new`, got `True`
    |
 16 | #[derivative(Default(new = "True"))]
    |                            ^^^^^^
+
+error: expected named value
+  --> $DIR/invalid-attribute.rs:20:20
+   |
+20 | #[derivative(Debug(bound))]
+   |                    ^^^^^

@@ -30,7 +30,7 @@ pub fn derive_eq(input: &ast::Input) -> proc_macro2::TokenStream {
 }
 
 /// Derive `PartialEq` for `input`.
-pub fn derive_partial_eq(input: &ast::Input) -> Result<proc_macro2::TokenStream, String> {
+pub fn derive_partial_eq(input: &ast::Input) -> proc_macro2::TokenStream {
     let discriminant_cmp = if let ast::Body::Enum(_) = input.body {
         let discriminant_path = paths::discriminant_path();
 
@@ -82,24 +82,24 @@ pub fn derive_partial_eq(input: &ast::Input) -> Result<proc_macro2::TokenStream,
         }
     };
 
-    Ok(quote! {
+    quote! {
         #[allow(unused_qualifications)]
         impl #impl_generics #partial_eq_trait_path for #name #ty_generics #where_clause {
             fn eq(&self, other: &Self) -> bool {
                 #discriminant_cmp && #match_fields
             }
         }
-    })
+    }
 }
 
 /// Derive `PartialOrd` for `input`.
-pub fn derive_partial_ord(input: &ast::Input) -> Result<proc_macro2::TokenStream, String> {
+pub fn derive_partial_ord(input: &ast::Input, errors: &mut proc_macro2::TokenStream) -> proc_macro2::TokenStream {
     if let ast::Body::Enum(_) = input.body {
         if !input.attrs.partial_ord_on_enum() {
-            return Err(
-                "can't use `#[derivative(PartialOrd)]` on an enumeration without \
-                 `feature_allow_slow_enum`; see the documentation for more details"
-                    .into(),
+            let message = "can't use `#[derivative(PartialOrd)]` on an enumeration without \
+            `feature_allow_slow_enum`; see the documentation for more details";
+            errors.extend(
+                syn::Error::new(input.span, message).to_compile_error()
             );
         }
     }
@@ -173,7 +173,7 @@ pub fn derive_partial_ord(input: &ast::Input) -> Result<proc_macro2::TokenStream
     );
     let (impl_generics, ty_generics, where_clause) = generics.split_for_impl();
 
-    Ok(quote! {
+    quote! {
         #[allow(unused_qualifications)]
         impl #impl_generics #partial_ord_trait_path for #name #ty_generics #where_clause {
             fn partial_cmp(&self, other: &Self) -> #option_path<#ordering_path> {
@@ -182,16 +182,18 @@ pub fn derive_partial_ord(input: &ast::Input) -> Result<proc_macro2::TokenStream
                 }
             }
         }
-    })
+    }
 }
 
 /// Derive `Ord` for `input`.
-pub fn derive_ord(input: &ast::Input) -> Result<proc_macro2::TokenStream, String> {
+pub fn derive_ord(input: &ast::Input, errors: &mut proc_macro2::TokenStream) -> proc_macro2::TokenStream {
     if let ast::Body::Enum(_) = input.body {
         if !input.attrs.ord_on_enum() {
-            return Err("can't use `#[derivative(Ord)]` on an enumeration without \
-                        `feature_allow_slow_enum`; see the documentation for more details"
-                .into());
+            let message = "can't use `#[derivative(Ord)]` on an enumeration without \
+            `feature_allow_slow_enum`; see the documentation for more details";
+            errors.extend(
+                syn::Error::new(input.span, message).to_compile_error()
+            );
         }
     }
 
@@ -261,7 +263,7 @@ pub fn derive_ord(input: &ast::Input) -> Result<proc_macro2::TokenStream, String
     );
     let (impl_generics, ty_generics, where_clause) = generics.split_for_impl();
 
-    Ok(quote! {
+    quote! {
         #[allow(unused_qualifications)]
         impl #impl_generics #ord_trait_path for #name #ty_generics #where_clause {
             fn cmp(&self, other: &Self) -> #ordering_path {
@@ -270,7 +272,7 @@ pub fn derive_ord(input: &ast::Input) -> Result<proc_macro2::TokenStream, String
                 }
             }
         }
-    })
+    }
 }
 
 fn needs_partial_eq_bound(attrs: &attr::Field) -> bool {
