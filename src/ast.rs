@@ -45,7 +45,7 @@ impl<'a> Input<'a> {
     pub fn from_ast(
         item: &'a syn::DeriveInput,
         errors: &mut proc_macro2::TokenStream,
-    ) -> Result<Input<'a>, String> {
+    ) -> Result<Input<'a>, ()> {
         let attrs = attr::Input::from_ast(&item.attrs, errors)?;
 
         let body = match item.data {
@@ -56,7 +56,13 @@ impl<'a> Input<'a> {
                 let (style, fields) = struct_from_ast(fields, errors)?;
                 Body::Struct(style, fields)
             }
-            _ => panic!("Unsupported data type"),
+            syn::Data::Union(..) => {
+                errors.extend(
+                    syn::Error::new_spanned(item, "derivative does not support unions")
+                        .to_compile_error()
+                );
+                return Err(());
+            }
         };
 
         Ok(Input {
@@ -99,7 +105,7 @@ impl<'a> Variant<'a> {
 fn enum_from_ast<'a>(
     variants: &'a syn::punctuated::Punctuated<syn::Variant, syn::token::Comma>,
     errors: &mut proc_macro2::TokenStream,
-) -> Result<Vec<Variant<'a>>, String> {
+) -> Result<Vec<Variant<'a>>, ()> {
     variants
         .iter()
         .map(|variant| {
@@ -117,7 +123,7 @@ fn enum_from_ast<'a>(
 fn struct_from_ast<'a>(
     fields: &'a syn::Fields,
     errors: &mut proc_macro2::TokenStream,
-) -> Result<(Style, Vec<Field<'a>>), String> {
+) -> Result<(Style, Vec<Field<'a>>), ()> {
     match *fields {
         syn::Fields::Named(ref fields) => {
             Ok((Style::Struct, fields_from_ast(&fields.named, errors)?))
@@ -132,7 +138,7 @@ fn struct_from_ast<'a>(
 fn fields_from_ast<'a>(
     fields: &'a syn::punctuated::Punctuated<syn::Field, syn::token::Comma>,
     errors: &mut proc_macro2::TokenStream,
-) -> Result<Vec<Field<'a>>, String> {
+) -> Result<Vec<Field<'a>>, ()> {
     fields
         .iter()
         .map(|field| {

@@ -1,5 +1,6 @@
 use proc_macro2;
 use syn;
+use syn::spanned::Spanned;
 
 /// Represent the `derivative` attributes on the input type (`struct`/`enum`).
 #[derive(Debug, Default)]
@@ -196,8 +197,10 @@ pub struct FieldOrd {
 macro_rules! for_all_attr {
     ($errors:ident; for ($name:ident, $value:ident) in $attrs:expr; $($body:tt)*) => {
         for meta_items in $attrs.iter() {
-            if let Some(meta_items) = derivative_attribute(meta_items.parse_meta(), $errors) {
-                for meta_item in meta_items.iter().map(read_items) {
+            let meta_items = derivative_attribute(meta_items.parse_meta(), $errors);
+            if let Some(meta_items) = meta_items {
+                for meta_item in meta_items.iter() {
+                    let meta_item = read_items(meta_item, $errors);
                     let MetaItem($name, $value) = try!(meta_item);
                     match $name.to_string().as_ref() {
                         $($body)*
@@ -258,7 +261,7 @@ impl Input {
     pub fn from_ast(
         attrs: &[syn::Attribute],
         errors: &mut proc_macro2::TokenStream,
-    ) -> Result<Input, String> {
+    ) -> Result<Input, ()> {
         let mut input = Input::default();
 
         for_all_attr! {
@@ -269,7 +272,7 @@ impl Input {
                     errors for "Clone";
                     let Some(clone) = input.clone;
                     for value in values;
-                    "bound" => try!(parse_bound(&mut clone.bounds, value, errors)),
+                    "bound" => parse_bound(&mut clone.bounds, value, errors),
                     "clone_from" => {
                         clone.clone_from = parse_boolean_meta_item(value, true, "clone_from", errors);
                     }
@@ -280,7 +283,7 @@ impl Input {
                     errors for "Copy";
                     let Some(copy) = input.copy;
                     for value in values;
-                    "bound" => try!(parse_bound(&mut copy.bounds, value, errors)),
+                    "bound" => parse_bound(&mut copy.bounds, value, errors),
                 }
             }
             "Debug" => {
@@ -288,7 +291,7 @@ impl Input {
                     errors for "Debug";
                     let Some(debug) = input.debug;
                     for value in values;
-                    "bound" => try!(parse_bound(&mut debug.bounds, value, errors)),
+                    "bound" => parse_bound(&mut debug.bounds, value, errors),
                     "transparent" => {
                         debug.transparent = parse_boolean_meta_item(value, true, "transparent", errors);
                     }
@@ -299,7 +302,7 @@ impl Input {
                     errors for "Default";
                     let Some(default) = input.default;
                     for value in values;
-                    "bound" => try!(parse_bound(&mut default.bounds, value, errors)),
+                    "bound" => parse_bound(&mut default.bounds, value, errors),
                     "new" => {
                         default.new = parse_boolean_meta_item(value, true, "new", errors);
                     }
@@ -310,7 +313,7 @@ impl Input {
                     errors for "Eq";
                     let Some(eq) = input.eq;
                     for value in values;
-                    "bound" => try!(parse_bound(&mut eq.bounds, value, errors)),
+                    "bound" => parse_bound(&mut eq.bounds, value, errors),
                 }
             }
             "Hash" => {
@@ -318,7 +321,7 @@ impl Input {
                     errors for "Hash";
                     let Some(hash) = input.hash;
                     for value in values;
-                    "bound" => try!(parse_bound(&mut hash.bounds, value, errors)),
+                    "bound" => parse_bound(&mut hash.bounds, value, errors),
                 }
             }
             "PartialEq" => {
@@ -326,7 +329,7 @@ impl Input {
                     errors for "PartialEq";
                     let Some(partial_eq) = input.partial_eq;
                     for value in values;
-                    "bound" => try!(parse_bound(&mut partial_eq.bounds, value, errors)),
+                    "bound" => parse_bound(&mut partial_eq.bounds, value, errors),
                     "feature_allow_slow_enum" => (), // backward compatibility, now unnecessary
                 }
             }
@@ -335,7 +338,7 @@ impl Input {
                     errors for "PartialOrd";
                     let Some(partial_ord) = input.partial_ord;
                     for value in values;
-                    "bound" => try!(parse_bound(&mut partial_ord.bounds, value, errors)),
+                    "bound" => parse_bound(&mut partial_ord.bounds, value, errors),
                     "feature_allow_slow_enum" => {
                         partial_ord.on_enum = parse_boolean_meta_item(value, true, "feature_allow_slow_enum", errors);
                     }
@@ -346,14 +349,14 @@ impl Input {
                     errors for "Ord";
                     let Some(ord) = input.ord;
                     for value in values;
-                    "bound" => try!(parse_bound(&mut ord.bounds, value, errors)),
+                    "bound" => parse_bound(&mut ord.bounds, value, errors),
                     "feature_allow_slow_enum" => {
                         ord.on_enum = parse_boolean_meta_item(value, true, "feature_allow_slow_enum", errors);
                     }
                 }
             }
             unknown => {
-                let message = format!("Deriving `{}` is not supported by derivative", unknown);
+                let message = format!("deriving `{}` is not supported by derivative", unknown);
                 errors.extend(quote_spanned! {name.span()=>
                     compile_error!(#message);
                 });
@@ -439,7 +442,7 @@ impl Field {
     pub fn from_ast(
         field: &syn::Field,
         errors: &mut proc_macro2::TokenStream,
-    ) -> Result<Field, String> {
+    ) -> Result<Field, ()> {
         let mut out = Field::default();
 
         for_all_attr! {
@@ -449,9 +452,9 @@ impl Field {
                 match_attributes! {
                     errors for "Clone";
                     for value in values;
-                    "bound" => try!(parse_bound(&mut out.clone.bounds, value, errors)),
+                    "bound" => parse_bound(&mut out.clone.bounds, value, errors),
                     "clone_with" => {
-                        let path = try!(value.ok_or_else(|| "`clone_with` needs a value".to_string()));
+                        let path = value.expect("`clone_with` needs a value");
                         out.clone.clone_with = parse_str_lit(&path, errors).ok();
                     }
                 }
@@ -460,9 +463,9 @@ impl Field {
                 match_attributes! {
                     errors for "Debug";
                     for value in values;
-                    "bound" => try!(parse_bound(&mut out.debug.bounds, value, errors)),
+                    "bound" => parse_bound(&mut out.debug.bounds, value, errors),
                     "format_with" => {
-                        let path = try!(value.ok_or_else(|| "`format_with` needs a value".to_string()));
+                        let path = value.expect("`format_with` needs a value");
                         out.debug.format_with = parse_str_lit(&path, errors).ok();
                     }
                     "ignore" => {
@@ -474,9 +477,9 @@ impl Field {
                 match_attributes! {
                     errors for "Default";
                     for value in values;
-                    "bound" => try!(parse_bound(&mut out.default.bounds, value, errors)),
+                    "bound" => parse_bound(&mut out.default.bounds, value, errors),
                     "value" => {
-                        let value = try!(value.ok_or_else(|| "`value` needs a value".to_string()));
+                        let value = value.expect("`value` needs a value");
                         out.default.value = parse_str_lit(&value, errors).ok();
                     }
                 }
@@ -485,16 +488,16 @@ impl Field {
                 match_attributes! {
                     errors for "Eq";
                     for value in values;
-                    "bound" => try!(parse_bound(&mut out.eq_bound, value, errors)),
+                    "bound" => parse_bound(&mut out.eq_bound, value, errors),
                 }
             }
             "Hash" => {
                 match_attributes! {
                     errors for "Hash";
                     for value in values;
-                    "bound" => try!(parse_bound(&mut out.hash.bounds, value, errors)),
+                    "bound" => parse_bound(&mut out.hash.bounds, value, errors),
                     "hash_with" => {
-                        let path = try!(value.ok_or_else(|| "`hash_with` needs a value".to_string()));
+                        let path = value.expect("`hash_with` needs a value");
                         out.hash.hash_with = parse_str_lit(&path, errors).ok();
                     }
                     "ignore" => {
@@ -506,9 +509,9 @@ impl Field {
                 match_attributes! {
                     errors for "PartialEq";
                     for value in values;
-                    "bound" => try!(parse_bound(&mut out.partial_eq.bounds, value, errors)),
+                    "bound" => parse_bound(&mut out.partial_eq.bounds, value, errors),
                     "compare_with" => {
-                        let path = try!(value.ok_or_else(|| "`compare_with` needs a value".to_string()));
+                        let path = value.expect("`compare_with` needs a value");
                         out.partial_eq.compare_with = parse_str_lit(&path, errors).ok();
                     }
                     "ignore" => {
@@ -520,9 +523,9 @@ impl Field {
                 match_attributes! {
                     errors for "PartialOrd";
                     for value in values;
-                    "bound" => try!(parse_bound(&mut out.partial_ord.bounds, value, errors)),
+                    "bound" => parse_bound(&mut out.partial_ord.bounds, value, errors),
                     "compare_with" => {
-                        let path = try!(value.ok_or_else(|| "`compare_with` needs a value".to_string()));
+                        let path = value.expect("`compare_with` needs a value");
                         out.partial_ord.compare_with = parse_str_lit(&path, errors).ok();
                     }
                     "ignore" => {
@@ -534,9 +537,9 @@ impl Field {
                 match_attributes! {
                     errors for "Ord";
                     for value in values;
-                    "bound" => try!(parse_bound(&mut out.ord.bounds, value, errors)),
+                    "bound" => parse_bound(&mut out.ord.bounds, value, errors),
                     "compare_with" => {
-                        let path = try!(value.ok_or_else(|| "`compare_with` needs a value".to_string()));
+                        let path = value.expect("`compare_with` needs a value");
                         out.ord.compare_with = parse_str_lit(&path, errors).ok();
                     }
                     "ignore" => {
@@ -545,7 +548,7 @@ impl Field {
                 }
             }
             unknown => {
-                let message = format!("Deriving `{}` is not supported by derivative", unknown);
+                let message = format!("deriving `{}` is not supported by derivative", unknown);
                 errors.extend(quote_spanned! {name.span()=>
                     compile_error!(#message);
                 });
@@ -653,18 +656,26 @@ struct MetaItem<'a>(
 );
 
 /// Parse an arbitrary item for our limited `MetaItem` subset.
-fn read_items(item: &syn::NestedMeta) -> Result<MetaItem, String> {
+fn read_items<'a>(item: &'a syn::NestedMeta, errors: &mut proc_macro2::TokenStream) -> Result<MetaItem<'a>, ()> {
     let item = match *item {
         syn::NestedMeta::Meta(ref item) => item,
-        syn::NestedMeta::Lit(..) => {
-            return Err("Expected meta-item but found literal".to_string());
+        syn::NestedMeta::Lit(ref lit) => {
+            errors.extend(quote_spanned! {lit.span()=>
+                compile_error!("expected meta-item but found literal");
+            });
+
+            return Err(());
         }
     };
     match *item {
         syn::Meta::Path(ref path) => match path.get_ident() {
             Some(name) => Ok(MetaItem(name, Vec::new())),
             None => {
-                Err("expected derivative attribute to be a string, but found a path".into())
+                errors.extend(quote_spanned! {path.span()=>
+                    compile_error!("expected derivative attribute to be a string, but found a path");
+                });
+
+                Err(())
             }
         },
         syn::Meta::List(syn::MetaList {
@@ -681,11 +692,15 @@ fn read_items(item: &syn::NestedMeta) -> Result<MetaItem, String> {
                         ..
                     })) = *value
                     {
-                        let (name, value) = ensure_str_lit(&path, &value)?;
+                        let (name, value) = ensure_str_lit(&path, &value, errors)?;
 
                         Ok((Some(name), Some(value)))
                     } else {
-                        Err("Expected named value".to_string())
+                        errors.extend(quote_spanned! {value.span()=>
+                            compile_error!("expected named value");
+                        });
+
+                        Err(())
                     }
                 })
                 .collect::<Result<_, _>>()?;
@@ -693,9 +708,11 @@ fn read_items(item: &syn::NestedMeta) -> Result<MetaItem, String> {
             let name = match path.get_ident() {
                 Some(name) => name,
                 None => {
-                    return Err(
-                        "expected derivative attribute to be a string, but found a path".into(),
-                    )
+                    errors.extend(quote_spanned! {path.span()=>
+                        compile_error!("expected derivative attribute to be a string, but found a path");
+                    });
+
+                    return Err(());
                 }
             };
 
@@ -706,7 +723,7 @@ fn read_items(item: &syn::NestedMeta) -> Result<MetaItem, String> {
             lit: ref value,
             ..
         }) => {
-            let (name, value) = ensure_str_lit(&path, &value)?;
+            let (name, value) = ensure_str_lit(&path, &value, errors)?;
 
             Ok(MetaItem(name, vec![(None, Some(value))]))
         }
@@ -783,24 +800,29 @@ fn parse_bound(
     opt_bounds: &mut Option<Vec<syn::WherePredicate>>,
     value: Option<&syn::LitStr>,
     errors: &mut proc_macro2::TokenStream,
-) -> Result<(), String> {
-    let bound = value.ok_or_else(|| "`bound` needs a value".to_string())?;
-
+) {
+    let bound = value.expect("`bound` needs a value");
     let bound_value = bound.value();
 
     *opt_bounds = if !bound_value.is_empty() {
         let where_string = syn::LitStr::new(&format!("where {}", bound_value), bound.span());
 
         let bounds = parse_str_lit::<syn::WhereClause>(&where_string, errors)
-            .map(|wh| wh.predicates.into_iter().collect())
-            .map_err(|_| "Could not parse `bound`".to_string());
+            .map(|wh| wh.predicates.into_iter().collect());
 
-        Some(bounds?)
+        match bounds {
+            Ok(bounds) => Some(bounds),
+            Err(_) => {
+                errors.extend(quote_spanned! {where_string.span()=>
+                    compile_error!("could not parse bound");
+                });
+
+                None
+            }
+        }
     } else {
         Some(vec![])
     };
-
-    Ok(())
 }
 
 fn parse_str_lit<T>(value: &syn::LitStr, errors: &mut proc_macro2::TokenStream) -> Result<T, ()>
@@ -822,19 +844,28 @@ where
 fn ensure_str_lit<'a>(
     attr_path: &'a syn::Path,
     lit: &'a syn::Lit,
-) -> Result<(&'a syn::Ident, &'a syn::LitStr), String> {
+    errors: &mut proc_macro2::TokenStream,
+) -> Result<(&'a syn::Ident, &'a syn::LitStr), ()> {
     let attr_name = match attr_path.get_ident() {
         Some(attr_name) => attr_name,
         None => {
-            return Err("expected derivative attribute to be a string, but found a path".into())
+            errors.extend(quote_spanned! {attr_path.span()=>
+                compile_error!("expected derivative attribute to be a string, but found a path");
+            });
+            return Err(());
         }
     };
+
     if let syn::Lit::Str(ref lit) = *lit {
         Ok((attr_name, lit))
     } else {
-        Err(format!(
+        let message = format!(
             "expected derivative {} attribute to be a string: `{} = \"...\"`",
             attr_name, attr_name
-        ))
+        );
+        errors.extend(quote_spanned! {lit.span()=>
+            compile_error!(#message);
+        });
+        Err(())
     }
 }

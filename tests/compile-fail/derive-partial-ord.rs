@@ -1,12 +1,10 @@
 #[macro_use]
 extern crate derivative;
 
-#[derive(Derivative)]
-//~^ ERROR 4:10: 4:20: proc-macro derive panicked
-//~| HELP can't use `#[derivative(PartialOrd)]` on an enumeration without `feature_allow_slow_enum`
+#[derive(Derivative, PartialEq)]
 #[derivative(PartialOrd)]
-enum Option<T> {
-    Some(T),
+enum Option {
+    Some,
     None,
 }
 
