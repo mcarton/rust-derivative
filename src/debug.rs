@@ -30,9 +30,13 @@ pub fn derive(input: &ast::Input) -> proc_macro2::TokenStream {
 
                 let arg = &bi.ident;
 
-                let dummy_debug = bi.field.attrs.debug_format_with().map(|format_fn| {
-                    format_with(bi.field, &arg, format_fn, input.generics.clone())
+                let dummy_debug = bi.field.attrs.debug_range().map(|range| {
+                    format_bounded(bi.field, &arg, range, input.generics.clone())
                 });
+
+                let dummy_debug = dummy_debug.or_else(|| bi.field.attrs.debug_format_with().map(|format_fn| {
+                    format_with(bi.field, &arg, format_fn, input.generics.clone())
+                }));
 
                 let builder = if let Some(ref name) = bi.field.ident {
                     let name = name.to_string();
@@ -124,6 +128,123 @@ fn phantom_path() -> syn::Path {
         parse_quote!(::core::marker::PhantomData)
     } else {
         parse_quote!(::std::marker::PhantomData)
+    }
+}
+
+fn format_bounded(
+    f: &ast::Field,
+    arg_n: &syn::Ident,
+    range: (usize, Option<usize>),
+    mut generics: syn::Generics,
+) -> proc_macro2::TokenStream {
+    let debug_trait_path = debug_trait_path();
+    let fmt_path = fmt_path();
+    let phantom_path = phantom_path();
+
+    generics
+        .make_where_clause()
+        .predicates
+        .extend(f.attrs.debug_bound().unwrap_or(&[]).iter().cloned());
+
+    generics
+        .params
+        .push(syn::GenericParam::Lifetime(syn::LifetimeDef::new(
+            parse_quote!('_derivative),
+        )));
+    let where_predicates = generics
+        .type_params()
+        .map(|ty| {
+            let mut bounds = syn::punctuated::Punctuated::new();
+            bounds.push(syn::TypeParamBound::Lifetime(syn::Lifetime::new(
+                "'_derivative",
+                proc_macro2::Span::call_site(),
+            )));
+
+            let path = syn::Path::from(syn::PathSegment::from(ty.ident.clone()));
+
+            syn::WherePredicate::Type(syn::PredicateType {
+                lifetimes: None,
+                bounded_ty: syn::Type::Path(syn::TypePath {
+                    qself: None,
+                    path,
+                }),
+                colon_token: Default::default(),
+                bounds,
+            })
+        })
+        .collect::<Vec<_>>();
+    generics
+        .make_where_clause()
+        .predicates
+        .extend(where_predicates);
+
+    let (impl_generics, ty_generics, where_clause) = generics.split_for_impl();
+
+    let ty = f.ty;
+
+    // Leave off the type parameter bounds, defaults, and attributes
+    let phantom = generics.type_params().map(|tp| &tp.ident);
+
+    let mut ctor_generics = generics.clone();
+    *ctor_generics
+        .lifetimes_mut()
+        .last()
+        .expect("There must be a '_derivative lifetime") = syn::LifetimeDef::new(parse_quote!('_));
+    let (_, ctor_ty_generics, _) = ctor_generics.split_for_impl();
+    let ctor_ty_generics = ctor_ty_generics.as_turbofish();
+
+    let start = range.0;
+    let end = range.1.unwrap_or_default();
+    let format_end = if range.1.is_some() {
+        quote! {
+            let len = iter.len();
+            let mut to_skip = len.saturating_sub(self.end);
+
+            if to_skip > 0 && iter.next().is_some() {
+                list.entry(&(..));
+                to_skip -= 1;
+            }
+
+            list.entries((&mut iter).skip(to_skip));
+        }
+    } else {
+        quote! {
+            if iter.next().is_some() {
+                list.entry(&(..));
+            }
+        }
+    };
+
+    quote!{
+        let #arg_n = {
+            struct Dummy #impl_generics #where_clause {
+                data: &'_derivative #ty,
+                phantom_path: #phantom_path <(#(#phantom,)*)>,
+                start: usize,
+                end: usize,
+            }
+
+            impl #impl_generics #debug_trait_path for Dummy #ty_generics #where_clause {
+                fn fmt(&self, __f: &mut #fmt_path::Formatter) -> #fmt_path::Result {
+                    let mut iter = (&self.data).into_iter();
+            
+                    let mut list = __f.debug_list();
+            
+                    list.entries((&mut iter).take(self.start));
+            
+                    #format_end
+            
+                    list.finish()
+                }
+            }
+
+            Dummy #ctor_ty_generics {
+                data: #arg_n,
+                phantom_path: #phantom_path,
+                start: #start,
+                end: #end,
+            }
+        };
     }
 }
 

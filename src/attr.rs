@@ -139,6 +139,8 @@ pub struct FieldDebug {
     format_with: Option<syn::Path>,
     /// Whether the field is to be ignored from output.
     ignore: bool,
+    /// The `range` attribute if present
+    range: Option<(usize, Option<usize>)>,
 }
 
 #[derive(Debug, Default)]
@@ -473,6 +475,10 @@ impl Field {
                     "ignore" => {
                         out.debug.ignore = parse_boolean_meta_item(value, true, "ignore", errors);
                     }
+                    "range" => {
+                        let range = value.expect("`range` needs a value");
+                        out.debug.range = parse_range(&range, errors).ok();
+                    }
                 }
             }
             "Default" => {
@@ -580,6 +586,10 @@ impl Field {
         self.debug.format_with.as_ref()
     }
 
+    pub fn debug_range(&self) -> Option<(usize, Option<usize>)> {
+        self.debug.range
+    }
+
     pub fn ignore_debug(&self) -> bool {
         self.debug.ignore
     }
@@ -658,7 +668,10 @@ struct MetaItem<'a>(
 );
 
 /// Parse an arbitrary item for our limited `MetaItem` subset.
-fn read_items<'a>(item: &'a syn::NestedMeta, errors: &mut proc_macro2::TokenStream) -> Result<MetaItem<'a>, ()> {
+fn read_items<'a>(
+    item: &'a syn::NestedMeta,
+    errors: &mut proc_macro2::TokenStream,
+) -> Result<MetaItem<'a>, ()> {
     let item = match *item {
         syn::NestedMeta::Meta(ref item) => item,
         syn::NestedMeta::Lit(ref lit) => {
@@ -861,5 +874,53 @@ fn ensure_str_lit<'a>(
             compile_error!(#message);
         });
         Err(())
+    }
+}
+
+/// Parse `1..2`, `..2` or `1..` ranges. If a starting bound is not specified, it is assumed to be 0.
+fn parse_range(
+    lit: &syn::LitStr,
+    errors: &mut proc_macro2::TokenStream,
+) -> Result<(usize, Option<usize>), ()> {
+    fn fail_if_suffix(lit: syn::LitInt) -> syn::Result<syn::LitInt> {
+        if lit.suffix().is_empty() {
+            Ok(lit)
+        } else {
+            Err(syn::Error::new(lit.span(), "bounds can't have a suffix"))
+        }
+    }
+
+    let parsed = lit.parse_with(|stream: syn::parse::ParseStream| {
+        let (start, end) = if stream.peek(Token![..]) {
+            stream.parse::<syn::token::Dot2>()?;
+            let end = stream.parse::<Option<syn::LitInt>>()?;
+
+            (None, end.map(fail_if_suffix).transpose()?)
+        } else {
+            let start = stream.parse::<syn::LitInt>()?;
+            stream.parse::<syn::token::Dot2>()?;
+            let end = stream.parse::<Option<syn::LitInt>>()?;
+
+            (
+                Some(fail_if_suffix(start)?),
+                end.map(fail_if_suffix).transpose()?,
+            )
+        };
+
+        let start = start
+            .map(|start| start.base10_parse())
+            .transpose()?
+            .unwrap_or_default();
+        let end = end.map(|start| start.base10_parse()).transpose()?;
+
+        Ok((start, end))
+    });
+
+    match parsed {
+        Ok(value) => Ok(value),
+        Err(error) => {
+            errors.extend(error.to_compile_error());
+            Err(())
+        }
     }
 }
