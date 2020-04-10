@@ -258,6 +258,7 @@ macro_rules! match_attributes {
 
 impl Input {
     /// Parse the `derivative` attributes on a type.
+    #[allow(clippy::cognitive_complexity)] // mostly macros
     pub fn from_ast(
         attrs: &[syn::Attribute],
         errors: &mut proc_macro2::TokenStream,
@@ -439,6 +440,7 @@ impl Input {
 
 impl Field {
     /// Parse the `derivative` attributes on a type.
+    #[allow(clippy::cognitive_complexity)] // mostly macros
     pub fn from_ast(
         field: &syn::Field,
         errors: &mut proc_macro2::TokenStream,

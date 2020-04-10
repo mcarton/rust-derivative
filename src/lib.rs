@@ -1,6 +1,9 @@
 // We need to support Rust 1.34 to stable
 #![allow(deprecated)]
 
+#![allow(clippy::mem_replace_with_default)] // needs rustc 1.40
+#![allow(clippy::option_as_ref_deref)] // needs rustc 1.40
+
 extern crate proc_macro;
 extern crate proc_macro2;
 #[macro_use]
