@@ -5,14 +5,12 @@
 [![Crates.io](https://img.shields.io/crates/v/derivative.svg?maxAge=3600)](https://crates.io/crates/derivative)
 [![Crates.io](https://img.shields.io/crates/l/derivative.svg?maxAge=3600)](https://github.com/mcarton/rust-derivative#license)
 
-This crate provides a set of alternative `#[derive]` attributes for Rust.
+This crate provides a set of alternative customizable `#[derive]` attributes for Rust.
 
 ## [Documentation][documentation]
 ## Stability
 
-This crate is now stable and usable on rustc stable too!
-
-Note that you need *rustc 1.34 or later*.
+This crate is stable and follows semver. It requires *rustc 1.34 or later* and changing the minimal rustc version will be considered a semver breaking change.
 
 ## What it does
 
