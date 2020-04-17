@@ -2,14 +2,15 @@
 The `Debug` trait supports the following attributes:
 
 * **Container attributes**
-    * [`Debug(bound="<where-clause or empty>")`](#custom-bound)
-    * [`Debug="transparent"`](#hiding-newtypes)
+    * [`Debug(bound = "<where-clause or empty>")`](#custom-bound)
+    * [`Debug = "transparent"`](#hiding-newtypes)
 * **Variant attributes**
-    * [`Debug="transparent"`](#hiding-newtypes)
+    * [`Debug = "transparent"`](#hiding-newtypes)
 * **Field attributes**
-    * [`Debug(bound="<where-clause or empty>")`](#custom-bound)
-    * [`Debug(format_with="<path>")`](#format-with)
-    * [`Debug="ignore"`](#ignoring-a-field)
+    * [`Debug(bound = "<where-clause or empty>")`](#custom-bound)
+    * [`Debug(format_with = "<path>")`](#format-with)
+    * [`Debug = "ignore"`](#ignoring-a-field)
+    * [`Debug(range = "..4")`](#range)
 
 # Ignoring a field
 
@@ -109,3 +110,40 @@ With `bound=""` it is possible to remove any bound for the type. This is useful
 if your type contains a `Foo<T>` that is `Debug` even if `T` is not.
 
 [`Formatter`]: https://doc.rust-lang.org/std/fmt/struct.Formatter.html
+
+# Range
+
+If a field's type is iterable, you can cap the number of elements that will be printed.
+
+```rust
+#[derive(Derivative)]
+#[derivative(Debug)]
+struct Foo {
+    #[derivative(Debug(range = "3.."))]
+    bar: Vec<usize>,
+}
+```
+
+This will print up to 3 elements followed by `..` if necessary:
+
+```
+Foo { bar: [] }
+Foo { bar: [40] }
+Foo { bar: [40, 41] }
+Foo { bar: [40, 41, 42] }
+Foo { bar: [40, 41, 42, ..] }
+Foo { bar: [40, 41, 42, ..] }
+// and so on
+```
+
+The range must be of the form `a..b` with `a` and `b` both optional. This will print up to `a` elements at the beginning and up to `b` elements at the end (or 0 if a bound is not specified). `..` will be inserted if elements had to be skipped.
+
+The type can be any type `T` such that:
+
+```rust
+for<'a> &'a T: IntoIterator,
+for<'a> <&'a T as IntoIterator>::Item: std::fmt::Debug,
+
+// Only if `b` is specified:
+for<'a> <&'a T as IntoIterator>::IntoIter: ExactSizeIterator,
+```
