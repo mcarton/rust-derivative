@@ -4,36 +4,15 @@ extern crate core;
 #[macro_use]
 extern crate derivative;
 
-#[derive(Derivative)]
-#[derivative(Debug)]
-struct Beginning {
-    #[derivative(Debug(range = "3.."))]
-    bar: Vec<usize>,
-}
-
-#[derive(Derivative)]
-#[derivative(Debug)]
-struct End {
-    #[derivative(Debug(range = "..4"))]
-    bar: Vec<usize>,
-}
-
-#[derive(Derivative)]
-#[derivative(Debug)]
-struct Both {
-    #[derivative(Debug(range = "3..4"))]
-    bar: Vec<usize>,
-}
-
-#[derive(Derivative)]
-#[derivative(Debug)]
-struct None {
-    #[derivative(Debug(range = ".."))]
-    bar: Vec<usize>,
-}
-
 #[test]
 fn beginning() {
+    #[derive(Derivative)]
+    #[derivative(Debug)]
+    struct Beginning {
+        #[derivative(Debug(range = "3.."))]
+        bar: Vec<usize>,
+    }
+
     let expected = [
         "Beginning { bar: [] }",
         "Beginning { bar: [0] }",
@@ -47,7 +26,12 @@ fn beginning() {
 
     for (i, &expected) in expected.take(10).enumerate() {
         assert_eq!(
-            format!("{:?}", Beginning { bar: (0..i).collect() }),
+            format!(
+                "{:?}",
+                Beginning {
+                    bar: (0..i).collect()
+                }
+            ),
             expected
         );
     }
@@ -55,6 +39,13 @@ fn beginning() {
 
 #[test]
 fn end() {
+    #[derive(Derivative)]
+    #[derivative(Debug)]
+    struct End {
+        #[derivative(Debug(range = "..4"))]
+        bar: Vec<usize>,
+    }
+
     let expected = [
         "End { bar: [] }",
         "End { bar: [0] }",
@@ -67,7 +58,12 @@ fn end() {
 
     for (i, &expected) in expected.iter().enumerate() {
         assert_eq!(
-            format!("{:?}", End { bar: (0..i).collect() }),
+            format!(
+                "{:?}",
+                End {
+                    bar: (0..i).collect()
+                }
+            ),
             expected
         );
     }
@@ -75,6 +71,13 @@ fn end() {
 
 #[test]
 fn both() {
+    #[derive(Derivative)]
+    #[derivative(Debug)]
+    struct Both {
+        #[derivative(Debug(range = "3..4"))]
+        bar: Vec<usize>,
+    }
+
     let expected = [
         "Both { bar: [] }",
         "Both { bar: [0] }",
@@ -92,7 +95,12 @@ fn both() {
 
     for (i, &expected) in expected.iter().enumerate() {
         assert_eq!(
-            format!("{:?}", Both { bar: (0..i).collect() }),
+            format!(
+                "{:?}",
+                Both {
+                    bar: (0..i).collect()
+                }
+            ),
             expected
         );
     }
@@ -100,6 +108,13 @@ fn both() {
 
 #[test]
 fn none() {
+    #[derive(Derivative)]
+    #[derivative(Debug)]
+    struct None {
+        #[derivative(Debug(range = ".."))]
+        bar: Vec<usize>,
+    }
+
     let expected = [
         "None { bar: [] }",
         "None { bar: [..] }",
@@ -109,8 +124,36 @@ fn none() {
 
     for (i, &expected) in expected.iter().enumerate() {
         assert_eq!(
-            format!("{:?}", None { bar: (0..i).collect() }),
+            format!(
+                "{:?}",
+                None {
+                    bar: (0..i).collect()
+                }
+            ),
             expected
         );
     }
+}
+
+#[derive(Derivative)]
+#[derivative(Debug)]
+struct BeginningMinimumType<T>
+where
+    for<'a> &'a T: IntoIterator,
+    for<'a> <&'a T as IntoIterator>::Item: std::fmt::Debug,
+{
+    #[derivative(Debug(range = "3.."))]
+    bar: T,
+}
+
+#[derive(Derivative)]
+#[derivative(Debug)]
+struct EndMinimumType<T>
+where
+    for<'a> &'a T: IntoIterator,
+    for<'a> <&'a T as IntoIterator>::Item: std::fmt::Debug,
+    for<'a> <&'a T as IntoIterator>::IntoIter: ExactSizeIterator,
+{
+    #[derivative(Debug(range = "..4"))]
+    bar: T,
 }
