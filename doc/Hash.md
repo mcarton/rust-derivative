@@ -5,7 +5,7 @@ The `Hash` trait supports the following attributes:
     * [`Hash(bound="<where-clause or empty>")`](#custom-bound)
 * **Field attributes**
     * [`Hash(bound="<where-clause or empty>")`](#custom-bound)
-    * [`Hash(format_with="<path>")`](#hash-with)
+    * [`Hash(hash_with="<path>")`](#hash-with)
     * [`Hash="ignore"`](#ignoring-a-field)
 
 # Ignoring a field
