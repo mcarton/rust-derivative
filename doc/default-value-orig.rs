@@ -1,4 +1,3 @@
-#[derive(Default)]
 pub struct RegexOptions {
     pub pats: Vec&lt;String&gt;,
     pub size_limit: usize,
