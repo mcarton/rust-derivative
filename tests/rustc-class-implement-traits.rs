@@ -23,10 +23,10 @@ trait noisy {
 #[derive(Derivative)]
 #[derivative(Clone)]
 struct cat {
-    meows : usize,
+    meows: usize,
 
-    how_hungry : isize,
-    name : String,
+    how_hungry: isize,
+    name: String,
 }
 
 impl cat {
@@ -53,10 +53,12 @@ impl cat {
 }
 
 impl noisy for cat {
-    fn speak(&mut self) { self.meow(); }
+    fn speak(&mut self) {
+        self.meow();
+    }
 }
 
-fn cat(in_x : usize, in_y : isize, in_name: String) -> cat {
+fn cat(in_x: usize, in_y: isize, in_name: String) -> cat {
     cat {
         meows: in_x,
         how_hungry: in_y,
@@ -64,8 +66,7 @@ fn cat(in_x : usize, in_y : isize, in_name: String) -> cat {
     }
 }
 
-
-fn make_speak<C:noisy>(mut c: C) {
+fn make_speak<C: noisy>(mut c: C) {
     c.speak();
 }
 

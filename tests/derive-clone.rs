@@ -10,12 +10,12 @@ extern crate derivative;
 #[derivative(Clone)]
 struct Foo {
     foo: u8,
-    #[derivative(Clone(clone_with="seventh"))]
+    #[derivative(Clone(clone_with = "seventh"))]
     bar: u8,
 }
 
 fn seventh(a: &u8) -> u8 {
-    a/7
+    a / 7
 }
 
 #[derive(Debug, PartialEq)]
@@ -32,15 +32,15 @@ impl Clone for EvilCloneFrom {
 }
 
 #[derive(Derivative)]
-#[derivative(Clone(clone_from="true"))]
+#[derivative(Clone(clone_from = "true"))]
 struct StructWithCloneFrom(EvilCloneFrom);
 
 #[derive(Debug, Derivative, PartialEq)]
-#[derivative(Clone(clone_from="true"))]
+#[derivative(Clone(clone_from = "true"))]
 enum EnumWithCloneFrom {
     Evil(EvilCloneFrom),
     Good(u32),
-    None
+    None,
 }
 
 #[test]

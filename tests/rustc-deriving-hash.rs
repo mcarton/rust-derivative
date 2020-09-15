@@ -16,8 +16,8 @@ extern crate core;
 #[macro_use]
 extern crate derivative;
 
-use std::hash::{Hash, Hasher};
 use std::collections::hash_map::DefaultHasher;
+use std::hash::{Hash, Hasher};
 
 #[derive(Derivative)]
 #[derivative(Hash)]
@@ -29,14 +29,20 @@ struct Person {
 
 // test for hygiene name collisions
 #[derive(Derivative)]
-#[derivative(Hash)] struct __H__H;
+#[derivative(Hash)]
+struct __H__H;
 #[derive(Derivative)]
-#[allow(dead_code)] #[derivative(Hash)] struct Collision<__H> ( __H );
+#[allow(dead_code)]
+#[derivative(Hash)]
+struct Collision<__H>(__H);
 // TODO(rustc) #[derivative(Hash)] enum Collision<__H> { __H { __H__H: __H } }
 
 #[derive(Derivative)]
 #[derivative(Hash)]
-enum E { A=1, B }
+enum E {
+    A = 1,
+    B,
+}
 
 fn hash<T: Hash>(t: &T) -> u64 {
     let mut s = DefaultHasher::new();
