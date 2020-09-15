@@ -44,10 +44,10 @@ impl cat {
         if self.how_hungry > 0 {
             println!("OM NOM NOM");
             self.how_hungry -= 2;
-            return true;
+            true
         } else {
             println!("Not hungry!");
-            return false;
+            false
         }
     }
 }
@@ -60,7 +60,7 @@ fn cat(in_x : usize, in_y : isize, in_name: String) -> cat {
     cat {
         meows: in_x,
         how_hungry: in_y,
-        name: in_name.clone()
+        name: in_name,
     }
 }
 

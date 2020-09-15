@@ -8,6 +8,8 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
+#![allow(clippy::zero_prefixed_literal, clippy::type_complexity)]
+
 #[cfg(feature = "use_core")]
 extern crate core;
 
