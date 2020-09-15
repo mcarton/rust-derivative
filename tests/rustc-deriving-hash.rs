@@ -64,12 +64,12 @@ fn main() {
     let person1 = Person {
         id: 5,
         name: "Janet".to_string(),
-        phone: 555_666_7777
+        phone: 555_666_777,
     };
     let person2 = Person {
         id: 5,
         name: "Bob".to_string(),
-        phone: 555_666_7777
+        phone: 555_666_777,
     };
     assert_eq!(hash(&person1), hash(&person1));
     assert!(hash(&person1) != hash(&person2));

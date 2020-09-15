@@ -23,5 +23,8 @@ struct Message<'a, P: 'a = &'a [u8]> {
 
 #[test]
 fn main() {
-    Message { header: &[1], payload: &[1] };
+    let _ = Message {
+        header: &[1],
+        payload: &[1],
+    };
 }

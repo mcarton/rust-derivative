@@ -1,3 +1,5 @@
+#![allow(clippy::blacklisted_name, clippy::redundant_clone)]
+
 #[cfg(feature = "use_core")]
 extern crate core;
 
