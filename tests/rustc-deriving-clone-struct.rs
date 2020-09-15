@@ -10,6 +10,8 @@
 
 // pretty-expanded FIXME #23616
 
+#![allow(clippy::redundant_clone)]
+
 #[cfg(feature = "use_core")]
 extern crate core;
 
