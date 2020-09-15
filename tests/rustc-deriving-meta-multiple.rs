@@ -27,16 +27,16 @@ use std::hash::Hash;
 #[derivative(Hash)]
 struct Foo {
     bar: usize,
-    baz: isize
+    baz: isize,
 }
 
 fn hash<T: Hash>(_t: &T) {}
 
 #[test]
 fn main() {
-    let a = Foo {bar: 4, baz: -3};
+    let a = Foo { bar: 4, baz: -3 };
 
-    let _ = a == a;    // check for PartialEq impl w/o testing its correctness
+    let _ = a == a; // check for PartialEq impl w/o testing its correctness
     let _ = a.clone(); // check for Clone impl w/o testing its correctness
-    hash(&a);  // check for Hash impl w/o testing its correctness
+    hash(&a); // check for Hash impl w/o testing its correctness
 }

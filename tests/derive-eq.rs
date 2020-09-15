@@ -9,14 +9,14 @@ extern crate derivative;
 #[derive(Derivative, PartialEq)]
 #[derivative(Eq)]
 struct Foo {
-    foo: u8
+    foo: u8,
 }
 
 #[derive(Derivative)]
 #[derivative(Eq)]
 struct WithPtr<T: ?Sized> {
-    #[derivative(Eq(bound=""))]
-    foo: *const T
+    #[derivative(Eq(bound = ""))]
+    foo: *const T,
 }
 
 impl<T: ?Sized> PartialEq for WithPtr<T> {
@@ -28,7 +28,7 @@ impl<T: ?Sized> PartialEq for WithPtr<T> {
 trait SomeTrait {}
 struct SomeType {
     #[allow(dead_code)]
-    foo: u8
+    foo: u8,
 }
 impl SomeTrait for SomeType {}
 
