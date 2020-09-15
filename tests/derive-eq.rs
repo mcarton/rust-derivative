@@ -1,3 +1,5 @@
+#![allow(clippy::eq_op)]
+
 #[cfg(feature = "use_core")]
 extern crate core;
 
