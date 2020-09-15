@@ -147,6 +147,7 @@ pub fn derive_clone(input: &ast::Input) -> proc_macro2::TokenStream {
             };
 
             quote! {
+                #[allow(clippy::needless_return)]
                 fn clone_from(&mut self, other: &Self) {
                     match *self {
                         #body
