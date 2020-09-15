@@ -36,7 +36,7 @@ test_script:
   - cargo test --verbose
   - cargo clean
   - cargo test --verbose --features=use_core
-  - if defined HAS_CLIPPY cargo clippy --verbose --features=use_core
+  - if defined HAS_CLIPPY cargo clippy --verbose --all-targets --features=use_core
 
   - if "%CONFIGURATION%" == "nightly" cargo update -Z minimal-versions
   - if "%CONFIGURATION%" == "nightly" cargo build --verbose
