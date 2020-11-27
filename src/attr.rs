@@ -197,7 +197,7 @@ pub struct FieldOrd {
 macro_rules! for_all_attr {
     ($errors:ident; for ($name:ident, $value:ident) in $attrs:expr; $($body:tt)*) => {
         for meta_items in $attrs.iter() {
-            let meta_items = derivative_attribute(meta_items.parse_meta(), $errors);
+            let meta_items = derivative_attribute(meta_items, $errors);
             if let Some(meta_items) = meta_items {
                 for meta_item in meta_items.iter() {
                     let meta_item = read_items(meta_item, $errors);
@@ -734,22 +734,14 @@ fn read_items<'a>(item: &'a syn::NestedMeta, errors: &mut proc_macro2::TokenStre
 
 /// Filter the `derivative` items from an attribute.
 fn derivative_attribute(
-    meta: syn::parse::Result<syn::Meta>,
+    attribute: &syn::Attribute,
     errors: &mut proc_macro2::TokenStream,
 ) -> Option<syn::punctuated::Punctuated<syn::NestedMeta, syn::token::Comma>> {
-    match meta {
-        Ok(syn::Meta::List(syn::MetaList {
-            path, nested: mis, ..
-        })) => {
-            if path
-                .get_ident()
-                .map_or(false, |ident| ident == "derivative")
-            {
-                Some(mis)
-            } else {
-                None
-            }
-        }
+    if !attribute.path.is_ident("derivative") {
+        return None;
+    }
+    match attribute.parse_meta() {
+        Ok(syn::Meta::List(meta_list)) => Some(meta_list.nested),
         Ok(_) => None,
         Err(e) => {
             let message = format!("invalid attribute: {}", e);
