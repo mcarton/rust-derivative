@@ -166,6 +166,7 @@ where
     cloned
 }
 
+#[allow(clippy::match_like_matches_macro)] // needs rustc 1.42
 fn is_phantom_data(path: &syn::Path) -> bool {
     match path.segments.last() {
         Some(path) if path.ident == "PhantomData" => true,
