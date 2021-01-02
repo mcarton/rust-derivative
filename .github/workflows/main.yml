@@ -41,6 +41,27 @@ jobs:
         features:
           - ''
           - 'use_core'
+        extra_args:
+          - ''
+        include:
+          # The compiler output isn't stable from one version to another of rustc, so we only
+          # test that on one version
+          - os: ubuntu-18.04
+            rust: 1.34.0
+            features: ''
+            extra_args: ''
+          - os: ubuntu-18.04
+            rust: 1.34.0
+            features: ''
+            extra_args:  'compile_test -- --ignored'
+          - os: ubuntu-18.04
+            rust: 1.34.0
+            features: 'use_core'
+            extra_args: ''
+          - os: ubuntu-18.04
+            rust: 1.34.0
+            features: 'use_core'
+            extra_args: 'compile_test -- --ignored'
     steps:
       - uses: actions/checkout@v2
       - uses: actions-rs/toolchain@v1
@@ -51,7 +72,7 @@ jobs:
       - uses: actions-rs/cargo@v1
         with:
           command: test
-          args: --features=${{ matrix.features }}
+          args: --features=${{ matrix.features }} ${{ matrix.extra_args }}
 
   clippy:
     name: Clippy
