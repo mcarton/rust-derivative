@@ -10,10 +10,6 @@ description = "A set of alternative `derive` attributes for Rust"
 keywords = ["derive", "macro", "macro1-1", "plugin"]
 categories = ["rust-patterns"]
 
-[badges]
-travis-ci = { repository = "mcarton/rust-derivative" }
-appveyor = { repository = "mcarton/rust-derivative" }
-
 [lib]
 proc-macro = true
 
