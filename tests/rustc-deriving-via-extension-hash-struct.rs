@@ -30,5 +30,5 @@ struct Foo {
 fn main() {
     use std::hash::Hash;
     let mut hasher = DefaultHasher::new();
-    let _ = Foo { x: 0, y: 0, z: 0 }.hash(&mut hasher);
+    Foo { x: 0, y: 0, z: 0 }.hash(&mut hasher);
 }

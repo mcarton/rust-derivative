@@ -25,15 +25,15 @@ struct Bar<T, U> (
 #[derive(Derivative)]
 #[derivative(Debug)]
 enum C<T, U> {
-    C1(T),
-    C2(#[derivative(Debug="ignore")] U),
-    C3(String),
+    V1(T),
+    V2(#[derivative(Debug="ignore")] U),
+    V3(String),
 }
 
 #[derive(Derivative)]
 #[derivative(Debug)]
 enum D<U> {
-    D1{
+    V1 {
         #[derivative(Debug="ignore")]
         a: U
     }
@@ -79,10 +79,10 @@ struct PhantomTuple<T> {
 fn main() {
     assert_eq!(Foo { foo: 42, bar: NoDebug }.to_show(), "Foo { foo: 42 }".to_string());
     assert_eq!(Bar(42, NoDebug).to_show(), "Bar(42)".to_string());
-    assert_eq!(C::C1::<i32, NoDebug>(12).to_show(), "C1(12)".to_string());
-    assert_eq!(C::C2::<i32, NoDebug>(NoDebug).to_show(), "C2".to_string());
-    assert_eq!(C::C3::<i32, NoDebug>("foo".to_string()).to_show(), "C3(\"foo\")".to_string());
-    assert_eq!(D::D1 { a: NoDebug }.to_show(), "D1".to_string());
+    assert_eq!(C::V1::<i32, NoDebug>(12).to_show(), "V1(12)".to_string());
+    assert_eq!(C::V2::<i32, NoDebug>(NoDebug).to_show(), "V2".to_string());
+    assert_eq!(C::V3::<i32, NoDebug>("foo".to_string()).to_show(), "V3(\"foo\")".to_string());
+    assert_eq!(D::V1 { a: NoDebug }.to_show(), "V1".to_string());
     assert_eq!(F(NoDebug).to_show(), "F".to_string());
     assert_eq!(G(42, NoDebug).to_show(), "G(42)".to_string());
     assert_eq!(J(NoDebug).to_show(), "J".to_string());

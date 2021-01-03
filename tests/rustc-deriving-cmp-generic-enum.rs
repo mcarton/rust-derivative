@@ -24,18 +24,18 @@ extern crate derivative;
     Ord = "feature_allow_slow_enum"
 )]
 enum E<T> {
-    E0,
-    E1(T),
-    E2(T, T),
+    V0,
+    V1(T),
+    V2(T, T),
 }
 
 #[test]
 fn main() {
-    let e0 = E::E0;
-    let e11 = E::E1(1);
-    let e12 = E::E1(2);
-    let e21 = E::E2(1, 1);
-    let e22 = E::E2(1, 2);
+    let e0 = E::V0;
+    let e11 = E::V1(1);
+    let e12 = E::V1(2);
+    let e21 = E::V2(1, 1);
+    let e22 = E::V2(1, 2);
 
     // in order for both PartialOrd and Ord
     let es = [e0, e11, e12, e21, e22];

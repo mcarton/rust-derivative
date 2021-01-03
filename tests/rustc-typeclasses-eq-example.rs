@@ -51,7 +51,7 @@ enum ColorTree {
 impl Equal for ColorTree {
     fn isEq(&self, a: &ColorTree) -> bool {
         match (self, a) {
-          (&leaf(ref x), &leaf(ref y)) => { x.isEq(&(*y).clone()) }
+          (&leaf(ref x), &leaf(ref y)) => { x.isEq(&(*y)) }
           (&branch(ref l1, ref r1), &branch(ref l2, ref r2)) => {
             (*l1).isEq(&(**l2).clone()) && (*r1).isEq(&(**r2).clone())
           }

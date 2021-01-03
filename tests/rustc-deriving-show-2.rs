@@ -14,15 +14,15 @@ use std::fmt;
 enum A {}
 #[derive(Derivative)]
 #[derivative(Debug)]
-enum B { B1, B2, B3 }
+enum B { V1, V2, V3 }
 
 #[derive(Derivative)]
 #[derivative(Debug)]
-enum C { C1(isize), C2(B), C3(String) }
+enum C { V1(isize), V2(B), V3(String) }
 
 #[derive(Derivative)]
 #[derivative(Debug)]
-enum D { D1{ a: isize } }
+enum D { V1{ a: isize } }
 
 #[derive(Derivative)]
 #[derivative(Debug)]
@@ -62,11 +62,11 @@ impl<T: fmt::Debug> ToDebug for T {
 
 #[test]
 fn main() {
-    assert_eq!(B::B1.to_show(), "B1".to_string());
-    assert_eq!(B::B2.to_show(), "B2".to_string());
-    assert_eq!(C::C1(3).to_show(), "C1(3)".to_string());
-    assert_eq!(C::C2(B::B2).to_show(), "C2(B2)".to_string());
-    assert_eq!(D::D1{ a: 2 }.to_show(), "D1 { a: 2 }".to_string());
+    assert_eq!(B::V1.to_show(), "V1".to_string());
+    assert_eq!(B::V2.to_show(), "V2".to_string());
+    assert_eq!(C::V1(3).to_show(), "V1(3)".to_string());
+    assert_eq!(C::V2(B::V2).to_show(), "V2(V2)".to_string());
+    assert_eq!(D::V1{ a: 2 }.to_show(), "V1 { a: 2 }".to_string());
     assert_eq!(E.to_show(), "E".to_string());
     assert_eq!(F(3).to_show(), "F(3)".to_string());
     assert_eq!(G(3, 4).to_show(), "G(3, 4)".to_string());

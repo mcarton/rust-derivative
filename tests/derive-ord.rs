@@ -1,3 +1,9 @@
+#![allow(renamed_and_removed_lints)] // clippy::cyclomatic_complexity → clippy::cognitive_complexity
+#![allow(clippy::cyclomatic_complexity)]
+#![allow(clippy::cognitive_complexity)]
+#![allow(clippy::trivially_copy_pass_by_ref)]
+#![allow(clippy::unknown_clippy_lints)]
+
 #[cfg(feature = "use_core")]
 extern crate core;
 

@@ -1,4 +1,4 @@
-#![allow(clippy::eq_op)]
+#![allow(clippy::eq_op, clippy::trivially_copy_pass_by_ref)]
 
 #[cfg(feature = "use_core")]
 extern crate core;
