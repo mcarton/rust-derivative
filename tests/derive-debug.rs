@@ -23,15 +23,15 @@ struct Bar (
 #[derive(Derivative)]
 #[derivative(Debug)]
 enum C {
-    C1(isize),
-    C2(#[derivative(Debug="ignore")] i32),
-    C3(String),
+    V1(isize),
+    V2(#[derivative(Debug="ignore")] i32),
+    V3(String),
 }
 
 #[derive(Derivative)]
 #[derivative(Debug)]
 enum D {
-    D1 {
+    V1 {
         #[derivative(Debug="ignore")]
         a: isize
     }
@@ -65,10 +65,10 @@ impl<T: std::fmt::Debug> ToDebug for T {
 fn main() {
     assert_eq!(Foo { foo: 42, bar: 1 }.to_show(), "Foo { foo: 42 }".to_string());
     assert_eq!(Bar(42, 1).to_show(), "Bar(42)".to_string());
-    assert_eq!(C::C1(12).to_show(), "C1(12)".to_string());
-    assert_eq!(C::C2(12).to_show(), "C2".to_string());
-    assert_eq!(C::C3("foo".to_string()).to_show(), "C3(\"foo\")".to_string());
-    assert_eq!(D::D1 { a: 42 }.to_show(), "D1".to_string());
+    assert_eq!(C::V1(12).to_show(), "V1(12)".to_string());
+    assert_eq!(C::V2(12).to_show(), "V2".to_string());
+    assert_eq!(C::V3("foo".to_string()).to_show(), "V3(\"foo\")".to_string());
+    assert_eq!(D::V1 { a: 42 }.to_show(), "V1".to_string());
     assert_eq!(F(42).to_show(), "F".to_string());
     assert_eq!(G(42, 0).to_show(), "G(42)".to_string());
     assert_eq!(J(NoDebug).to_show(), "J".to_string());

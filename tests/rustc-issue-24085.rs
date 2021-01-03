@@ -12,6 +12,8 @@
 // inference due to the requirement that `'a:b'`, which was getting
 // incorrectly translated in connection with the closure below.
 
+#![allow(clippy::redundant_closure)]
+
 #[cfg(feature = "use_core")]
 extern crate core;
 

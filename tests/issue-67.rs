@@ -6,6 +6,6 @@ extern crate derivative;
 
 #[derive(Derivative)]
 #[derivative(Hash)]
-enum Enumeration<T> {
+enum _Enumeration<T> {
     _Variant(T),
 }
