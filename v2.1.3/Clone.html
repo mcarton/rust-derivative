@@ -1,0 +1,549 @@
+
+<!DOCTYPE HTML>
+<html lang="en" >
+    <head>
+        <meta charset="UTF-8">
+        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+        <title>Copy and Clone traits · Derivative</title>
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="description" content="">
+        <meta name="generator" content="GitBook 3.2.3">
+        
+        
+        
+    
+    <link rel="stylesheet" href="gitbook/style.css">
+
+    
+            
+                
+                <link rel="stylesheet" href="gitbook/gitbook-plugin-anchors/plugin.css">
+                
+            
+                
+                <link rel="stylesheet" href="gitbook/gitbook-plugin-highlight/website.css">
+                
+            
+                
+                <link rel="stylesheet" href="gitbook/gitbook-plugin-fontsettings/website.css">
+                
+            
+        
+
+    
+
+    
+        
+        <link rel="stylesheet" href="styles/website.css">
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+
+        
+    
+    
+    <meta name="HandheldFriendly" content="true"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <link rel="apple-touch-icon-precomposed" sizes="152x152" href="gitbook/images/apple-touch-icon-precomposed-152.png">
+    <link rel="shortcut icon" href="gitbook/images/favicon.ico" type="image/x-icon">
+
+    
+    <link rel="next" href="Clone.html" />
+    
+    
+    <link rel="prev" href="./" />
+    
+
+    </head>
+    <body>
+        
+<div class="book">
+    <div class="book-summary">
+        
+            
+            
+                <nav role="navigation">
+                
+
+
+<ul class="summary">
+    
+    
+
+    
+
+    
+        
+        
+    
+        <li class="chapter " data-level="1.1" data-path="./">
+            
+                <a href="./">
+            
+                    
+                    Overview
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter active" data-level="1.2" data-path="Clone.html">
+            
+                <a href="Clone.html">
+            
+                    
+                    Copy and Clone traits
+            
+                </a>
+            
+
+            
+            <ul class="articles">
+                
+    
+        <li class="chapter " data-level="1.2.1" data-path="Clone.html">
+            
+                <a href="Clone.html#clone-from">
+            
+                    
+                    clone_from
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.2.2" data-path="Clone.html">
+            
+                <a href="Clone.html#custom-bound">
+            
+                    
+                    Custom bound
+            
+                </a>
+            
+
+            
+        </li>
+    
+
+            </ul>
+            
+        </li>
+    
+        <li class="chapter " data-level="1.3" data-path="Debug.html">
+            
+                <a href="Debug.html">
+            
+                    
+                    Debug trait
+            
+                </a>
+            
+
+            
+            <ul class="articles">
+                
+    
+        <li class="chapter " data-level="1.3.1" data-path="Debug.html">
+            
+                <a href="Debug.html#ignoring-a-field">
+            
+                    
+                    Hiding fields
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.3.2" data-path="Debug.html">
+            
+                <a href="Debug.html#hiding-newtypes">
+            
+                    
+                    Hiding newtypes
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.3.3" data-path="Debug.html">
+            
+                <a href="Debug.html#format-with">
+            
+                    
+                    Alternative format function
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.3.4" data-path="Debug.html">
+            
+                <a href="Debug.html#custom-bound">
+            
+                    
+                    Custom bound
+            
+                </a>
+            
+
+            
+        </li>
+    
+
+            </ul>
+            
+        </li>
+    
+        <li class="chapter " data-level="1.4" data-path="Default.html">
+            
+                <a href="Default.html">
+            
+                    
+                    Default trait
+            
+                </a>
+            
+
+            
+            <ul class="articles">
+                
+    
+        <li class="chapter " data-level="1.4.1" data-path="Default.html">
+            
+                <a href="Default.html#default-enumeration">
+            
+                    
+                    Default enumeration
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.4.2" data-path="Default.html">
+            
+                <a href="Default.html#setting-the-value-of-a-field">
+            
+                    
+                    Setting the value of a field
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.4.3" data-path="Default.html">
+            
+                <a href="Default.html#new-function">
+            
+                    
+                    new function
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.4.4" data-path="Default.html">
+            
+                <a href="Default.html#custom-bound">
+            
+                    
+                    Custom bound
+            
+                </a>
+            
+
+            
+        </li>
+    
+
+            </ul>
+            
+        </li>
+    
+        <li class="chapter " data-level="1.5" data-path="Hash.html">
+            
+                <a href="Hash.html">
+            
+                    
+                    Hash trait
+            
+                </a>
+            
+
+            
+            <ul class="articles">
+                
+    
+        <li class="chapter " data-level="1.5.1" data-path="Hash.html">
+            
+                <a href="Hash.html#ignoring-a-field">
+            
+                    
+                    Ignoring fields
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.5.2" data-path="Debug.html">
+            
+                <a href="Debug.html#hash-with">
+            
+                    
+                    Alternative hash function
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.5.3" data-path="Hash.html">
+            
+                <a href="Hash.html#custom-bound">
+            
+                    
+                    Custom bound
+            
+                </a>
+            
+
+            
+        </li>
+    
+
+            </ul>
+            
+        </li>
+    
+        <li class="chapter " data-level="1.6" data-path="cmp.html">
+            
+                <a href="cmp.html">
+            
+                    
+                    Comparison traits
+            
+                </a>
+            
+
+            
+            <ul class="articles">
+                
+    
+        <li class="chapter " data-level="1.6.1" data-path="cmp.html">
+            
+                <a href="cmp.html#enumerations">
+            
+                    
+                    Note about enumerations
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.6.2" data-path="cmp.html">
+            
+                <a href="cmp.html#ignoring-a-field">
+            
+                    
+                    Ignoring fields
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.6.3" data-path="cmp.html">
+            
+                <a href="cmp.html#compare-with">
+            
+                    
+                    Alternative comparison function
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.6.4" data-path="cmp.html">
+            
+                <a href="cmp.html#custom-bound">
+            
+                    
+                    Custom bound
+            
+                </a>
+            
+
+            
+        </li>
+    
+
+            </ul>
+            
+        </li>
+    
+
+    
+
+    <li class="divider"></li>
+
+    <li>
+        <a href="https://www.gitbook.com" target="blank" class="gitbook-link">
+            Published with GitBook
+        </a>
+    </li>
+</ul>
+
+
+                </nav>
+            
+        
+    </div>
+
+    <div class="book-body">
+        
+            <div class="body-inner">
+                
+                    
+
+<div class="book-header" role="navigation">
+    
+
+    <!-- Title -->
+    <h1>
+        <i class="fa fa-circle-o-notch fa-spin"></i>
+        <a href="." >Copy and Clone traits</a>
+    </h1>
+</div>
+
+
+
+
+                    <div class="page-wrapper" tabindex="-1" role="main">
+                        <div class="page-inner">
+                            
+                                <section class="normal markdown-section">
+                                
+                                <h1 id="custom-attributes"><a name="custom-attributes" class="plugin-anchor" href="#custom-attributes"><i class="fa fa-link" aria-hidden="true"></i></a>Custom attributes</h1>
+<p>The <code>Copy</code> and <code>Clone</code> traits support the following attributes:</p>
+<ul>
+<li><strong>Container attributes</strong><ul>
+<li><a href="#custom-bound"><code>&lt;Copy or Clone&gt;(bound=&quot;&lt;where-clause or empty&gt;&quot;)</code></a></li>
+<li><a href="#clone-from"><code>Clone(clone_from=&quot;true&quot;)</code></a></li>
+</ul>
+</li>
+<li><strong>Field attributes</strong><ul>
+<li><a href="#custom-bound"><code>&lt;Copy or Clone&gt;(bound=&quot;&lt;where-clause or empty&gt;&quot;)</code></a></li>
+</ul>
+</li>
+</ul>
+<h1 id="clonefrom"><a name="clonefrom" class="plugin-anchor" href="#clonefrom"><i class="fa fa-link" aria-hidden="true"></i></a><a id="clone-from"> <code>clone_from</code></a></h1>
+<p>The <a href="https://doc.rust-lang.org/std/clone/trait.Clone.html" target="_blank"><code>Clone</code></a> trait has a default implementation for <a href="https://doc.rust-lang.org/std/clone/trait.Clone.html#method.clone_from" target="_blank"><code>clone_from</code></a> and
+<code>derive(Clone)</code> never implements that method. <em>derivative</em> can implement it if
+asked explicitly.</p>
+<p>Note that while the generated implementation is good for structures, it might
+not be very efficient for enumerations. What it does is check if both <code>self</code>
+and the clone-from value have the same variant, if they have, use <code>clone_from</code>
+on the members, otherwise fallback to <code>*self = other.clone();</code>. Ask yourself if
+you really need this.</p>
+<h1 id="custom-bound"><a name="custom-bound" class="plugin-anchor" href="#custom-bound"><i class="fa fa-link" aria-hidden="true"></i></a>Custom bound</h1>
+<p>As most other traits, <code>Copy</code> and <code>Debug</code> support a custom bound on container
+and fields. See <a href="Debug.html#custom-bound"><code>Debug</code>&apos;s documentation</a> for more
+information.</p>
+<h1 id="limitations"><a name="limitations" class="plugin-anchor" href="#limitations"><i class="fa fa-link" aria-hidden="true"></i></a>Limitations</h1>
+<p><em>rustc</em> can optimize <code>derive(Clone, Copy)</code> to generate faster, smaller code.
+So does <em>derivative</em>. But <em>rustc</em> does not know about <code>derivative(Copy)</code> and
+would not optimize <code>#[derivative(Copy)] #[derive(Clone)]</code>.
+To avoid that issue, you should avoid deriving <code>Clone</code> using <em>rustc</em>&apos;s default
+<code>derive</code> and <code>Copy</code> using <code>derivative</code>. <em>derivative</em> will error if it detects
+that, but can&apos;t always do it.</p>
+
+                                
+                                </section>
+                            
+                        </div>
+                    </div>
+                
+            </div>
+
+            
+                
+                <a href="./" class="navigation navigation-prev " aria-label="Previous page: Overview">
+                    <i class="fa fa-angle-left"></i>
+                </a>
+                
+                
+                <a href="Clone.html#clone-from" class="navigation navigation-next " aria-label="Next page: clone_from">
+                    <i class="fa fa-angle-right"></i>
+                </a>
+                
+            
+        
+    </div>
+
+    <script>
+        var gitbook = gitbook || [];
+        gitbook.push(function() {
+            gitbook.page.hasChanged({"page":{"title":"Copy and Clone traits","level":"1.2","depth":1,"next":{"title":"clone_from","level":"1.2.1","depth":2,"anchor":"#clone-from","path":"Clone.md","ref":"Clone.md#clone-from","articles":[]},"previous":{"title":"Overview","level":"1.1","depth":1,"path":"README.md","ref":"README.md","articles":[]},"dir":"ltr"},"config":{"plugins":["-search","-sharing","codesnippet","edit-link","anchors"],"root":"doc","styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"pluginsConfig":{"edit-link":{"label":"Edit","base":"https://github.com/mcarton/rust-derivative/tree/master/doc"},"codesnippet":{},"anchors":{},"highlight":{},"lunr":{"maxIndexSize":1000000,"ignoreSpecialCharacters":false},"fontsettings":{"theme":"white","family":"sans","size":2},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false}},"theme":"default","pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"variables":{},"title":"Derivative","language":"en","gitbook":"*"},"file":{"path":"Clone.md","mtime":"2018-10-20T13:28:47.780Z","type":"markdown"},"gitbook":{"version":"3.2.3","time":"2020-03-29T20:31:46.320Z"},"basePath":".","book":{"language":""}});
+        });
+    </script>
+</div>
+
+        
+    <script src="gitbook/gitbook.js"></script>
+    <script src="gitbook/theme.js"></script>
+    
+        
+        <script src="gitbook/gitbook-plugin-edit-link/plugin.js"></script>
+        
+    
+        
+        <script src="gitbook/gitbook-plugin-lunr/lunr.min.js"></script>
+        
+    
+        
+        <script src="gitbook/gitbook-plugin-lunr/search-lunr.js"></script>
+        
+    
+        
+        <script src="gitbook/gitbook-plugin-fontsettings/fontsettings.js"></script>
+        
+    
+
+    </body>
+</html>
+

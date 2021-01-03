@@ -1,0 +1,712 @@
+
+<!DOCTYPE HTML>
+<html lang="en" >
+    <head>
+        <meta charset="UTF-8">
+        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+        <title>Overview · Derivative</title>
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="description" content="">
+        <meta name="generator" content="GitBook 3.2.3">
+        
+        
+        
+    
+    <link rel="stylesheet" href="gitbook/style.css">
+
+    
+            
+                
+                <link rel="stylesheet" href="gitbook/gitbook-plugin-anchors/plugin.css">
+                
+            
+                
+                <link rel="stylesheet" href="gitbook/gitbook-plugin-highlight/website.css">
+                
+            
+                
+                <link rel="stylesheet" href="gitbook/gitbook-plugin-fontsettings/website.css">
+                
+            
+        
+
+    
+
+    
+        
+        <link rel="stylesheet" href="styles/website.css">
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+
+        
+    
+    
+    <meta name="HandheldFriendly" content="true"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <link rel="apple-touch-icon-precomposed" sizes="152x152" href="gitbook/images/apple-touch-icon-precomposed-152.png">
+    <link rel="shortcut icon" href="gitbook/images/favicon.ico" type="image/x-icon">
+
+    
+    <link rel="next" href="Clone.html" />
+    
+    
+
+    </head>
+    <body>
+        
+<div class="book">
+    <div class="book-summary">
+        
+            
+            
+                <nav role="navigation">
+                
+
+
+<ul class="summary">
+    
+    
+
+    
+
+    
+        
+        
+    
+        <li class="chapter active" data-level="1.1" data-path="./">
+            
+                <a href="./">
+            
+                    
+                    Overview
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.2" data-path="Clone.html">
+            
+                <a href="Clone.html">
+            
+                    
+                    Copy and Clone traits
+            
+                </a>
+            
+
+            
+            <ul class="articles">
+                
+    
+        <li class="chapter " data-level="1.2.1" data-path="Clone.html">
+            
+                <a href="Clone.html#clone-from">
+            
+                    
+                    clone_from
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.2.2" data-path="Clone.html">
+            
+                <a href="Clone.html#custom-bound">
+            
+                    
+                    Custom bound
+            
+                </a>
+            
+
+            
+        </li>
+    
+
+            </ul>
+            
+        </li>
+    
+        <li class="chapter " data-level="1.3" data-path="Debug.html">
+            
+                <a href="Debug.html">
+            
+                    
+                    Debug trait
+            
+                </a>
+            
+
+            
+            <ul class="articles">
+                
+    
+        <li class="chapter " data-level="1.3.1" data-path="Debug.html">
+            
+                <a href="Debug.html#ignoring-a-field">
+            
+                    
+                    Hiding fields
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.3.2" data-path="Debug.html">
+            
+                <a href="Debug.html#hiding-newtypes">
+            
+                    
+                    Hiding newtypes
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.3.3" data-path="Debug.html">
+            
+                <a href="Debug.html#format-with">
+            
+                    
+                    Alternative format function
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.3.4" data-path="Debug.html">
+            
+                <a href="Debug.html#custom-bound">
+            
+                    
+                    Custom bound
+            
+                </a>
+            
+
+            
+        </li>
+    
+
+            </ul>
+            
+        </li>
+    
+        <li class="chapter " data-level="1.4" data-path="Default.html">
+            
+                <a href="Default.html">
+            
+                    
+                    Default trait
+            
+                </a>
+            
+
+            
+            <ul class="articles">
+                
+    
+        <li class="chapter " data-level="1.4.1" data-path="Default.html">
+            
+                <a href="Default.html#default-enumeration">
+            
+                    
+                    Default enumeration
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.4.2" data-path="Default.html">
+            
+                <a href="Default.html#setting-the-value-of-a-field">
+            
+                    
+                    Setting the value of a field
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.4.3" data-path="Default.html">
+            
+                <a href="Default.html#new-function">
+            
+                    
+                    new function
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.4.4" data-path="Default.html">
+            
+                <a href="Default.html#custom-bound">
+            
+                    
+                    Custom bound
+            
+                </a>
+            
+
+            
+        </li>
+    
+
+            </ul>
+            
+        </li>
+    
+        <li class="chapter " data-level="1.5" data-path="Hash.html">
+            
+                <a href="Hash.html">
+            
+                    
+                    Hash trait
+            
+                </a>
+            
+
+            
+            <ul class="articles">
+                
+    
+        <li class="chapter " data-level="1.5.1" data-path="Hash.html">
+            
+                <a href="Hash.html#ignoring-a-field">
+            
+                    
+                    Ignoring fields
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.5.2" data-path="Debug.html">
+            
+                <a href="Debug.html#hash-with">
+            
+                    
+                    Alternative hash function
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.5.3" data-path="Hash.html">
+            
+                <a href="Hash.html#custom-bound">
+            
+                    
+                    Custom bound
+            
+                </a>
+            
+
+            
+        </li>
+    
+
+            </ul>
+            
+        </li>
+    
+        <li class="chapter " data-level="1.6" data-path="cmp.html">
+            
+                <a href="cmp.html">
+            
+                    
+                    Comparison traits
+            
+                </a>
+            
+
+            
+            <ul class="articles">
+                
+    
+        <li class="chapter " data-level="1.6.1" data-path="cmp.html">
+            
+                <a href="cmp.html#enumerations">
+            
+                    
+                    Note about enumerations
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.6.2" data-path="cmp.html">
+            
+                <a href="cmp.html#ignoring-a-field">
+            
+                    
+                    Ignoring fields
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.6.3" data-path="cmp.html">
+            
+                <a href="cmp.html#compare-with">
+            
+                    
+                    Alternative comparison function
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.6.4" data-path="cmp.html">
+            
+                <a href="cmp.html#custom-bound">
+            
+                    
+                    Custom bound
+            
+                </a>
+            
+
+            
+        </li>
+    
+
+            </ul>
+            
+        </li>
+    
+
+    
+
+    <li class="divider"></li>
+
+    <li>
+        <a href="https://www.gitbook.com" target="blank" class="gitbook-link">
+            Published with GitBook
+        </a>
+    </li>
+</ul>
+
+
+                </nav>
+            
+        
+    </div>
+
+    <div class="book-body">
+        
+            <div class="body-inner">
+                
+                    
+
+<div class="book-header" role="navigation">
+    
+
+    <!-- Title -->
+    <h1>
+        <i class="fa fa-circle-o-notch fa-spin"></i>
+        <a href="." >Overview</a>
+    </h1>
+</div>
+
+
+
+
+                    <div class="page-wrapper" tabindex="-1" role="main">
+                        <div class="page-inner">
+                            
+                                <section class="normal markdown-section">
+                                
+                                <h1 id="derivative"><a name="derivative" class="plugin-anchor" href="#derivative"><i class="fa fa-link" aria-hidden="true"></i></a>Derivative</h1>
+<p>This crate provides a set of alternative <code>#[derive]</code> attributes for Rust.</p>
+<h2 id="examples"><a name="examples" class="plugin-anchor" href="#examples"><i class="fa fa-link" aria-hidden="true"></i></a>Examples</h2>
+<p><em>derivative</em> uses attributes to make it possible to derive more implementations
+than the built-in <code>derive(Trait)</code>. Here are a few examples of stuffs you cannot
+just <code>derive</code>.</p>
+<p>You can derive <code>Default</code> on enumerations:</p>
+<table>
+<thead>
+<tr>
+<th>With <em>derivative</em></th>
+<th><a href="https://github.com/rust-lang/rust/blob/16eeeac783d2ede28e09f2a433c612dea309fe33/src/libcore/option.rs#L714-L718" target="_blank">Original</a></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><pre><code class="lang-rs"><span class="hljs-meta">#[derive(Derivative)]</span>
+<span class="hljs-meta">#[derivative(Default(bound=<span class="hljs-meta-string">&quot;&quot;</span>))]</span>
+<span class="hljs-keyword">pub</span> <span class="hljs-class"><span class="hljs-keyword">enum</span> <span class="hljs-title">Option</span></span> {
+    <span class="hljs-meta">#[derivative(Default)]</span>
+    <span class="hljs-comment">/// No value</span>
+    <span class="hljs-literal">None</span>,
+    <span class="hljs-comment">/// Some value `T`</span>
+    <span class="hljs-literal">Some</span>(T),
+}
+</code></pre></td>
+<td><pre><code class="lang-rs"><span class="hljs-keyword">pub</span> <span class="hljs-class"><span class="hljs-keyword">enum</span> <span class="hljs-title">Option</span></span> {
+    <span class="hljs-comment">/// No value</span>
+    <span class="hljs-literal">None</span>,
+    <span class="hljs-comment">/// Some value `T`</span>
+    <span class="hljs-literal">Some</span>(T),
+}
+
+<span class="hljs-keyword">impl</span> <span class="hljs-built_in">Default</span> <span class="hljs-keyword">for</span> <span class="hljs-built_in">Option</span> {
+    <span class="hljs-comment">/// Returns None.</span>
+    <span class="hljs-meta">#[inline]</span>
+    <span class="hljs-function"><span class="hljs-keyword">fn</span> <span class="hljs-title">default</span></span>() -&gt; <span class="hljs-built_in">Option</span> {
+        <span class="hljs-literal">None</span>
+    }
+}
+</code></pre></td>
+</tr>
+</tbody>
+</table>
+<p>You can use different default values for some fields:</p>
+<table>
+<thead>
+<tr>
+<th>With <em>derivative</em></th>
+<th><a href="https://github.com/rust-lang-nursery/regex/blob/3cfef1e79d135a3e8a670aff53e7fabef453a3e1/src/re_builder.rs#L12-L39" target="_blank">Original</a></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><pre><code class="lang-rs"><span class="hljs-meta">#[derive(Derivative)]</span>
+<span class="hljs-meta">#[derivative(Default)]</span>
+<span class="hljs-keyword">pub</span> <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">RegexOptions</span></span> {
+    <span class="hljs-keyword">pub</span> pats: <span class="hljs-built_in">Vec</span>&lt;<span class="hljs-built_in">String</span>&gt;,
+    <span class="hljs-meta">#[derivative(Default(value=<span class="hljs-meta-string">&quot;10 * (1&lt;&lt;20)&quot;</span>))]</span>
+    <span class="hljs-keyword">pub</span> size_limit: usize,
+    <span class="hljs-meta">#[derivative(Default(value=<span class="hljs-meta-string">&quot;2 * (1&lt;&lt;20)&quot;</span>))]</span>
+    <span class="hljs-keyword">pub</span> dfa_size_limit: usize,
+    <span class="hljs-keyword">pub</span> case_insensitive: <span class="hljs-keyword">bool</span>,
+    <span class="hljs-keyword">pub</span> multi_line: <span class="hljs-keyword">bool</span>,
+    <span class="hljs-keyword">pub</span> dot_matches_new_line: <span class="hljs-keyword">bool</span>,
+    <span class="hljs-keyword">pub</span> swap_greed: <span class="hljs-keyword">bool</span>,
+    <span class="hljs-keyword">pub</span> ignore_whitespace: <span class="hljs-keyword">bool</span>,
+    <span class="hljs-meta">#[derivative(Default(value=<span class="hljs-meta-string">&quot;true&quot;</span>))]</span>
+    <span class="hljs-keyword">pub</span> unicode: <span class="hljs-keyword">bool</span>,
+}
+</code></pre></td>
+<td><pre><code class="lang-rs"><span class="hljs-meta">#[derive(Default)]</span>
+<span class="hljs-keyword">pub</span> <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">RegexOptions</span></span> {
+    <span class="hljs-keyword">pub</span> pats: <span class="hljs-built_in">Vec</span>&lt;<span class="hljs-built_in">String</span>&gt;,
+    <span class="hljs-keyword">pub</span> size_limit: usize,
+    <span class="hljs-keyword">pub</span> dfa_size_limit: usize,
+    <span class="hljs-keyword">pub</span> case_insensitive: <span class="hljs-keyword">bool</span>,
+    <span class="hljs-keyword">pub</span> multi_line: <span class="hljs-keyword">bool</span>,
+    <span class="hljs-keyword">pub</span> dot_matches_new_line: <span class="hljs-keyword">bool</span>,
+    <span class="hljs-keyword">pub</span> swap_greed: <span class="hljs-keyword">bool</span>,
+    <span class="hljs-keyword">pub</span> ignore_whitespace: <span class="hljs-keyword">bool</span>,
+    <span class="hljs-keyword">pub</span> unicode: <span class="hljs-keyword">bool</span>,
+}
+
+<span class="hljs-keyword">impl</span> <span class="hljs-built_in">Default</span> <span class="hljs-keyword">for</span> RegexOptions {
+    <span class="hljs-function"><span class="hljs-keyword">fn</span> <span class="hljs-title">default</span></span>() -&gt; <span class="hljs-keyword">Self</span> {
+        RegexOptions {
+            pats: <span class="hljs-built_in">vec!</span>[],
+            size_limit: <span class="hljs-number">10</span> * (<span class="hljs-number">1</span>&lt;&lt;<span class="hljs-number">20</span>),
+            dfa_size_limit: <span class="hljs-number">2</span> * (<span class="hljs-number">1</span>&lt;&lt;<span class="hljs-number">20</span>),
+            case_insensitive: <span class="hljs-literal">false</span>,
+            multi_line: <span class="hljs-literal">false</span>,
+            dot_matches_new_line: <span class="hljs-literal">false</span>,
+            swap_greed: <span class="hljs-literal">false</span>,
+            ignore_whitespace: <span class="hljs-literal">false</span>,
+            unicode: <span class="hljs-literal">true</span>,
+        }
+    }
+}
+</code></pre></td>
+</tr>
+</tbody>
+</table>
+<p>Want a transparent <code>Debug</code> implementation for your wrapper? We got that:</p>
+<table>
+<thead>
+<tr>
+<th>With <em>derivative</em></th>
+<th><a href="https://github.com/rust-lang/rust/blob/5457c35ece57bbc4a65baff239a02d6abb81c8a2/src/libcore/num/mod.rs#L46-L54" target="_blank">Original</a></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><pre><code class="lang-rs"><span class="hljs-meta">#[derive(Derivative)]</span>
+<span class="hljs-meta">#[derivative(Debug=<span class="hljs-meta-string">&quot;transparent&quot;</span>)]</span>
+<span class="hljs-keyword">pub</span> <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">Wrapping</span></span>(<span class="hljs-keyword">pub</span> T);
+</code></pre></td>
+<td><pre><code class="lang-rs"><span class="hljs-keyword">pub</span> <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">Wrapping</span></span>(<span class="hljs-keyword">pub</span> T);
+
+<span class="hljs-keyword">impl</span> fmt::Debug <span class="hljs-keyword">for</span> Wrapping {
+    <span class="hljs-function"><span class="hljs-keyword">fn</span> <span class="hljs-title">fmt</span></span>(&amp;<span class="hljs-keyword">self</span>, f: &amp;<span class="hljs-keyword">mut</span> fmt::Formatter) -&gt; fmt::<span class="hljs-built_in">Result</span> {
+        <span class="hljs-keyword">self</span>.<span class="hljs-number">0</span>.fmt(f)
+    }
+}
+</code></pre></td>
+</tr>
+</tbody>
+</table>
+<p>Need to ignore a field? We got that too:</p>
+<table>
+<thead>
+<tr>
+<th>With <em>derivative</em></th>
+<th><a href="https://github.com/steveklabnik/semver/blob/baa0fbb57c80a7fb344fbeedac24a28439ddf5b5/src/version.rs#L196-L205" target="_blank">Original</a></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><pre><code class="lang-rs"><span class="hljs-meta">#[derive(Derivative)]</span>
+<span class="hljs-meta">#[derivative(PartialEq, Hash)]</span>
+<span class="hljs-keyword">pub</span> <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">Version</span></span> {
+    <span class="hljs-comment">/// The major version.</span>
+    <span class="hljs-keyword">pub</span> major: <span class="hljs-keyword">u64</span>,
+    <span class="hljs-comment">/// The minor version.</span>
+    <span class="hljs-keyword">pub</span> minor: <span class="hljs-keyword">u64</span>,
+    <span class="hljs-comment">/// The patch version.</span>
+    <span class="hljs-keyword">pub</span> patch: <span class="hljs-keyword">u64</span>,
+    <span class="hljs-comment">/// The pre-release version identifier.</span>
+    <span class="hljs-keyword">pub</span> pre: <span class="hljs-built_in">Vec</span>,
+    <span class="hljs-comment">// We should ignore build metadata</span>
+    <span class="hljs-comment">// here, otherwise versions v1 and</span>
+    <span class="hljs-comment">// v2 can exist such that !(v1 &lt; v2)</span>
+    <span class="hljs-comment">// &amp;&amp; !(v1 &gt; v2) &amp;&amp; v1 != v2, which</span>
+    <span class="hljs-comment">// violate strict total ordering rules.</span>
+    <span class="hljs-meta">#[derivative(PartialEq=<span class="hljs-meta-string">&quot;ignore&quot;</span>)]</span>
+    <span class="hljs-meta">#[derivative(Hash=<span class="hljs-meta-string">&quot;ignore&quot;</span>)]</span>
+    <span class="hljs-comment">/// The build metadata, ignored when</span>
+    <span class="hljs-comment">/// determining version precedence.</span>
+    <span class="hljs-keyword">pub</span> build: <span class="hljs-built_in">Vec</span>,
+}
+</code></pre></td>
+<td><pre><code class="lang-rs"><span class="hljs-keyword">pub</span> <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">Version</span></span> {
+    <span class="hljs-comment">/// The major version.</span>
+    <span class="hljs-keyword">pub</span> major: <span class="hljs-keyword">u64</span>,
+    <span class="hljs-comment">/// The minor version.</span>
+    <span class="hljs-keyword">pub</span> minor: <span class="hljs-keyword">u64</span>,
+    <span class="hljs-comment">/// The patch version.</span>
+    <span class="hljs-keyword">pub</span> patch: <span class="hljs-keyword">u64</span>,
+    <span class="hljs-comment">/// The pre-release version identifier.</span>
+    <span class="hljs-keyword">pub</span> pre: <span class="hljs-built_in">Vec</span>,
+    <span class="hljs-comment">/// The build metadata, ignored when</span>
+    <span class="hljs-comment">/// determining version precedence.</span>
+    <span class="hljs-keyword">pub</span> build: <span class="hljs-built_in">Vec</span>,
+}
+
+<span class="hljs-keyword">impl</span> cmp::<span class="hljs-built_in">PartialEq</span> <span class="hljs-keyword">for</span> Version {
+    <span class="hljs-meta">#[inline]</span>
+    <span class="hljs-function"><span class="hljs-keyword">fn</span> <span class="hljs-title">eq</span></span>(&amp;<span class="hljs-keyword">self</span>, other: &amp;Version) -&gt; <span class="hljs-keyword">bool</span> {
+        <span class="hljs-comment">// We should ignore build metadata</span>
+        <span class="hljs-comment">// here, otherwise versions v1 and</span>
+        <span class="hljs-comment">// v2 can exist such that !(v1 &lt; v2)</span>
+        <span class="hljs-comment">// &amp;&amp; !(v1 &gt; v2) &amp;&amp; v1 != v2, which</span>
+        <span class="hljs-comment">// violate strict total ordering rules.</span>
+        <span class="hljs-keyword">self</span>.major == other.major &amp;&amp;
+        <span class="hljs-keyword">self</span>.minor == other.minor &amp;&amp;
+        <span class="hljs-keyword">self</span>.patch == other.patch &amp;&amp;
+        <span class="hljs-keyword">self</span>.pre == other.pre
+    }
+}
+
+<span class="hljs-keyword">impl</span> hash::Hash <span class="hljs-keyword">for</span> Version {
+    <span class="hljs-function"><span class="hljs-keyword">fn</span> <span class="hljs-title">hash</span></span>(&amp;<span class="hljs-keyword">self</span>, into: &amp;<span class="hljs-keyword">mut</span> H) {
+        <span class="hljs-keyword">self</span>.major.hash(into);
+        <span class="hljs-keyword">self</span>.minor.hash(into);
+        <span class="hljs-keyword">self</span>.patch.hash(into);
+        <span class="hljs-keyword">self</span>.pre.hash(into);
+    }
+}
+</code></pre></td>
+</tr>
+</tbody>
+</table>
+
+                                
+                                </section>
+                            
+                        </div>
+                    </div>
+                
+            </div>
+
+            
+                
+                
+                <a href="Clone.html" class="navigation navigation-next navigation-unique" aria-label="Next page: Copy and Clone traits">
+                    <i class="fa fa-angle-right"></i>
+                </a>
+                
+            
+        
+    </div>
+
+    <script>
+        var gitbook = gitbook || [];
+        gitbook.push(function() {
+            gitbook.page.hasChanged({"page":{"title":"Overview","level":"1.1","depth":1,"next":{"title":"Copy and Clone traits","level":"1.2","depth":1,"path":"Clone.md","ref":"Clone.md","articles":[{"title":"clone_from","level":"1.2.1","depth":2,"anchor":"#clone-from","path":"Clone.md","ref":"Clone.md#clone-from","articles":[]},{"title":"Custom bound","level":"1.2.2","depth":2,"anchor":"#custom-bound","path":"Clone.md","ref":"Clone.md#custom-bound","articles":[]}]},"dir":"ltr"},"config":{"plugins":["-search","-sharing","codesnippet","edit-link","anchors"],"root":"doc","styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"pluginsConfig":{"edit-link":{"label":"Edit","base":"https://github.com/mcarton/rust-derivative/tree/master/doc"},"codesnippet":{},"anchors":{},"highlight":{},"lunr":{"maxIndexSize":1000000,"ignoreSpecialCharacters":false},"fontsettings":{"theme":"white","family":"sans","size":2},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false}},"theme":"default","pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"variables":{},"title":"Derivative","language":"en","gitbook":"*"},"file":{"path":"README.md","mtime":"2018-10-20T17:32:18.898Z","type":"markdown"},"gitbook":{"version":"3.2.3","time":"2020-03-29T20:31:46.320Z"},"basePath":".","book":{"language":""}});
+        });
+    </script>
+</div>
+
+        
+    <script src="gitbook/gitbook.js"></script>
+    <script src="gitbook/theme.js"></script>
+    
+        
+        <script src="gitbook/gitbook-plugin-edit-link/plugin.js"></script>
+        
+    
+        
+        <script src="gitbook/gitbook-plugin-lunr/lunr.min.js"></script>
+        
+    
+        
+        <script src="gitbook/gitbook-plugin-lunr/search-lunr.js"></script>
+        
+    
+        
+        <script src="gitbook/gitbook-plugin-fontsettings/fontsettings.js"></script>
+        
+    
+
+    </body>
+</html>
+

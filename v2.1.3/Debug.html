@@ -1,0 +1,611 @@
+
+<!DOCTYPE HTML>
+<html lang="en" >
+    <head>
+        <meta charset="UTF-8">
+        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+        <title>Debug trait · Derivative</title>
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="description" content="">
+        <meta name="generator" content="GitBook 3.2.3">
+        
+        
+        
+    
+    <link rel="stylesheet" href="gitbook/style.css">
+
+    
+            
+                
+                <link rel="stylesheet" href="gitbook/gitbook-plugin-anchors/plugin.css">
+                
+            
+                
+                <link rel="stylesheet" href="gitbook/gitbook-plugin-highlight/website.css">
+                
+            
+                
+                <link rel="stylesheet" href="gitbook/gitbook-plugin-fontsettings/website.css">
+                
+            
+        
+
+    
+
+    
+        
+        <link rel="stylesheet" href="styles/website.css">
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+
+        
+    
+    
+    <meta name="HandheldFriendly" content="true"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <link rel="apple-touch-icon-precomposed" sizes="152x152" href="gitbook/images/apple-touch-icon-precomposed-152.png">
+    <link rel="shortcut icon" href="gitbook/images/favicon.ico" type="image/x-icon">
+
+    
+    <link rel="next" href="Debug.html" />
+    
+    
+    <link rel="prev" href="Clone.html" />
+    
+
+    </head>
+    <body>
+        
+<div class="book">
+    <div class="book-summary">
+        
+            
+            
+                <nav role="navigation">
+                
+
+
+<ul class="summary">
+    
+    
+
+    
+
+    
+        
+        
+    
+        <li class="chapter " data-level="1.1" data-path="./">
+            
+                <a href="./">
+            
+                    
+                    Overview
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.2" data-path="Clone.html">
+            
+                <a href="Clone.html">
+            
+                    
+                    Copy and Clone traits
+            
+                </a>
+            
+
+            
+            <ul class="articles">
+                
+    
+        <li class="chapter " data-level="1.2.1" data-path="Clone.html">
+            
+                <a href="Clone.html#clone-from">
+            
+                    
+                    clone_from
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.2.2" data-path="Clone.html">
+            
+                <a href="Clone.html#custom-bound">
+            
+                    
+                    Custom bound
+            
+                </a>
+            
+
+            
+        </li>
+    
+
+            </ul>
+            
+        </li>
+    
+        <li class="chapter active" data-level="1.3" data-path="Debug.html">
+            
+                <a href="Debug.html">
+            
+                    
+                    Debug trait
+            
+                </a>
+            
+
+            
+            <ul class="articles">
+                
+    
+        <li class="chapter " data-level="1.3.1" data-path="Debug.html">
+            
+                <a href="Debug.html#ignoring-a-field">
+            
+                    
+                    Hiding fields
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.3.2" data-path="Debug.html">
+            
+                <a href="Debug.html#hiding-newtypes">
+            
+                    
+                    Hiding newtypes
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.3.3" data-path="Debug.html">
+            
+                <a href="Debug.html#format-with">
+            
+                    
+                    Alternative format function
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.3.4" data-path="Debug.html">
+            
+                <a href="Debug.html#custom-bound">
+            
+                    
+                    Custom bound
+            
+                </a>
+            
+
+            
+        </li>
+    
+
+            </ul>
+            
+        </li>
+    
+        <li class="chapter " data-level="1.4" data-path="Default.html">
+            
+                <a href="Default.html">
+            
+                    
+                    Default trait
+            
+                </a>
+            
+
+            
+            <ul class="articles">
+                
+    
+        <li class="chapter " data-level="1.4.1" data-path="Default.html">
+            
+                <a href="Default.html#default-enumeration">
+            
+                    
+                    Default enumeration
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.4.2" data-path="Default.html">
+            
+                <a href="Default.html#setting-the-value-of-a-field">
+            
+                    
+                    Setting the value of a field
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.4.3" data-path="Default.html">
+            
+                <a href="Default.html#new-function">
+            
+                    
+                    new function
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.4.4" data-path="Default.html">
+            
+                <a href="Default.html#custom-bound">
+            
+                    
+                    Custom bound
+            
+                </a>
+            
+
+            
+        </li>
+    
+
+            </ul>
+            
+        </li>
+    
+        <li class="chapter " data-level="1.5" data-path="Hash.html">
+            
+                <a href="Hash.html">
+            
+                    
+                    Hash trait
+            
+                </a>
+            
+
+            
+            <ul class="articles">
+                
+    
+        <li class="chapter " data-level="1.5.1" data-path="Hash.html">
+            
+                <a href="Hash.html#ignoring-a-field">
+            
+                    
+                    Ignoring fields
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.5.2" data-path="Debug.html">
+            
+                <a href="Debug.html#hash-with">
+            
+                    
+                    Alternative hash function
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.5.3" data-path="Hash.html">
+            
+                <a href="Hash.html#custom-bound">
+            
+                    
+                    Custom bound
+            
+                </a>
+            
+
+            
+        </li>
+    
+
+            </ul>
+            
+        </li>
+    
+        <li class="chapter " data-level="1.6" data-path="cmp.html">
+            
+                <a href="cmp.html">
+            
+                    
+                    Comparison traits
+            
+                </a>
+            
+
+            
+            <ul class="articles">
+                
+    
+        <li class="chapter " data-level="1.6.1" data-path="cmp.html">
+            
+                <a href="cmp.html#enumerations">
+            
+                    
+                    Note about enumerations
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.6.2" data-path="cmp.html">
+            
+                <a href="cmp.html#ignoring-a-field">
+            
+                    
+                    Ignoring fields
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.6.3" data-path="cmp.html">
+            
+                <a href="cmp.html#compare-with">
+            
+                    
+                    Alternative comparison function
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.6.4" data-path="cmp.html">
+            
+                <a href="cmp.html#custom-bound">
+            
+                    
+                    Custom bound
+            
+                </a>
+            
+
+            
+        </li>
+    
+
+            </ul>
+            
+        </li>
+    
+
+    
+
+    <li class="divider"></li>
+
+    <li>
+        <a href="https://www.gitbook.com" target="blank" class="gitbook-link">
+            Published with GitBook
+        </a>
+    </li>
+</ul>
+
+
+                </nav>
+            
+        
+    </div>
+
+    <div class="book-body">
+        
+            <div class="body-inner">
+                
+                    
+
+<div class="book-header" role="navigation">
+    
+
+    <!-- Title -->
+    <h1>
+        <i class="fa fa-circle-o-notch fa-spin"></i>
+        <a href="." >Debug trait</a>
+    </h1>
+</div>
+
+
+
+
+                    <div class="page-wrapper" tabindex="-1" role="main">
+                        <div class="page-inner">
+                            
+                                <section class="normal markdown-section">
+                                
+                                <h1 id="custom-attributes"><a name="custom-attributes" class="plugin-anchor" href="#custom-attributes"><i class="fa fa-link" aria-hidden="true"></i></a>Custom attributes</h1>
+<p>The <code>Debug</code> trait supports the following attributes:</p>
+<ul>
+<li><strong>Container attributes</strong><ul>
+<li><a href="#custom-bound"><code>Debug(bound=&quot;&lt;where-clause or empty&gt;&quot;)</code></a></li>
+<li><a href="#hiding-newtypes"><code>Debug=&quot;transparent&quot;</code></a></li>
+</ul>
+</li>
+<li><strong>Variant attributes</strong><ul>
+<li><a href="#hiding-newtypes"><code>Debug=&quot;transparent&quot;</code></a></li>
+</ul>
+</li>
+<li><strong>Field attributes</strong><ul>
+<li><a href="#custom-bound"><code>Debug(bound=&quot;&lt;where-clause or empty&gt;&quot;)</code></a></li>
+<li><a href="#format-with"><code>Debug(format_with=&quot;&lt;path&gt;&quot;)</code></a></li>
+<li><a href="#ignoring-a-field"><code>Debug=&quot;ignore&quot;</code></a></li>
+</ul>
+</li>
+</ul>
+<h1 id="ignoring-a-field"><a name="ignoring-a-field" class="plugin-anchor" href="#ignoring-a-field"><i class="fa fa-link" aria-hidden="true"></i></a>Ignoring a field</h1>
+<p>You can use <em>derivative</em> to hide fields from a structure or enumeration <code>Debug</code>
+implementation:</p>
+<pre><code class="lang-rust"><span class="hljs-meta">#[derive(Derivative)]</span>
+<span class="hljs-meta">#[derivative(Debug)]</span>
+<span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">Foo</span></span> {
+    foo: <span class="hljs-keyword">u8</span>,
+    <span class="hljs-meta">#[derivative(Debug=<span class="hljs-meta-string">&quot;ignore&quot;</span>)]</span>
+    bar: <span class="hljs-keyword">u8</span>,
+}
+
+<span class="hljs-built_in">println!</span>(<span class="hljs-string">&quot;{:?}&quot;</span>, Foo { foo: <span class="hljs-number">42</span>, bar: <span class="hljs-number">1</span> }); <span class="hljs-comment">// Foo { foo: 42 }</span>
+</code></pre>
+<h1 id="hiding-newtypes"><a name="hiding-newtypes" class="plugin-anchor" href="#hiding-newtypes"><i class="fa fa-link" aria-hidden="true"></i></a>Hiding newtypes</h1>
+<p>You can use <em>derivative</em> to automatically unwrap newtypes and enumeration
+variants with only one field:</p>
+<pre><code class="lang-rust"><span class="hljs-meta">#[derive(Derivative)]</span>
+<span class="hljs-meta">#[derivative(Debug=<span class="hljs-meta-string">&quot;transparent&quot;</span>)]</span>
+<span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">A</span></span>(isize);
+
+<span class="hljs-meta">#[derive(Derivative)]</span>
+<span class="hljs-meta">#[derivative(Debug)]</span>
+<span class="hljs-class"><span class="hljs-keyword">enum</span> <span class="hljs-title">C</span></span> {
+    Foo(<span class="hljs-keyword">u8</span>),
+    <span class="hljs-meta">#[derivative(Debug=<span class="hljs-meta-string">&quot;transparent&quot;</span>)]</span>
+    Bar(<span class="hljs-keyword">u8</span>),
+}
+
+<span class="hljs-built_in">println!</span>(<span class="hljs-string">&quot;{:?}&quot;</span>, A(<span class="hljs-number">42</span>)); <span class="hljs-comment">// 42</span>
+<span class="hljs-built_in">println!</span>(<span class="hljs-string">&quot;{:?}&quot;</span>, C::Bar(<span class="hljs-number">42</span>)); <span class="hljs-comment">// 42</span>
+
+<span class="hljs-comment">// But:</span>
+<span class="hljs-built_in">println!</span>(<span class="hljs-string">&quot;{:?}&quot;</span>, C::Foo(<span class="hljs-number">42</span>)); <span class="hljs-comment">// Foo(42)</span>
+</code></pre>
+<h1 id="format-with"><a name="format-with" class="plugin-anchor" href="#format-with"><i class="fa fa-link" aria-hidden="true"></i></a>Format with</h1>
+<p>You can pass a field to a format function:</p>
+<pre><code class="lang-rust"><span class="hljs-meta">#[derive(Derivative)]</span>
+<span class="hljs-meta">#[derivative(Debug)]</span>
+<span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">Foo</span></span> {
+    foo: <span class="hljs-keyword">u32</span>,
+    <span class="hljs-meta">#[derivative(Debug(format_with=<span class="hljs-meta-string">&quot;path::to::my_fmt_fn&quot;</span>))]</span>
+    bar: SomeTypeThatMightNotBeDebug,
+}
+</code></pre>
+<p>The field <code>bar</code> will be displayed with <code>path::to::my_fmt_fn(&amp;bar, &amp;mut fmt)</code>
+where <code>fmt</code> is the current <a href="https://doc.rust-lang.org/std/fmt/struct.Formatter.html" target="_blank"><code>Formatter</code></a>.</p>
+<p>The function must the following prototype:</p>
+<pre><code class="lang-rust"><span class="hljs-function"><span class="hljs-keyword">fn</span> <span class="hljs-title">fmt</span></span>(&amp;T, &amp;<span class="hljs-keyword">mut</span> std::fmt::Formatter) -&gt; <span class="hljs-built_in">Result</span>&lt;(), std::fmt::Error&gt;;
+</code></pre>
+<h1 id="custom-bound"><a name="custom-bound" class="plugin-anchor" href="#custom-bound"><i class="fa fa-link" aria-hidden="true"></i></a>Custom bound</h1>
+<p>Usually, <em>derivative</em> will add a <code>T: Debug</code> bound for each type parameter <code>T</code>
+of the current type. If you do not want that, you can specify an explicit bound:</p>
+<ul>
+<li>Either on the type. This replaces all bounds:</li>
+</ul>
+<pre><code class="lang-rust"><span class="hljs-meta">#[derive(Derivative)]</span>
+<span class="hljs-meta">#[derivative(Debug(bound=<span class="hljs-meta-string">&quot;T: Debug, U:MyDebug&quot;</span>)]</span>
+<span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">Foo</span></span>&lt;T, U&gt; {
+    foo: T,
+    <span class="hljs-meta">#[derivative(Debug(format_with=<span class="hljs-meta-string">&quot;MyDebug::my_fmt&quot;</span>))]</span>
+    bar: U,
+}
+</code></pre>
+<ul>
+<li>Or on a field. This replaces the bound <em>derivative</em> guessed for that field. The example below is equivalent to the above:</li>
+</ul>
+<pre><code class="lang-rust"><span class="hljs-meta">#[derive(Derivative)]</span>
+<span class="hljs-meta">#[derivative(Debug)]</span>
+<span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">Foo</span></span>&lt;T, U&gt; {
+    foo: T,
+    <span class="hljs-meta">#[derivative(Debug(format_with=<span class="hljs-meta-string">&quot;MyDebug::my_fmt&quot;</span>, bound=<span class="hljs-meta-string">&quot;U: MyDebug&quot;</span>))]</span>
+    bar: U,
+}
+</code></pre>
+<p>With <code>bound=&quot;&quot;</code> it is possible to remove any bound for the type. This is useful
+if your type contains a <code>Foo&lt;T&gt;</code> that is <code>Debug</code> even if <code>T</code> is not.</p>
+
+                                
+                                </section>
+                            
+                        </div>
+                    </div>
+                
+            </div>
+
+            
+                
+                <a href="Clone.html#custom-bound" class="navigation navigation-prev " aria-label="Previous page: Custom bound">
+                    <i class="fa fa-angle-left"></i>
+                </a>
+                
+                
+                <a href="Debug.html#ignoring-a-field" class="navigation navigation-next " aria-label="Next page: Hiding fields">
+                    <i class="fa fa-angle-right"></i>
+                </a>
+                
+            
+        
+    </div>
+
+    <script>
+        var gitbook = gitbook || [];
+        gitbook.push(function() {
+            gitbook.page.hasChanged({"page":{"title":"Debug trait","level":"1.3","depth":1,"next":{"title":"Hiding fields","level":"1.3.1","depth":2,"anchor":"#ignoring-a-field","path":"Debug.md","ref":"Debug.md#ignoring-a-field","articles":[]},"previous":{"title":"Custom bound","level":"1.2.2","depth":2,"anchor":"#custom-bound","path":"Clone.md","ref":"Clone.md#custom-bound","articles":[]},"dir":"ltr"},"config":{"plugins":["-search","-sharing","codesnippet","edit-link","anchors"],"root":"doc","styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"pluginsConfig":{"edit-link":{"label":"Edit","base":"https://github.com/mcarton/rust-derivative/tree/master/doc"},"codesnippet":{},"anchors":{},"highlight":{},"lunr":{"maxIndexSize":1000000,"ignoreSpecialCharacters":false},"fontsettings":{"theme":"white","family":"sans","size":2},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false}},"theme":"default","pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"variables":{},"title":"Derivative","language":"en","gitbook":"*"},"file":{"path":"Debug.md","mtime":"2018-10-20T13:28:47.780Z","type":"markdown"},"gitbook":{"version":"3.2.3","time":"2020-03-29T20:31:46.320Z"},"basePath":".","book":{"language":""}});
+        });
+    </script>
+</div>
+
+        
+    <script src="gitbook/gitbook.js"></script>
+    <script src="gitbook/theme.js"></script>
+    
+        
+        <script src="gitbook/gitbook-plugin-edit-link/plugin.js"></script>
+        
+    
+        
+        <script src="gitbook/gitbook-plugin-lunr/lunr.min.js"></script>
+        
+    
+        
+        <script src="gitbook/gitbook-plugin-lunr/search-lunr.js"></script>
+        
+    
+        
+        <script src="gitbook/gitbook-plugin-fontsettings/fontsettings.js"></script>
+        
+    
+
+    </body>
+</html>
+

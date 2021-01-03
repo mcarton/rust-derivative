@@ -1,0 +1,611 @@
+
+<!DOCTYPE HTML>
+<html lang="en" >
+    <head>
+        <meta charset="UTF-8">
+        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+        <title>Comparison traits · Derivative</title>
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="description" content="">
+        <meta name="generator" content="GitBook 3.2.3">
+        
+        
+        
+    
+    <link rel="stylesheet" href="gitbook/style.css">
+
+    
+            
+                
+                <link rel="stylesheet" href="gitbook/gitbook-plugin-anchors/plugin.css">
+                
+            
+                
+                <link rel="stylesheet" href="gitbook/gitbook-plugin-highlight/website.css">
+                
+            
+                
+                <link rel="stylesheet" href="gitbook/gitbook-plugin-fontsettings/website.css">
+                
+            
+        
+
+    
+
+    
+        
+        <link rel="stylesheet" href="styles/website.css">
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+
+        
+    
+    
+    <meta name="HandheldFriendly" content="true"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <link rel="apple-touch-icon-precomposed" sizes="152x152" href="gitbook/images/apple-touch-icon-precomposed-152.png">
+    <link rel="shortcut icon" href="gitbook/images/favicon.ico" type="image/x-icon">
+
+    
+    <link rel="next" href="cmp.html" />
+    
+    
+    <link rel="prev" href="Hash.html" />
+    
+
+    </head>
+    <body>
+        
+<div class="book">
+    <div class="book-summary">
+        
+            
+            
+                <nav role="navigation">
+                
+
+
+<ul class="summary">
+    
+    
+
+    
+
+    
+        
+        
+    
+        <li class="chapter " data-level="1.1" data-path="./">
+            
+                <a href="./">
+            
+                    
+                    Overview
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.2" data-path="Clone.html">
+            
+                <a href="Clone.html">
+            
+                    
+                    Copy and Clone traits
+            
+                </a>
+            
+
+            
+            <ul class="articles">
+                
+    
+        <li class="chapter " data-level="1.2.1" data-path="Clone.html">
+            
+                <a href="Clone.html#clone-from">
+            
+                    
+                    clone_from
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.2.2" data-path="Clone.html">
+            
+                <a href="Clone.html#custom-bound">
+            
+                    
+                    Custom bound
+            
+                </a>
+            
+
+            
+        </li>
+    
+
+            </ul>
+            
+        </li>
+    
+        <li class="chapter " data-level="1.3" data-path="Debug.html">
+            
+                <a href="Debug.html">
+            
+                    
+                    Debug trait
+            
+                </a>
+            
+
+            
+            <ul class="articles">
+                
+    
+        <li class="chapter " data-level="1.3.1" data-path="Debug.html">
+            
+                <a href="Debug.html#ignoring-a-field">
+            
+                    
+                    Hiding fields
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.3.2" data-path="Debug.html">
+            
+                <a href="Debug.html#hiding-newtypes">
+            
+                    
+                    Hiding newtypes
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.3.3" data-path="Debug.html">
+            
+                <a href="Debug.html#format-with">
+            
+                    
+                    Alternative format function
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.3.4" data-path="Debug.html">
+            
+                <a href="Debug.html#custom-bound">
+            
+                    
+                    Custom bound
+            
+                </a>
+            
+
+            
+        </li>
+    
+
+            </ul>
+            
+        </li>
+    
+        <li class="chapter " data-level="1.4" data-path="Default.html">
+            
+                <a href="Default.html">
+            
+                    
+                    Default trait
+            
+                </a>
+            
+
+            
+            <ul class="articles">
+                
+    
+        <li class="chapter " data-level="1.4.1" data-path="Default.html">
+            
+                <a href="Default.html#default-enumeration">
+            
+                    
+                    Default enumeration
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.4.2" data-path="Default.html">
+            
+                <a href="Default.html#setting-the-value-of-a-field">
+            
+                    
+                    Setting the value of a field
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.4.3" data-path="Default.html">
+            
+                <a href="Default.html#new-function">
+            
+                    
+                    new function
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.4.4" data-path="Default.html">
+            
+                <a href="Default.html#custom-bound">
+            
+                    
+                    Custom bound
+            
+                </a>
+            
+
+            
+        </li>
+    
+
+            </ul>
+            
+        </li>
+    
+        <li class="chapter " data-level="1.5" data-path="Hash.html">
+            
+                <a href="Hash.html">
+            
+                    
+                    Hash trait
+            
+                </a>
+            
+
+            
+            <ul class="articles">
+                
+    
+        <li class="chapter " data-level="1.5.1" data-path="Hash.html">
+            
+                <a href="Hash.html#ignoring-a-field">
+            
+                    
+                    Ignoring fields
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.5.2" data-path="Debug.html">
+            
+                <a href="Debug.html#hash-with">
+            
+                    
+                    Alternative hash function
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.5.3" data-path="Hash.html">
+            
+                <a href="Hash.html#custom-bound">
+            
+                    
+                    Custom bound
+            
+                </a>
+            
+
+            
+        </li>
+    
+
+            </ul>
+            
+        </li>
+    
+        <li class="chapter active" data-level="1.6" data-path="cmp.html">
+            
+                <a href="cmp.html">
+            
+                    
+                    Comparison traits
+            
+                </a>
+            
+
+            
+            <ul class="articles">
+                
+    
+        <li class="chapter " data-level="1.6.1" data-path="cmp.html">
+            
+                <a href="cmp.html#enumerations">
+            
+                    
+                    Note about enumerations
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.6.2" data-path="cmp.html">
+            
+                <a href="cmp.html#ignoring-a-field">
+            
+                    
+                    Ignoring fields
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.6.3" data-path="cmp.html">
+            
+                <a href="cmp.html#compare-with">
+            
+                    
+                    Alternative comparison function
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.6.4" data-path="cmp.html">
+            
+                <a href="cmp.html#custom-bound">
+            
+                    
+                    Custom bound
+            
+                </a>
+            
+
+            
+        </li>
+    
+
+            </ul>
+            
+        </li>
+    
+
+    
+
+    <li class="divider"></li>
+
+    <li>
+        <a href="https://www.gitbook.com" target="blank" class="gitbook-link">
+            Published with GitBook
+        </a>
+    </li>
+</ul>
+
+
+                </nav>
+            
+        
+    </div>
+
+    <div class="book-body">
+        
+            <div class="body-inner">
+                
+                    
+
+<div class="book-header" role="navigation">
+    
+
+    <!-- Title -->
+    <h1>
+        <i class="fa fa-circle-o-notch fa-spin"></i>
+        <a href="." >Comparison traits</a>
+    </h1>
+</div>
+
+
+
+
+                    <div class="page-wrapper" tabindex="-1" role="main">
+                        <div class="page-inner">
+                            
+                                <section class="normal markdown-section">
+                                
+                                <h1 id="custom-attributes"><a name="custom-attributes" class="plugin-anchor" href="#custom-attributes"><i class="fa fa-link" aria-hidden="true"></i></a>Custom attributes</h1>
+<p>The <code>PartialEq</code>, <code>Eq</code>, <code>PartialOrd</code> and <code>Eq</code> and traits support the following attributes:</p>
+<ul>
+<li><strong>Container attributes</strong><ul>
+<li><a href="#custom-bound"><code>&lt;CmpTrait&gt;(bound=&quot;&lt;where-clause or empty&gt;&quot;)</code></a></li>
+</ul>
+</li>
+<li><strong>Field attributes</strong><ul>
+<li><a href="#custom-bound"><code>&lt;CmpTrait&gt;(bound=&quot;&lt;where-clause or empty&gt;&quot;)</code></a></li>
+</ul>
+</li>
+</ul>
+<p>The <code>PartialEq</code>, <code>PartialOrd</code> and <code>Ord</code> traits also supports the following attributes:</p>
+<ul>
+<li><strong>Container attributes</strong><ul>
+<li><a href="#enumerations"><code>&lt;CmpTrait&gt;=&quot;feature_allow_slow_enum&quot;</code></a></li>
+</ul>
+</li>
+<li><strong>Field attributes</strong><ul>
+<li><a href="#ignoring-a-field"><code>&lt;CmpTrait&gt;=&quot;ignore&quot;</code></a></li>
+<li><a href="#compare-with"><code>&lt;CmpTrait&gt;(compare_with=&quot;&lt;path&gt;&quot;)</code></a></li>
+</ul>
+</li>
+</ul>
+<p>(These attributes are not relevant for <code>Eq</code> which is just a marker trait.)</p>
+<h1 id="enumerations"><a name="enumerations" class="plugin-anchor" href="#enumerations"><i class="fa fa-link" aria-hidden="true"></i></a>Enumerations</h1>
+<p>Unfortunately, there is no way for derivative to derive <code>PartialOrd</code> or <code>Ord</code> on
+enumerations as efficiently as the built-in <code>derive(&#x2026;)</code> yet.</p>
+<p>If you want to use derivative on enumerations anyway, you can add</p>
+<pre><code class="lang-rust"><span class="hljs-meta">#[derivative(PartialOrd=<span class="hljs-meta-string">&quot;feature_allow_slow_enum&quot;</span>)]</span>
+</code></pre>
+<p>to your enumeration. This acts as a &#x201C;feature-gate&#x201D;.</p>
+<p>This attribute is also allowed for <code>PartialEq</code> for historical reason. It is not
+necessary anymore as of v2.1.0. It was never necessary nor allowed for <code>Eq</code>.</p>
+<h1 id="ignoring-a-field"><a name="ignoring-a-field" class="plugin-anchor" href="#ignoring-a-field"><i class="fa fa-link" aria-hidden="true"></i></a>Ignoring a field</h1>
+<p>You can use <em>derivative</em> to ignore a field when comparing:</p>
+<pre><code class="lang-rust"><span class="hljs-meta">#[derive(Derivative)]</span>
+<span class="hljs-meta">#[derivative(PartialEq)]</span>
+<span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">Foo</span></span> {
+    foo: <span class="hljs-keyword">u8</span>,
+    <span class="hljs-meta">#[derivative(PartialEq=<span class="hljs-meta-string">&quot;ignore&quot;</span>)]</span>
+    bar: <span class="hljs-keyword">u8</span>,
+}
+
+<span class="hljs-built_in">assert!</span>(Foo { foo: <span class="hljs-number">0</span>, bar: <span class="hljs-number">42</span> } == Foo { foo: <span class="hljs-number">0</span>, bar: <span class="hljs-number">7</span>});
+<span class="hljs-built_in">assert!</span>(Foo { foo: <span class="hljs-number">42</span>, bar: <span class="hljs-number">0</span> } != Foo { foo: <span class="hljs-number">7</span>, bar: <span class="hljs-number">0</span>});
+</code></pre>
+<h1 id="compare-with"><a name="compare-with" class="plugin-anchor" href="#compare-with"><i class="fa fa-link" aria-hidden="true"></i></a>Compare with</h1>
+<p>Usually fields are compared using <code>==</code>, <code>PartialOrd::partial_cmp</code> or <code>Ord::cmp</code>. You can use an alternative comparison
+function if you like:</p>
+<pre><code class="lang-rust"><span class="hljs-meta">#[derive(Derivative)]</span>
+<span class="hljs-meta">#[derivative(PartialEq)]</span>
+<span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">Foo</span></span> {
+    foo: <span class="hljs-keyword">u32</span>,
+    <span class="hljs-meta">#[derivative(PartialEq(compare_with=<span class="hljs-meta-string">&quot;path::to::my_cmp_fn&quot;</span>))]</span>
+    bar: SomeTypeThatMightNotBePartialEq,
+}
+</code></pre>
+<p><code>foo</code> will be compared with <code>==</code> and <code>bar</code> will be compared with
+<code>path::to::my_cmp_fn</code> which must have the following prototype:</p>
+<table>
+<thead>
+<tr>
+<th>Trait</th>
+<th>Signature</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>PartialEq</code></td>
+<td><code>fn my_cmp_fn(&amp;T, &amp;T) -&gt; bool;</code></td>
+</tr>
+<tr>
+<td><code>PartialOrd</code></td>
+<td><code>fn my_cmp_fn(&amp;T, &amp;T) -&gt; std::option::Option&lt;std::cmp::Ordering&gt;;</code></td>
+</tr>
+<tr>
+<td><code>Ord</code></td>
+<td><code>fn my_cmp_fn(&amp;T, &amp;T) -&gt; std::cmp::Ordering;</code></td>
+</tr>
+</tbody>
+</table>
+<h1 id="custom-bound"><a name="custom-bound" class="plugin-anchor" href="#custom-bound"><i class="fa fa-link" aria-hidden="true"></i></a>Custom bound</h1>
+<p>Usually if you derive <code>CmpTrait</code>, a <code>T: CmpTrait</code> bound is added for each type parameter <code>T</code>. You can use
+override this behavior if the inferred bound is not correct for you.</p>
+<p>Eg. comparing raw pointers does not require the type to be <code>Eq</code>, so you could
+use:</p>
+<pre><code class="lang-rust"><span class="hljs-meta">#[derive(Derivative)]</span>
+<span class="hljs-meta">#[derivative(Eq)]</span>
+<span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">WithPtr</span></span>&lt;T: ?<span class="hljs-built_in">Sized</span>&gt; {
+    <span class="hljs-meta">#[derivative(Eq(bound=<span class="hljs-meta-string">&quot;&quot;</span>))]</span>
+    foo: *<span class="hljs-keyword">const</span> T
+}
+</code></pre>
+<p>See <a href="Default.html#custom-bound"><code>Default</code>&apos;s documentation</a> for more details.</p>
+
+                                
+                                </section>
+                            
+                        </div>
+                    </div>
+                
+            </div>
+
+            
+                
+                <a href="Hash.html#custom-bound" class="navigation navigation-prev " aria-label="Previous page: Custom bound">
+                    <i class="fa fa-angle-left"></i>
+                </a>
+                
+                
+                <a href="cmp.html#enumerations" class="navigation navigation-next " aria-label="Next page: Note about enumerations">
+                    <i class="fa fa-angle-right"></i>
+                </a>
+                
+            
+        
+    </div>
+
+    <script>
+        var gitbook = gitbook || [];
+        gitbook.push(function() {
+            gitbook.page.hasChanged({"page":{"title":"Comparison traits","level":"1.6","depth":1,"next":{"title":"Note about enumerations","level":"1.6.1","depth":2,"anchor":"#enumerations","path":"cmp.md","ref":"cmp.md#enumerations","articles":[]},"previous":{"title":"Custom bound","level":"1.5.3","depth":2,"anchor":"#custom-bound","path":"Hash.md","ref":"Hash.md#custom-bound","articles":[]},"dir":"ltr"},"config":{"plugins":["-search","-sharing","codesnippet","edit-link","anchors"],"root":"doc","styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"pluginsConfig":{"edit-link":{"label":"Edit","base":"https://github.com/mcarton/rust-derivative/tree/master/doc"},"codesnippet":{},"anchors":{},"highlight":{},"lunr":{"maxIndexSize":1000000,"ignoreSpecialCharacters":false},"fontsettings":{"theme":"white","family":"sans","size":2},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false}},"theme":"default","pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"variables":{},"title":"Derivative","language":"en","gitbook":"*"},"file":{"path":"cmp.md","mtime":"2020-03-29T20:30:52.099Z","type":"markdown"},"gitbook":{"version":"3.2.3","time":"2020-03-29T20:31:46.320Z"},"basePath":".","book":{"language":""}});
+        });
+    </script>
+</div>
+
+        
+    <script src="gitbook/gitbook.js"></script>
+    <script src="gitbook/theme.js"></script>
+    
+        
+        <script src="gitbook/gitbook-plugin-edit-link/plugin.js"></script>
+        
+    
+        
+        <script src="gitbook/gitbook-plugin-lunr/lunr.min.js"></script>
+        
+    
+        
+        <script src="gitbook/gitbook-plugin-lunr/search-lunr.js"></script>
+        
+    
+        
+        <script src="gitbook/gitbook-plugin-fontsettings/fontsettings.js"></script>
+        
+    
+
+    </body>
+</html>
+
