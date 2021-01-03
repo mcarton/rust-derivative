@@ -81,6 +81,7 @@ jobs:
       matrix:
         rust:
           - 1.34.0
+          - stable
         features:
           - ''
           - 'use_core'
