@@ -95,4 +95,4 @@ jobs:
       - uses: actions-rs/cargo@v1
         with:
           command: clippy
-          args: --features=${{ matrix.features }} -- -D warnings
+          args: --all-targets --features=${{ matrix.features }} -- -D warnings
