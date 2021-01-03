@@ -1,6 +1,9 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## 2.1.2
+* Fix bug when used in combination with other attributes ([#79]).
+
 ## 2.1.1
 * Improve error reporting. ([#70])
 * Fix a Clippy warning in generated code. ([#71]).
@@ -58,3 +61,4 @@ This is the last version to support rustc versions 1.15 to 1.33.
 [#68]: https://github.com/mcarton/rust-derivative/pull/68
 [#70]: https://github.com/mcarton/rust-derivative/pull/70
 [#71]: https://github.com/mcarton/rust-derivative/pull/71
+[#79]: https://github.com/mcarton/rust-derivative/pull/79
