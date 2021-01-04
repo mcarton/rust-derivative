@@ -73,6 +73,14 @@ jobs:
         with:
           command: test
           args: --features=${{ matrix.features }} ${{ matrix.extra_args }}
+      - uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: stable
+      - run: cargo +stable install mdbook --no-default-features --features search --vers "^0.4.0"
+      - run: mdbook build
+      - run: mdbook test -L ./target/debug/deps/
+        if: ${{ matrix.features }} != 'use_core'
 
   clippy:
     name: Clippy
