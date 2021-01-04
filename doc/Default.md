@@ -8,7 +8,7 @@ The `Default` trait supports the following attributes:
     * [`Default`](#default-enumeration)
 * **Field attributes**
     * [`Default(bound="<where-clause or empty>")`](#custom-bound)
-    * [`Default(value="<expr>")`](#ignoring-a-field)
+    * [`Default(value="<expr>")`](#setting-the-value-of-a-field)
 
 # Default enumeration
 
