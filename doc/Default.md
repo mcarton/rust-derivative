@@ -17,6 +17,8 @@ This does not work with *rustc*'s `#[derive(Default)]`.
 All you need is to specify what variant is the default value:
 
 ```rust
+# extern crate derivative;
+# use derivative::Derivative;
 #[derive(Debug, Derivative)]
 #[derivative(Default)]
 enum Enum {
@@ -34,6 +36,8 @@ You can use *derivative* to change the default value of a field in a `Default`
 implementation:
 
 ```rust
+# extern crate derivative;
+# use derivative::Derivative;
 #[derive(Debug, Derivative)]
 #[derivative(Default)]
 struct Foo {
@@ -51,6 +55,8 @@ You can use *derivative* to derive a convenience `new` method for your type
 that calls `Default::default`:
 
 ```rust
+# extern crate derivative;
+# use derivative::Derivative;
 #[derive(Debug, Derivative)]
 #[derivative(Default(new="true"))]
 struct Foo {
@@ -66,7 +72,9 @@ println!("{:?}", Foo::new()); // Foo { foo: 0, bar: 0 }
 The following does not work because `derive` adds a `T: Default` bound on the
 `impl Default for Foo<T>`:
 
-```rust
+```rust,compile_fail
+# extern crate derivative;
+# use derivative::Derivative;
 #[derive(Default)]
 struct Foo<T> {
     foo: Option<T>,
@@ -74,7 +82,7 @@ struct Foo<T> {
 
 struct NonDefault;
 
-Foo::<NonDefault>::default() // gives:
+Foo::<NonDefault>::default(); // gives:
 // error: no associated item named `default` found for type `Foo<NonDefault>` in the current scope
 //  = note: the method `default` exists but the following trait bounds were not satisfied: `NonDefault : std::default::Default`
 ```
@@ -84,6 +92,8 @@ That bound however is useless as `Option<T>: Default` for any `T`.
 correct:
 
 ```rust
+# extern crate derivative;
+# use derivative::Derivative;
 #[derive(Derivative)]
 #[derivative(Default(bound=""))] // don't need any bound
 struct Foo<T> {
@@ -92,5 +102,5 @@ struct Foo<T> {
 
 struct NonDefault;
 
-Foo::<NonDefault>::default() // works!
+Foo::<NonDefault>::default(); // works!
 ```

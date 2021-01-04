@@ -13,6 +13,8 @@ The `Hash` trait supports the following attributes:
 You can use *derivative* to ignore fields from a `Hash` implementation:
 
 ```rust
+# extern crate derivative;
+# use derivative::Derivative;
 #[derive(Derivative)]
 #[derivative(Hash)]
 struct Foo {
@@ -26,7 +28,14 @@ struct Bar {
     foo: u8,
 }
 
-assert_eq!(hash(Foo { foo: 42, bar: -1337 }), hash(Bar { foo: 42 }));
+# fn hash<T: std::hash::Hash>(t: &T) -> u64 {
+#     use std::hash::Hasher;
+#     let mut s = std::collections::hash_map::DefaultHasher::new();
+#     t.hash(&mut s);
+#     s.finish()
+# }
+# 
+assert_eq!(hash(&Foo { foo: 42, bar: -1337 }), hash(&Bar { foo: 42 }));
 ```
 
 # Hash with
@@ -34,6 +43,15 @@ assert_eq!(hash(Foo { foo: 42, bar: -1337 }), hash(Bar { foo: 42 }));
 You can pass a field to a hash function:
 
 ```rust
+# extern crate derivative;
+# use derivative::Derivative;
+# mod path {
+#   pub struct SomeTypeThatMightNotBeHash;
+#   pub mod to {
+#     pub fn my_hash_fn<H>(_: &super::SomeTypeThatMightNotBeHash, state: &mut H) where H: std::hash::Hasher { unimplemented!() }
+#   }
+# }
+# use path::SomeTypeThatMightNotBeHash;
 #[derive(Derivative)]
 #[derivative(Hash)]
 struct Foo {
@@ -48,7 +66,7 @@ where `state` is the current [`Hasher`].
 
 The function must the following prototype:
 
-```rust
+```rust,ignore
 fn my_hash_fn<H>(&T, state: &mut H) where H: Hasher;
 ```
 

@@ -17,6 +17,8 @@ You can use *derivative* to hide fields from a structure or enumeration `Debug`
 implementation:
 
 ```rust
+# extern crate derivative;
+# use derivative::Derivative;
 #[derive(Derivative)]
 #[derivative(Debug)]
 struct Foo {
@@ -34,6 +36,8 @@ You can use *derivative* to automatically unwrap newtypes and enumeration
 variants with only one field:
 
 ```rust
+# extern crate derivative;
+# use derivative::Derivative;
 #[derive(Derivative)]
 #[derivative(Debug="transparent")]
 struct A(isize);
@@ -58,6 +62,15 @@ println!("{:?}", C::Foo(42)); // Foo(42)
 You can pass a field to a format function:
 
 ```rust
+# extern crate derivative;
+# use derivative::Derivative;
+# mod path {
+#   pub struct SomeTypeThatMightNotBeDebug;
+#   pub mod to {
+#     pub fn my_fmt_fn(_: &super::SomeTypeThatMightNotBeDebug, _: &mut std::fmt::Formatter) -> Result<(), std::fmt::Error> { unimplemented!() }
+#   }
+# }
+# use path::SomeTypeThatMightNotBeDebug;
 #[derive(Derivative)]
 #[derivative(Debug)]
 struct Foo {
@@ -72,7 +85,7 @@ where `fmt` is the current [`Formatter`].
 
 The function must the following prototype:
 
-```rust
+```rust,ignore
 fn fmt(&T, &mut std::fmt::Formatter) -> Result<(), std::fmt::Error>;
 ```
 
@@ -84,8 +97,14 @@ of the current type. If you do not want that, you can specify an explicit bound:
 * Either on the type. This replaces all bounds:
 
 ```rust
+# extern crate derivative;
+# use derivative::Derivative;
+# trait MyDebug {
+#   fn my_fmt(&self, _: &mut std::fmt::Formatter) -> Result<(), std::fmt::Error>;
+# }
+# use std::fmt::Debug;
 #[derive(Derivative)]
-#[derivative(Debug(bound="T: Debug, U:MyDebug")]
+#[derivative(Debug(bound="T: Debug, U: MyDebug"))]
 struct Foo<T, U> {
     foo: T,
     #[derivative(Debug(format_with="MyDebug::my_fmt"))]
@@ -96,6 +115,11 @@ struct Foo<T, U> {
 * Or on a field. This replaces the bound *derivative* guessed for that field. The example below is equivalent to the above:
 
 ```rust
+# extern crate derivative;
+# use derivative::Derivative;
+# trait MyDebug {
+#   fn my_fmt(&self, _: &mut std::fmt::Formatter) -> Result<(), std::fmt::Error>;
+# }
 #[derive(Derivative)]
 #[derivative(Debug)]
 struct Foo<T, U> {
