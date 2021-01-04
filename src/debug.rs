@@ -31,7 +31,12 @@ pub fn derive(input: &ast::Input) -> proc_macro2::TokenStream {
                 let arg = &bi.ident;
 
                 let dummy_debug = bi.field.attrs.debug_format_with().map(|format_fn| {
-                    format_with(bi.field, &arg, format_fn, input.generics.clone())
+                    format_with(
+                        bi.field,
+                        &input.attrs.debug_bound(),
+                        &arg,
+                        format_fn,
+                        input.generics.clone())
                 });
 
                 let builder = if let Some(ref name) = bi.field.ident {
@@ -129,6 +134,7 @@ fn phantom_path() -> syn::Path {
 
 fn format_with(
     f: &ast::Field,
+    bounds: &Option<&[syn::WherePredicate]>,
     arg_n: &syn::Ident,
     format_fn: &syn::Path,
     mut generics: syn::Generics,
@@ -168,6 +174,7 @@ fn format_with(
                 bounds,
             })
         })
+        .chain(bounds.iter().flat_map(|b| b.iter().cloned()))
         .collect::<Vec<_>>();
     generics
         .make_where_clause()
@@ -189,13 +196,17 @@ fn format_with(
     let (_, ctor_ty_generics, _) = ctor_generics.split_for_impl();
     let ctor_ty_generics = ctor_ty_generics.as_turbofish();
 
+    // don't attach a span to prevent issue #58
+    let match_self = quote!(match self.0);
     quote_spanned!(format_fn.span()=>
         let #arg_n = {
             struct Dummy #impl_generics (&'_derivative #ty, #phantom_path <(#(#phantom,)*)>) #where_clause;
 
             impl #impl_generics #debug_trait_path for Dummy #ty_generics #where_clause {
                 fn fmt(&self, __f: &mut #fmt_path::Formatter) -> #fmt_path::Result {
-                    #format_fn(&self.0, __f)
+                    #match_self {
+                        this => #format_fn(this, __f)
+                    }
                 }
             }
 
