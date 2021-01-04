@@ -1,6 +1,6 @@
-#use std::{cmp, hash};
-##[derive(PartialEq, Hash)]
-#struct Identifier;
+# use std::{cmp, hash};
+# #[derive(PartialEq, Hash)]
+# struct Identifier;
 pub struct Version {
     /// The major version.
     pub major: u64,

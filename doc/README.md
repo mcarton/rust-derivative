@@ -23,7 +23,7 @@ With *derivative*
 </tr>
 <tr>
 </tr>
-<tr>
+<tr class="readme-example">
 <td>
 
 {{#playground default-enum.rs}}
@@ -50,7 +50,7 @@ With *derivative*
 </tr>
 <tr>
 </tr>
-<tr>
+<tr class="readme-example">
 <td>
 
 {{#playground default-value.rs}}
@@ -78,7 +78,7 @@ With *derivative*
 </tr>
 <tr>
 </tr>
-<tr>
+<tr class="readme-example">
 <td>
 
 {{#playground debug-transparent.rs}}
@@ -106,7 +106,7 @@ With *derivative*
 </tr>
 <tr>
 </tr>
-<tr>
+<tr class="readme-example">
 <td>
 
 {{#playground eq-ignore.rs}}

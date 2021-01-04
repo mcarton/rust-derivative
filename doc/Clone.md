@@ -8,7 +8,7 @@ The `Copy` and `Clone` traits support the following attributes:
 * **Field attributes**
     * [`<Copy or Clone>(bound="<where-clause or empty>")`](#custom-bound)
 
-# <a id="clone-from"/> `clone_from`
+# `clone_from`
 
 The [`Clone`] trait has a default implementation for [`clone_from`] and
 `derive(Clone)` never implements that method. *derivative* can implement it if

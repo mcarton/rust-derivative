@@ -23,7 +23,7 @@ enumerations as efficiently as the built-in `derive(…)` yet.
 
 If you want to use derivative on enumerations anyway, you can add
 
-```rust
+```rust,ignore
 #[derivative(PartialOrd="feature_allow_slow_enum")]
 ```
 
@@ -37,6 +37,8 @@ necessary anymore as of v2.1.0. It was never necessary nor allowed for `Eq`.
 You can use *derivative* to ignore a field when comparing:
 
 ```rust
+# extern crate derivative;
+# use derivative::Derivative;
 #[derive(Derivative)]
 #[derivative(PartialEq)]
 struct Foo {
@@ -55,6 +57,15 @@ Usually fields are compared using `==`, `PartialOrd::partial_cmp` or `Ord::cmp`.
 function if you like:
 
 ```rust
+# extern crate derivative;
+# use derivative::Derivative;
+# mod path {
+#   pub struct SomeTypeThatMightNotBePartialEq;
+#   pub mod to {
+#     pub fn my_cmp_fn(_: &super::SomeTypeThatMightNotBePartialEq, _: &super::SomeTypeThatMightNotBePartialEq) -> bool { false }
+#   }
+# }
+# use path::SomeTypeThatMightNotBePartialEq;
 #[derive(Derivative)]
 #[derivative(PartialEq)]
 struct Foo {
@@ -69,9 +80,9 @@ struct Foo {
 
 | Trait        | Signature |
 |--------------|-----------|
-| `PartialEq`  | `fn my_cmp_fn(&T, &T) -> bool;`
-| `PartialOrd` | `fn my_cmp_fn(&T, &T) -> std::option::Option<std::cmp::Ordering>;`
-| `Ord`        | `fn my_cmp_fn(&T, &T) -> std::cmp::Ordering;`
+| `PartialEq`  | <span class="rust">`fn my_cmp_fn(&T, &T) -> bool;`</span>
+| `PartialOrd` | <span class="rust">`fn my_cmp_fn(&T, &T) -> std::option::Option<std::cmp::Ordering>;`</span>
+| `Ord`        | <span class="rust">`fn my_cmp_fn(&T, &T) -> std::cmp::Ordering;`</span>
 
 # Custom bound
 
@@ -82,10 +93,12 @@ Eg. comparing raw pointers does not require the type to be `Eq`, so you could
 use:
 
 ```rust
+# extern crate derivative;
+# use derivative::Derivative;
 #[derive(Derivative)]
-#[derivative(Eq)]
+#[derivative(PartialEq)]
 struct WithPtr<T: ?Sized> {
-    #[derivative(Eq(bound=""))]
+    #[derivative(PartialEq(bound=""))]
     foo: *const T
 }
 ```

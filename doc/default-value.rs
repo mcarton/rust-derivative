@@ -1,4 +1,5 @@
-#use derivative::Derivative;
+# extern crate derivative;
+# use derivative::Derivative;
 #[derive(Derivative)]
 #[derivative(Default)]
 pub struct RegexOptions {
