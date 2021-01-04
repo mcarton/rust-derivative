@@ -1,3 +1,8 @@
+# #![no_implicit_prelude]
+# extern crate core;
+# use core::default::Default;
+# use Option::None;
+#
 pub enum Option<T> {
     /// No value
     None,

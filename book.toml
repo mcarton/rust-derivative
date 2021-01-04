@@ -1,0 +1,15 @@
+[book]
+title = "Derivative"
+src = "doc"
+
+[rust]
+edition = "2018"
+
+[build]
+create-missing = false
+
+[output.html.search]
+limit-results = 15
+
+[output.html]
+additional-css = ["doc/custom.css"]
