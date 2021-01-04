@@ -6,5 +6,4 @@ error[E0277]: `U` doesn't implement `std::fmt::Debug`
    |
    = help: the trait `std::fmt::Debug` is not implemented for `U`
    = help: consider adding a `where U: std::fmt::Debug` bound
-   = note: required because of the requirements on the impl of `std::fmt::Debug` for `&U`
    = note: required by `std::fmt::Debug::fmt`

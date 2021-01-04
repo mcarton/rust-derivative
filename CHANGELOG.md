@@ -1,6 +1,10 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+
+## Next version
+* Fix bug with `Debug` bounds
+
 ## 2.1.3
 * Fix Clippy warning ([#81]).
 

@@ -15,7 +15,7 @@ struct Foo<T, U> {
 }
 
 #[derive(Derivative)]
-#[derivative(Debug(bound="T: std::fmt::Debug, U:MyDebug"))]
+#[derivative(Debug(bound="T: std::fmt::Debug, U: MyDebug"))]
 struct Foo2<T, U> {
     foo: T,
     #[derivative(Debug(format_with="MyDebug::my_fmt"))]
@@ -31,7 +31,7 @@ struct Bar<T, U> (
 );
 
 #[derive(Derivative)]
-#[derivative(Debug(bound="T: std::fmt::Debug, U:MyDebug"))]
+#[derivative(Debug(bound="T: std::fmt::Debug, U: MyDebug"))]
 struct Bar2<T, U> (
     T,
     #[derivative(Debug(format_with="MyDebug::my_fmt"))]
