@@ -10,30 +10,113 @@ just `derive`.
 
 You can derive `Default` on enumerations:
 
-| With *derivative* | [Original][default-enum-source] |
-|-------------------|---------------------------------|
-| {% codesnippet "default-enum.rs" %}{% endcodesnippet %} | {% codesnippet "default-enum-orig.rs" %}{% endcodesnippet %} |
+<table>
+<tr>
+<th>
 
+With *derivative*
+</th>
+<th>
+    
+[Original][default-value-source]
+</th>
+</tr>
+<tr>
+</tr>
+<tr>
+<td>
+
+{{#playground default-enum.rs}}
+</td>
+<td>
+
+{{#playground default-enum-orig.rs}}
+</td>
+</tr>
+</table>
 
 You can use different default values for some fields:
 
-| With *derivative* | [Original][default-value-source] |
-|-------------------|---------------------------------|
-| {% codesnippet "default-value.rs" %}{% endcodesnippet %} | {% codesnippet "default-value-orig.rs" %}{% endcodesnippet %} |
+<table>
+<tr>
+<th>
+
+With *derivative*
+</th>
+<th>
+    
+[Original][default-value-source]
+</th>
+</tr>
+<tr>
+</tr>
+<tr>
+<td>
+
+{{#playground default-value.rs}}
+</td>
+<td>
+
+{{#playground default-value-orig.rs}}
+</td>
+</tr>
+</table>
 
 
 Want a transparent `Debug` implementation for your wrapper? We got that:
 
-| With *derivative* | [Original][transparent-source] |
-|-------------------|---------------------------------|
-| {% codesnippet "debug-transparent.rs" %}{% endcodesnippet %} | {% codesnippet "debug-transparent-orig.rs" %}{% endcodesnippet %} |
+<table>
+<tr>
+<th>
+
+With *derivative*
+</th>
+<th>
+    
+[Original][transparent-source]
+</th>
+</tr>
+<tr>
+</tr>
+<tr>
+<td>
+
+{{#playground debug-transparent.rs}}
+</td>
+<td>
+
+{{#playground debug-transparent-orig.rs}}
+</td>
+</tr>
+</table>
 
 
 Need to ignore a field? We got that too:
 
-| With *derivative* | [Original][eq-ignore-source] |
-|-------------------|---------------------------------|
-| {% codesnippet "eq-ignore.rs" %}{% endcodesnippet %} | {% codesnippet "eq-ignore-orig.rs" %}{% endcodesnippet %} |
+<table>
+<tr>
+<th>
+
+With *derivative*
+</th>
+<th>
+    
+[Original][eq-ignore-source]
+</th>
+</tr>
+<tr>
+</tr>
+<tr>
+<td>
+
+{{#playground eq-ignore.rs}}
+</td>
+<td>
+
+{{#playground eq-ignore-orig.rs}}
+</td>
+</tr>
+</table>
 
 
 [default-value-source]: https://github.com/rust-lang-nursery/regex/blob/3cfef1e79d135a3e8a670aff53e7fabef453a3e1/src/re_builder.rs#L12-L39

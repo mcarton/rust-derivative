@@ -1,3 +1,4 @@
+#use std::fmt;
 pub struct Wrapping<T>(pub T);
 
 impl<T: fmt::Debug> fmt::Debug for Wrapping<T> {

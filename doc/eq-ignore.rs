@@ -1,3 +1,6 @@
+#use derivative::Derivative;
+##[derive(PartialEq, Hash)]
+#struct Identifier;
 #[derive(Derivative)]
 #[derivative(PartialEq, Hash)]
 pub struct Version {
