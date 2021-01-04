@@ -2,4 +2,15 @@
     position: relative;
     left: 50%;
     transform: translateX(-50%);
+
+    margin-left: 0px;
+    margin-right: 0px;
+}
+
+#content > main > table td {
+	vertical-align: top;
+}
+
+#content > main > table .hljs {
+    background: none;
 }
