@@ -23,6 +23,7 @@ pub struct Input {
     pub partial_ord: Option<InputPartialOrd>,
     /// Whether `Ord` is present and its specific attributes.
     pub ord: Option<InputOrd>,
+    pub is_packed: bool,
 }
 
 #[derive(Debug, Default)]
@@ -263,7 +264,10 @@ impl Input {
         attrs: &[syn::Attribute],
         errors: &mut proc_macro2::TokenStream,
     ) -> Result<Input, ()> {
-        let mut input = Input::default();
+        let mut input = Input {
+            is_packed: attrs.iter().any(has_repr_packed_attr),
+            ..Default::default()
+        };
 
         for_all_attr! {
             errors;
@@ -862,4 +866,22 @@ fn ensure_str_lit<'a>(
         });
         Err(())
     }
+}
+
+pub fn has_repr_packed_attr(attr: &syn::Attribute) -> bool {
+    if let Ok(attr) = attr.parse_meta() {
+        if attr.path().get_ident().map(|i| i == "repr") == Some(true) {
+            if let syn::Meta::List(items) = attr {
+                for item in items.nested {
+                    if let syn::NestedMeta::Meta(item) = item {
+                        if item.path().get_ident().map(|i| i == "packed") == Some(true) {
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    false
 }

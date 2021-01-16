@@ -20,7 +20,7 @@ pub fn derive(input: &ast::Input) -> proc_macro2::TokenStream {
         None
     };
 
-    let body = matcher::Matcher::new(matcher::BindingStyle::Ref).build_arms(
+    let body = matcher::Matcher::new(matcher::BindingStyle::Ref, input.attrs.is_packed).build_arms(
         input,
         "__arg",
         |_, _, _, _, _, bis| {
@@ -29,15 +29,15 @@ pub fn derive(input: &ast::Input) -> proc_macro2::TokenStream {
                     return None;
                 }
 
-                let arg = &bi.ident;
+                let arg = &bi.expr;
 
                 if let Some(hash_with) = bi.field.attrs.hash_with() {
                     Some(quote! {
-                        #hash_with(#arg, __state);
+                        #hash_with(&#arg, __state);
                     })
                 } else {
                     Some(quote! {
-                        #hash_trait_path::hash(#arg, __state);
+                        #hash_trait_path::hash(&#arg, __state);
                     })
                 }
             });

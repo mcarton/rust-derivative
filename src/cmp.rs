@@ -38,20 +38,20 @@ pub fn derive_partial_eq(input: &ast::Input) -> proc_macro2::TokenStream {
     } else {
         quote!(true)
     };
-    let body = matcher::Matcher::new(matcher::BindingStyle::Ref).build_2_arms(
+    let body = matcher::Matcher::new(matcher::BindingStyle::Ref, input.attrs.is_packed).build_2_arms(
         (input, "__self"),
         (input, "__other"),
         |_, _, _, (left_variant, right_variant)| {
             let cmp = left_variant.iter().zip(&right_variant).map(|(o, i)| {
-                let outer_name = &o.ident;
-                let inner_name = &i.ident;
+                let outer_name = &o.expr;
+                let inner_name = &i.expr;
 
                 if o.field.attrs.ignore_partial_eq() {
                     None
                 } else if let Some(compare_fn) = o.field.attrs.partial_eq_compare_with() {
-                    Some(quote!(&& #compare_fn(#outer_name, #inner_name)))
+                    Some(quote!(&& #compare_fn(&#outer_name, &#inner_name)))
                 } else {
-                    Some(quote!(&& #outer_name == #inner_name))
+                    Some(quote!(&& &#outer_name == &#inner_name))
                 }
             });
 
@@ -107,11 +107,11 @@ pub fn derive_partial_ord(input: &ast::Input, errors: &mut proc_macro2::TokenStr
     let option_path = option_path();
     let ordering_path = ordering_path();
 
-    let body = matcher::Matcher::new(matcher::BindingStyle::Ref).build_arms(
+    let body = matcher::Matcher::new(matcher::BindingStyle::Ref, input.attrs.is_packed).build_arms(
         input,
         "__self",
         |_, n, _, _, _, outer_bis| {
-            let body = matcher::Matcher::new(matcher::BindingStyle::Ref).build_arms(
+            let body = matcher::Matcher::new(matcher::BindingStyle::Ref, input.attrs.is_packed).build_arms(
                 input,
                 "__other",
                 |_, m, _, _, _, inner_bis| match n.cmp(&m) {
@@ -126,8 +126,8 @@ pub fn derive_partial_ord(input: &ast::Input, errors: &mut proc_macro2::TokenStr
                             .rev()
                             .zip(inner_bis.into_iter().rev())
                             .fold(quote!(#option_path::Some(#equal_path)), |acc, (o, i)| {
-                                let outer_name = &o.ident;
-                                let inner_name = &i.ident;
+                                let outer_name = &o.expr;
+                                let inner_name = &i.expr;
 
                                 if o.field.attrs.ignore_partial_ord() {
                                     acc
@@ -142,7 +142,7 @@ pub fn derive_partial_ord(input: &ast::Input, errors: &mut proc_macro2::TokenStr
                                             quote!(#path::partial_cmp)
                                         });
 
-                                    quote!(match #cmp_fn(&(*#outer_name), &(*#inner_name)) {
+                                    quote!(match #cmp_fn(&#outer_name, &#inner_name) {
                                         #option_path::Some(#equal_path) => #acc,
                                         __derive_ordering_other => __derive_ordering_other,
                                     })
@@ -199,11 +199,11 @@ pub fn derive_ord(input: &ast::Input, errors: &mut proc_macro2::TokenStream) -> 
 
     let ordering_path = ordering_path();
 
-    let body = matcher::Matcher::new(matcher::BindingStyle::Ref).build_arms(
+    let body = matcher::Matcher::new(matcher::BindingStyle::Ref, input.attrs.is_packed).build_arms(
         input,
         "__self",
         |_, n, _, _, _, outer_bis| {
-            let body = matcher::Matcher::new(matcher::BindingStyle::Ref).build_arms(
+            let body = matcher::Matcher::new(matcher::BindingStyle::Ref, input.attrs.is_packed).build_arms(
                 input,
                 "__other",
                 |_, m, _, _, _, inner_bis| match n.cmp(&m) {
@@ -216,8 +216,8 @@ pub fn derive_ord(input: &ast::Input, errors: &mut proc_macro2::TokenStream) -> 
                             .rev()
                             .zip(inner_bis.into_iter().rev())
                             .fold(quote!(#equal_path), |acc, (o, i)| {
-                                let outer_name = &o.ident;
-                                let inner_name = &i.ident;
+                                let outer_name = &o.expr;
+                                let inner_name = &i.expr;
 
                                 if o.field.attrs.ignore_ord() {
                                     acc
@@ -232,7 +232,7 @@ pub fn derive_ord(input: &ast::Input, errors: &mut proc_macro2::TokenStream) -> 
                                             quote!(#path::cmp)
                                         });
 
-                                    quote!(match #cmp_fn(&(*#outer_name), &(*#inner_name)) {
+                                    quote!(match #cmp_fn(&#outer_name, &#inner_name) {
                                        #equal_path => #acc,
                                         __derive_ordering_other => __derive_ordering_other,
                                     })

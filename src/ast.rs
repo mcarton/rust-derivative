@@ -59,7 +59,7 @@ impl<'a> Input<'a> {
             syn::Data::Union(..) => {
                 errors.extend(
                     syn::Error::new_spanned(item, "derivative does not support unions")
-                        .to_compile_error()
+                        .to_compile_error(),
                 );
                 return Err(());
             }

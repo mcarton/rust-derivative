@@ -27,6 +27,17 @@ pub enum BindingStyle {
     RefMut,
 }
 
+impl BindingStyle {
+    fn with_packed(self, is_packed: bool) -> BindingStyle {
+        match self {
+            BindingStyle::Move | BindingStyle::MoveMut => self,
+            BindingStyle::Ref if is_packed => BindingStyle::Move,
+            BindingStyle::RefMut if is_packed => BindingStyle::MoveMut,
+            BindingStyle::Ref | BindingStyle::RefMut => self,
+        }
+    }
+}
+
 impl quote::ToTokens for BindingStyle {
     fn to_tokens(&self, tokens: &mut TokenStream) {
         match *self {
@@ -42,6 +53,7 @@ impl quote::ToTokens for BindingStyle {
 
 #[derive(Debug)]
 pub struct BindingInfo<'a> {
+    pub expr: TokenStream,
     pub ident: syn::Ident,
     pub field: &'a ast::Field<'a>,
 }
@@ -57,13 +69,15 @@ pub struct CommonVariant<'a> {
 pub struct Matcher {
     binding_name: String,
     binding_style: BindingStyle,
+    is_packed: bool,
 }
 
 impl Matcher {
-    pub fn new(style: BindingStyle) -> Self {
+    pub fn new(style: BindingStyle, is_packed: bool) -> Self {
         Matcher {
             binding_name: "__arg".into(),
-            binding_style: style,
+            binding_style: style.with_packed(is_packed),
+            is_packed,
         }
     }
 
@@ -253,10 +267,22 @@ impl Matcher {
             &format!("{}_{}", binding_name, i),
             proc_macro2::Span::call_site(),
         );
+        let expr = syn::Expr::Path(syn::ExprPath {
+            attrs: vec![],
+            qself: None,
+            path: syn::Path::from(ident.clone())
+        });
+
+        let expr = if self.is_packed {
+            expr.into_token_stream()
+        } else {
+            quote!((*#expr))
+        };
 
         f(field, &ident, binding_style).to_tokens(&mut stream);
 
         matches.push(BindingInfo {
+            expr,
             ident,
             field,
         });
