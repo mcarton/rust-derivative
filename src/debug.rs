@@ -13,10 +13,9 @@ pub fn derive(input: &ast::Input) -> proc_macro2::TokenStream {
 
     let formatter = quote_spanned! {input.span=> __f};
 
-    let body = matcher::Matcher::new(matcher::BindingStyle::Ref, input.attrs.is_packed).build_arms(
-        input,
-        "__arg",
-        |_, _, arm_name, style, attrs, bis| {
+    let body = matcher::Matcher::new(matcher::BindingStyle::Ref, input.attrs.is_packed)
+        .with_field_filter(|f: &ast::Field| !f.attrs.ignore_debug())
+        .build_arms(input, "__arg", |_, _, arm_name, style, attrs, bis| {
             let field_prints = bis.iter().filter_map(|bi| {
                 if bi.field.attrs.ignore_debug() {
                     return None;
@@ -38,7 +37,8 @@ pub fn derive(input: &ast::Input) -> proc_macro2::TokenStream {
                         &arg_expr,
                         &arg_ident,
                         format_fn,
-                        input.generics.clone())
+                        input.generics.clone(),
+                    )
                 });
                 let expr = if bi.field.attrs.debug_format_with().is_some() {
                     quote_spanned! {arm_name.span()=>
@@ -84,8 +84,7 @@ pub fn derive(input: &ast::Input) -> proc_macro2::TokenStream {
                     __debug_trait_builder.finish()
                 }
             }
-        },
-    );
+        });
 
     let name = &input.ident;
 
@@ -178,10 +177,7 @@ fn format_with(
 
             syn::WherePredicate::Type(syn::PredicateType {
                 lifetimes: None,
-                bounded_ty: syn::Type::Path(syn::TypePath {
-                    qself: None,
-                    path,
-                }),
+                bounded_ty: syn::Type::Path(syn::TypePath { qself: None, path }),
                 colon_token: Default::default(),
                 bounds,
             })

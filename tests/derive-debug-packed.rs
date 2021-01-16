@@ -1,5 +1,3 @@
-#![allow(dead_code)]
-
 #[cfg(feature = "use_core")]
 extern crate core;
 
@@ -8,6 +6,7 @@ extern crate derivative;
 
 #[derive(Derivative)]
 #[derivative(Debug)]
+#[repr(C, packed)]
 struct Foo {
     foo: u8,
     #[derivative(Debug="ignore")]
@@ -16,6 +15,7 @@ struct Foo {
 
 #[derive(Derivative)]
 #[derivative(Debug)]
+#[repr(C, packed)]
 struct Bar (
     u8,
     #[derivative(Debug="ignore")]
@@ -24,32 +24,31 @@ struct Bar (
 
 #[derive(Derivative)]
 #[derivative(Debug)]
-enum C {
-    V1(isize),
-    V2(#[derivative(Debug="ignore")] i32),
-    V3(String),
-}
-
-#[derive(Derivative)]
-#[derivative(Debug)]
-enum D {
-    V1 {
-        #[derivative(Debug="ignore")]
-        a: isize
-    }
-}
-
-#[derive(Derivative)]
-#[derivative(Debug)]
+#[repr(C, packed)]
 struct F(#[derivative(Debug="ignore")] isize);
 
 #[derive(Derivative)]
 #[derivative(Debug)]
+#[repr(C, packed)]
 struct G(isize, #[derivative(Debug="ignore")] isize);
 
 #[derive(Derivative)]
 #[derivative(Debug)]
+#[repr(C, packed)]
 struct J(#[derivative(Debug="ignore")] NoDebug);
+
+#[derive(Derivative)]
+#[derivative(Debug)]
+#[repr(C, packed)]
+struct K(isize, #[derivative(Debug="ignore")] NoDebug);
+
+#[derive(Derivative)]
+#[derivative(Debug)]
+#[repr(C, packed)]
+struct L {
+    #[derivative(Debug="ignore")]
+    foo: NoDebug
+}
 
 struct NoDebug;
 
@@ -67,11 +66,9 @@ impl<T: std::fmt::Debug> ToDebug for T {
 fn main() {
     assert_eq!(Foo { foo: 42, bar: 1 }.to_show(), "Foo { foo: 42 }".to_string());
     assert_eq!(Bar(42, 1).to_show(), "Bar(42)".to_string());
-    assert_eq!(C::V1(12).to_show(), "V1(12)".to_string());
-    assert_eq!(C::V2(12).to_show(), "V2".to_string());
-    assert_eq!(C::V3("foo".to_string()).to_show(), "V3(\"foo\")".to_string());
-    assert_eq!(D::V1 { a: 42 }.to_show(), "V1".to_string());
     assert_eq!(F(42).to_show(), "F".to_string());
     assert_eq!(G(42, 0).to_show(), "G(42)".to_string());
     assert_eq!(J(NoDebug).to_show(), "J".to_string());
+    assert_eq!(K(42, NoDebug).to_show(), "K(42)".to_string());
+    assert_eq!(L{ foo: NoDebug }.to_show(), "L".to_string());
 }

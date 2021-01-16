@@ -1,3 +1,5 @@
+#![allow(dead_code)]
+
 #[cfg(feature = "use_core")]
 extern crate core;
 

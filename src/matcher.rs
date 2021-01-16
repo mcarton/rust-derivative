@@ -66,25 +66,38 @@ pub struct CommonVariant<'a> {
     attrs: &'a attr::Input,
 }
 
-pub struct Matcher {
+pub struct Matcher<T> {
     binding_name: String,
     binding_style: BindingStyle,
     is_packed: bool,
+    field_filter: T,
 }
 
-impl Matcher {
+impl Matcher<fn (&ast::Field) -> bool> {
     pub fn new(style: BindingStyle, is_packed: bool) -> Self {
         Matcher {
             binding_name: "__arg".into(),
             binding_style: style.with_packed(is_packed),
             is_packed,
+            field_filter: |_| true,
         }
     }
+}
 
+impl<T: Fn (&ast::Field) -> bool> Matcher<T> {
     pub fn with_name(self, name: String) -> Self {
         Matcher {
             binding_name: name,
             ..self
+        }
+    }
+
+    pub fn with_field_filter<P>(self, field_filter: P) -> Matcher<P> {
+        Matcher {
+            field_filter,
+            binding_name: self.binding_name,
+            binding_style: self.binding_style,
+            is_packed: self.is_packed,
         }
     }
 
@@ -220,7 +233,13 @@ impl Matcher {
                             (stream, matches),
                             field,
                             binding_name,
-                            |_, ident, binding| quote!(#binding #ident ,),
+                            |f, ident, binding| {
+                                if (self.field_filter)(f) {
+                                    quote!(#binding #ident ,)
+                                } else {
+                                    quote!(_ ,)
+                                }
+                            },
                         )
                     },
                 );
@@ -237,7 +256,11 @@ impl Matcher {
                             binding_name,
                             |field, ident, binding| {
                                 let field_name = field.ident.as_ref().unwrap();
-                                quote!(#field_name : #binding #ident ,)
+                                if (self.field_filter)(field) {
+                                    quote!(#field_name : #binding #ident ,)
+                                } else {
+                                    quote!(#field_name : _ ,)
+                                }
                             },
                         )
                     },
