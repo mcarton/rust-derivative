@@ -1,4 +1,4 @@
-#![forbid(clippy::all)]
+#![deny(clippy::all)]
 
 #[cfg(feature = "use_core")]
 extern crate core;
