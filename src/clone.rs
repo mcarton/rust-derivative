@@ -51,15 +51,15 @@ pub fn derive_clone(input: &ast::Input) -> proc_macro2::TokenStream {
             }
         }
     } else {
-        let body = matcher::Matcher::new(matcher::BindingStyle::Ref).build_arms(
+        let body = matcher::Matcher::new(matcher::BindingStyle::Ref, input.attrs.is_packed).build_arms(
             input,
             "__arg",
             |arm_path, _, _, style, _, bis| {
                 let field_clones = bis.iter().map(|bi| {
-                    let arg = &bi.ident;
+                    let arg = &bi.expr;
 
                     let clone = if let Some(clone_with) = bi.field.attrs.clone_with() {
-                        quote!(#clone_with(#arg))
+                        quote!(#clone_with(&#arg))
                     } else {
                         quote!(#arg.clone())
                     };
@@ -97,21 +97,21 @@ pub fn derive_clone(input: &ast::Input) -> proc_macro2::TokenStream {
 
         let clone_from = if input.attrs.clone_from() {
             Some(
-                matcher::Matcher::new(matcher::BindingStyle::RefMut).build_arms(
+                matcher::Matcher::new(matcher::BindingStyle::RefMut, input.attrs.is_packed).build_arms(
                     input,
                     "__arg",
                     |outer_arm_path, _, _, _, _, outer_bis| {
-                        let body = matcher::Matcher::new(matcher::BindingStyle::Ref).build_arms(
+                        let body = matcher::Matcher::new(matcher::BindingStyle::Ref, input.attrs.is_packed).build_arms(
                             input,
                             "__other",
                             |inner_arm_path, _, _, _, _, inner_bis| {
                                 if outer_arm_path == inner_arm_path {
                                     let field_clones = outer_bis.iter().zip(inner_bis).map(
                                         |(outer_bi, inner_bi)| {
-                                            let outer = &outer_bi.ident;
-                                            let inner = &inner_bi.ident;
+                                            let outer = &outer_bi.expr;
+                                            let inner = &inner_bi.expr;
 
-                                            quote!(#outer.clone_from(#inner);)
+                                            quote!(#outer.clone_from(&#inner);)
                                         },
                                     );
 

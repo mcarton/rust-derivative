@@ -13,7 +13,7 @@ pub fn derive(input: &ast::Input) -> proc_macro2::TokenStream {
 
     let formatter = quote_spanned! {input.span=> __f};
 
-    let body = matcher::Matcher::new(matcher::BindingStyle::Ref).build_arms(
+    let body = matcher::Matcher::new(matcher::BindingStyle::Ref, input.attrs.is_packed).build_arms(
         input,
         "__arg",
         |_, _, arm_name, style, attrs, bis| {
@@ -28,27 +28,38 @@ pub fn derive(input: &ast::Input) -> proc_macro2::TokenStream {
                     });
                 }
 
-                let arg = &bi.ident;
+                let arg_expr = &bi.expr;
+                let arg_ident = &bi.ident;
 
                 let dummy_debug = bi.field.attrs.debug_format_with().map(|format_fn| {
                     format_with(
                         bi.field,
                         &input.attrs.debug_bound(),
-                        &arg,
+                        &arg_expr,
+                        &arg_ident,
                         format_fn,
                         input.generics.clone())
                 });
+                let expr = if bi.field.attrs.debug_format_with().is_some() {
+                    quote_spanned! {arm_name.span()=>
+                        &#arg_ident
+                    }
+                } else {
+                    quote_spanned! {arm_name.span()=>
+                        &&#arg_expr
+                    }
+                };
 
                 let builder = if let Some(ref name) = bi.field.ident {
                     let name = name.to_string();
                     quote_spanned! {arm_name.span()=>
                         #dummy_debug
-                        let _ = __debug_trait_builder.field(#name, &#arg);
+                        let _ = __debug_trait_builder.field(#name, #expr);
                     }
                 } else {
                     quote_spanned! {arm_name.span()=>
                         #dummy_debug
-                        let _ = __debug_trait_builder.field(&#arg);
+                        let _ = __debug_trait_builder.field(#expr);
                     }
                 };
 
@@ -135,7 +146,8 @@ fn phantom_path() -> syn::Path {
 fn format_with(
     f: &ast::Field,
     bounds: &Option<&[syn::WherePredicate]>,
-    arg_n: &syn::Ident,
+    arg_expr: &proc_macro2::TokenStream,
+    arg_ident: &syn::Ident,
     format_fn: &syn::Path,
     mut generics: syn::Generics,
 ) -> proc_macro2::TokenStream {
@@ -199,7 +211,7 @@ fn format_with(
     // don't attach a span to prevent issue #58
     let match_self = quote!(match self.0);
     quote_spanned!(format_fn.span()=>
-        let #arg_n = {
+        let #arg_ident = {
             struct Dummy #impl_generics (&'_derivative #ty, #phantom_path <(#(#phantom,)*)>) #where_clause;
 
             impl #impl_generics #debug_trait_path for Dummy #ty_generics #where_clause {
@@ -210,7 +222,7 @@ fn format_with(
                 }
             }
 
-            Dummy #ctor_ty_generics (#arg_n, #phantom_path)
+            Dummy #ctor_ty_generics (&&#arg_expr, #phantom_path)
         };
     )
 }
