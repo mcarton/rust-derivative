@@ -23,7 +23,9 @@ pub fn derive_eq(input: &ast::Input) -> proc_macro2::TokenStream {
     let new_where_clause;
     let (impl_generics, ty_generics, mut where_clause) = generics.split_for_impl();
 
-    if let Some(new_where_clause2) = maybe_add_copy(input, where_clause) {
+    if let Some(new_where_clause2) =
+        maybe_add_copy(input, where_clause, |f| !f.attrs.ignore_partial_eq())
+    {
         new_where_clause = new_where_clause2;
         where_clause = Some(&new_where_clause);
     }
@@ -60,30 +62,34 @@ pub fn derive_partial_eq(input: &ast::Input) -> proc_macro2::TokenStream {
     let match_fields = if input.is_trivial_enum() {
         quote!(true)
     } else {
-        matcher::Matcher::new(matcher::BindingStyle::Ref, input.attrs.is_packed).build_2_arms(
-            (quote!(*self), quote!(*other)),
-            (input, "__self"),
-            (input, "__other"),
-            |_, _, _, (left_variant, right_variant)| {
-                let cmp = left_variant.iter().zip(&right_variant).map(|(o, i)| {
-                    let outer_name = &o.expr;
-                    let inner_name = &i.expr;
+        matcher::Matcher::new(matcher::BindingStyle::Ref, input.attrs.is_packed)
+            .with_field_filter(|f: &ast::Field| !f.attrs.ignore_partial_eq())
+            .build_2_arms(
+                (quote!(*self), quote!(*other)),
+                (input, "__self"),
+                (input, "__other"),
+                |_, _, _, (left_variant, right_variant)| {
+                    let cmp = left_variant.iter().zip(&right_variant).map(|(o, i)| {
+                        let outer_name = &o.expr;
+                        let inner_name = &i.expr;
 
-                    if o.field.attrs.ignore_partial_eq() {
-                        None
-                    } else if let Some(compare_fn) = o.field.attrs.partial_eq_compare_with() {
-                        Some(quote!(&& #compare_fn(&#outer_name, &#inner_name)))
-                    } else {
-                        Some(quote!(&& &#outer_name == &#inner_name))
-                    }
-                });
+                        if o.field.attrs.ignore_partial_eq() {
+                            None
+                        } else if let Some(compare_fn) = o.field.attrs.partial_eq_compare_with() {
+                            Some(quote!(&& #compare_fn(&#outer_name, &#inner_name)))
+                        } else {
+                            Some(quote!(&& &#outer_name == &#inner_name))
+                        }
+                    });
 
-                quote!(true #(#cmp)*)
-            },
-        )
+                    quote!(true #(#cmp)*)
+                },
+            )
     };
 
-    if let Some(new_where_clause2) = maybe_add_copy(input, where_clause) {
+    if let Some(new_where_clause2) =
+        maybe_add_copy(input, where_clause, |f| !f.attrs.ignore_partial_eq())
+    {
         new_where_clause = new_where_clause2;
         where_clause = Some(&new_where_clause);
     }
@@ -114,11 +120,11 @@ pub fn derive_partial_ord(
     let option_path = option_path();
     let ordering_path = ordering_path();
 
-    let body = matcher::Matcher::new(matcher::BindingStyle::Ref, input.attrs.is_packed).build_arms(
-        input,
-        "__self",
-        |_, n, _, _, _, outer_bis| {
+    let body = matcher::Matcher::new(matcher::BindingStyle::Ref, input.attrs.is_packed)
+        .with_field_filter(|f: &ast::Field| !f.attrs.ignore_partial_ord())
+        .build_arms(input, "__self", |_, n, _, _, _, outer_bis| {
             let body = matcher::Matcher::new(matcher::BindingStyle::Ref, input.attrs.is_packed)
+                .with_field_filter(|f: &ast::Field| !f.attrs.ignore_partial_ord())
                 .build_arms(input, "__other", |_, m, _, _, _, inner_bis| {
                     match n.cmp(&m) {
                         ::std::cmp::Ordering::Less => {
@@ -166,8 +172,7 @@ pub fn derive_partial_ord(
                 }
 
             }
-        },
-    );
+        });
 
     let name = &input.ident;
 
@@ -182,11 +187,13 @@ pub fn derive_partial_ord(
     let new_where_clause;
     let (impl_generics, ty_generics, mut where_clause) = generics.split_for_impl();
 
-    if let Some(new_where_clause2) = maybe_add_copy(input, where_clause) {
+    if let Some(new_where_clause2) =
+        maybe_add_copy(input, where_clause, |f| !f.attrs.ignore_partial_ord())
+    {
         new_where_clause = new_where_clause2;
         where_clause = Some(&new_where_clause);
     }
-    
+
     quote! {
         #[allow(unused_qualifications)]
         impl #impl_generics #partial_ord_trait_path for #name #ty_generics #where_clause {
@@ -214,11 +221,11 @@ pub fn derive_ord(
 
     let ordering_path = ordering_path();
 
-    let body = matcher::Matcher::new(matcher::BindingStyle::Ref, input.attrs.is_packed).build_arms(
-        input,
-        "__self",
-        |_, n, _, _, _, outer_bis| {
+    let body = matcher::Matcher::new(matcher::BindingStyle::Ref, input.attrs.is_packed)
+        .with_field_filter(|f: &ast::Field| !f.attrs.ignore_ord())
+        .build_arms(input, "__self", |_, n, _, _, _, outer_bis| {
             let body = matcher::Matcher::new(matcher::BindingStyle::Ref, input.attrs.is_packed)
+                .with_field_filter(|f: &ast::Field| !f.attrs.ignore_ord())
                 .build_arms(input, "__other", |_, m, _, _, _, inner_bis| {
                     match n.cmp(&m) {
                         ::std::cmp::Ordering::Less => quote!(#ordering_path::Less),
@@ -262,8 +269,7 @@ pub fn derive_ord(
                 }
 
             }
-        },
-    );
+        });
 
     let name = &input.ident;
 
@@ -278,7 +284,8 @@ pub fn derive_ord(
     let new_where_clause;
     let (impl_generics, ty_generics, mut where_clause) = generics.split_for_impl();
 
-    if let Some(new_where_clause2) = maybe_add_copy(input, where_clause) {
+    if let Some(new_where_clause2) = maybe_add_copy(input, where_clause, |f| !f.attrs.ignore_ord())
+    {
         new_where_clause = new_where_clause2;
         where_clause = Some(&new_where_clause);
     }
@@ -365,21 +372,30 @@ fn ordering_path() -> syn::Path {
     }
 }
 
-fn maybe_add_copy(input: &ast::Input, where_clause: Option<&syn::WhereClause>) -> Option<syn::WhereClause> {
+fn maybe_add_copy(
+    input: &ast::Input,
+    where_clause: Option<&syn::WhereClause>,
+    field_filter: impl Fn(&ast::Field) -> bool,
+) -> Option<syn::WhereClause> {
     if input.attrs.is_packed && !input.body.is_empty() {
         let mut new_where_clause = where_clause.cloned().unwrap_or_else(|| syn::WhereClause {
             where_token: parse_quote!(where),
             predicates: Default::default(),
         });
 
-        new_where_clause
-            .predicates
-            .extend(input.body.all_fields().into_iter().map(|f| {
-                let ty = f.ty;
+        new_where_clause.predicates.extend(
+            input
+                .body
+                .all_fields()
+                .into_iter()
+                .filter(|f| field_filter(f))
+                .map(|f| {
+                    let ty = f.ty;
 
-                let pred: syn::WherePredicate = parse_quote!(#ty: Copy);
-                pred
-            }));
+                    let pred: syn::WherePredicate = parse_quote!(#ty: Copy);
+                    pred
+                }),
+        );
 
         Some(new_where_clause)
     } else {
