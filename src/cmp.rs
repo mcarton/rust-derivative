@@ -5,7 +5,7 @@ use attr;
 use matcher;
 use paths;
 use proc_macro2;
-use syn::{self, WhereClause};
+use syn;
 use utils;
 
 /// Derive `Eq` for `input`.
@@ -20,7 +20,13 @@ pub fn derive_eq(input: &ast::Input) -> proc_macro2::TokenStream {
         |field| field.eq_bound(),
         |input| input.eq_bound(),
     );
-    let (impl_generics, ty_generics, where_clause) = generics.split_for_impl();
+    let new_where_clause;
+    let (impl_generics, ty_generics, mut where_clause) = generics.split_for_impl();
+
+    if let Some(new_where_clause2) = maybe_add_copy(input, where_clause) {
+        new_where_clause = new_where_clause2;
+        where_clause = Some(&new_where_clause);
+    }
 
     quote! {
         #[allow(unused_qualifications)]
@@ -48,7 +54,7 @@ pub fn derive_partial_eq(input: &ast::Input) -> proc_macro2::TokenStream {
         |field| field.partial_eq_bound(),
         |input| input.partial_eq_bound(),
     );
-    let mut new_where_clause;
+    let new_where_clause;
     let (impl_generics, ty_generics, mut where_clause) = generics.split_for_impl();
 
     let match_fields = if input.is_trivial_enum() {
@@ -77,21 +83,8 @@ pub fn derive_partial_eq(input: &ast::Input) -> proc_macro2::TokenStream {
         )
     };
 
-    if input.attrs.is_packed && !input.body.is_empty() {
-        new_where_clause = where_clause.cloned().unwrap_or_else(|| WhereClause {
-            where_token: parse_quote!(where),
-            predicates: Default::default(),
-        });
-
-        new_where_clause
-            .predicates
-            .extend(input.body.all_fields().into_iter().map(|f| {
-                let ty = f.ty;
-
-                let pred: syn::WherePredicate = parse_quote!(#ty: Copy);
-                pred
-            }));
-
+    if let Some(new_where_clause2) = maybe_add_copy(input, where_clause) {
+        new_where_clause = new_where_clause2;
         where_clause = Some(&new_where_clause);
     }
 
@@ -186,8 +179,14 @@ pub fn derive_partial_ord(
         |field| field.partial_ord_bound(),
         |input| input.partial_ord_bound(),
     );
-    let (impl_generics, ty_generics, where_clause) = generics.split_for_impl();
+    let new_where_clause;
+    let (impl_generics, ty_generics, mut where_clause) = generics.split_for_impl();
 
+    if let Some(new_where_clause2) = maybe_add_copy(input, where_clause) {
+        new_where_clause = new_where_clause2;
+        where_clause = Some(&new_where_clause);
+    }
+    
     quote! {
         #[allow(unused_qualifications)]
         impl #impl_generics #partial_ord_trait_path for #name #ty_generics #where_clause {
@@ -276,7 +275,13 @@ pub fn derive_ord(
         |field| field.ord_bound(),
         |input| input.ord_bound(),
     );
-    let (impl_generics, ty_generics, where_clause) = generics.split_for_impl();
+    let new_where_clause;
+    let (impl_generics, ty_generics, mut where_clause) = generics.split_for_impl();
+
+    if let Some(new_where_clause2) = maybe_add_copy(input, where_clause) {
+        new_where_clause = new_where_clause2;
+        where_clause = Some(&new_where_clause);
+    }
 
     quote! {
         #[allow(unused_qualifications)]
@@ -357,5 +362,27 @@ fn ordering_path() -> syn::Path {
         parse_quote!(::core::cmp::Ordering)
     } else {
         parse_quote!(::std::cmp::Ordering)
+    }
+}
+
+fn maybe_add_copy(input: &ast::Input, where_clause: Option<&syn::WhereClause>) -> Option<syn::WhereClause> {
+    if input.attrs.is_packed && !input.body.is_empty() {
+        let mut new_where_clause = where_clause.cloned().unwrap_or_else(|| syn::WhereClause {
+            where_token: parse_quote!(where),
+            predicates: Default::default(),
+        });
+
+        new_where_clause
+            .predicates
+            .extend(input.body.all_fields().into_iter().map(|f| {
+                let ty = f.ty;
+
+                let pred: syn::WherePredicate = parse_quote!(#ty: Copy);
+                pred
+            }));
+
+        Some(new_where_clause)
+    } else {
+        None
     }
 }
