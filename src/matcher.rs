@@ -134,6 +134,7 @@ impl<T: Fn (&ast::Field) -> bool> Matcher<T> {
 
     pub fn build_2_arms<F>(
         self,
+        (left_matched_expr, right_matched_expr): (TokenStream, TokenStream),
         left: (&ast::Input, &str),
         right: (&ast::Input, &str),
         f: F,
@@ -151,18 +152,38 @@ impl<T: Fn (&ast::Field) -> bool> Matcher<T> {
 
         assert_eq!(left_variants.len(), right_variants.len());
 
-        // Now that we have the patterns, generate the actual branches of the match
-        // expression
-        let mut t = TokenStream::new();
-        for (i, (left, right)) in left_variants.into_iter().zip(right_variants).enumerate() {
-            let (left, (left_pat, left_bindings)) = left;
-            let (right, (right_pat, right_bindings)) = right;
+        if left_variants.len() == 1 {
+            let (left, (left_pat, left_bindings)) = left_variants.into_iter().next().unwrap();
+            let (right, (right_pat, right_bindings)) = right_variants.into_iter().next().unwrap();
 
-            let body = f(i, left, right, (left_bindings, right_bindings));
-            quote!((#left_pat, #right_pat) => { #body }).to_tokens(&mut t);
+            let body = f(0, left, right, (left_bindings, right_bindings));
+
+            quote! {
+                match #left_matched_expr {
+                    #left_pat => match #right_matched_expr {
+                        #right_pat => #body,
+                    },
+                }
+            }
+        } else {
+            // Now that we have the patterns, generate the actual branches of the match
+            // expression
+            let mut t = TokenStream::new();
+            for (i, (left, right)) in left_variants.into_iter().zip(right_variants).enumerate() {
+                let (left, (left_pat, left_bindings)) = left;
+                let (right, (right_pat, right_bindings)) = right;
+
+                let body = f(i, left, right, (left_bindings, right_bindings));
+                quote!((#left_pat, #right_pat) => { #body }).to_tokens(&mut t);
+            }
+
+            quote! {
+                match (&#left_matched_expr, &#right_matched_expr) {
+                    #t
+                    _ => unreachable!(),
+                }
+            }
         }
-
-        t
     }
 
     /// Generate patterns for matching against all of the variants
