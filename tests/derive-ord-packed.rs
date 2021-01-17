@@ -7,8 +7,6 @@
 #[cfg(feature = "use_core")]
 extern crate core;
 
-use std::marker::PhantomData;
-
 #[macro_use]
 extern crate derivative;
 
@@ -105,7 +103,7 @@ struct GenericIgnore<T> {
     #[derivative(PartialEq = "ignore")]
     #[derivative(PartialOrd = "ignore")]
     #[derivative(Ord = "ignore")]
-    t: PhantomData<T>,
+    t: T,
 }
 
 trait SomeTrait {}
@@ -244,22 +242,22 @@ fn main() {
     assert_eq!(
         GenericIgnore {
             f: 123,
-            t: PhantomData::<NonPartialOrd>::default()
+            t: NonPartialOrd
         }
         .cmp(&GenericIgnore {
             f: 123,
-            t: PhantomData::<NonPartialOrd>::default()
+            t: NonPartialOrd
         }),
         Ordering::Equal
     );
     assert_eq!(
         GenericIgnore {
             f: 123,
-            t: PhantomData::<NonPartialOrd>::default()
+            t: NonPartialOrd
         }
         .partial_cmp(&GenericIgnore {
             f: 123,
-            t: PhantomData::<NonPartialOrd>::default()
+            t: NonPartialOrd
         }),
         Some(Ordering::Equal)
     );

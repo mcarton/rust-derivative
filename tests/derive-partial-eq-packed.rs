@@ -3,8 +3,6 @@
 #[cfg(feature = "use_core")]
 extern crate core;
 
-use std::marker::PhantomData;
-
 #[macro_use]
 extern crate derivative;
 
@@ -71,7 +69,7 @@ struct NonPartialEq;
 struct GenericIgnore<T> {
     f: u32,
     #[derivative(PartialEq = "ignore")]
-    t: PhantomData<T>,
+    t: T,
 }
 
 trait SomeTrait {}
@@ -113,10 +111,10 @@ fn main() {
     assert!(
         GenericIgnore {
             f: 123,
-            t: PhantomData::<NonPartialEq>::default()
+            t: NonPartialEq
         } == GenericIgnore {
             f: 123,
-            t: PhantomData::<NonPartialEq>::default()
+            t: NonPartialEq
         }
     );
 }
