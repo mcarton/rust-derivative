@@ -93,6 +93,13 @@ impl<'a> Body<'a> {
             Body::Struct(_, ref fields) => fields.iter().collect(),
         }
     }
+
+    pub fn is_empty(&self) -> bool {
+        match *self {
+            Body::Enum(ref variants) => variants.is_empty(),
+            Body::Struct(_, ref fields) => fields.is_empty(),
+        }
+    }
 }
 
 impl<'a> Variant<'a> {
