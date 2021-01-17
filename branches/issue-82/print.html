@@ -624,6 +624,24 @@ struct Foo&lt;T, U&gt; {
 </span></code></pre></pre>
 <p>With <code>bound=&quot;&quot;</code> it is possible to remove any bound for the type. This is useful
 if your type contains a <code>Foo&lt;T&gt;</code> that is <code>Debug</code> even if <code>T</code> is not.</p>
+<h1><a class="header" href="#packed-structures" id="packed-structures">Packed structures</a></h1>
+<p>You can use <em>derivative</em> to implement <code>Debug</code> on packed structures. Unlike the standard <code>derive(debug)</code>, <em>derivative</em> does not require the structure itself to be <code>Copy</code>, but like the standard <code>derive(debug)</code>, it requires each (non-ignored) field to be <code>Copy</code>.</p>
+<pre><pre class="playground"><code class="language-rust edition2018">
+<span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span><span class="boring">extern crate derivative;
+</span><span class="boring">use derivative::Derivative;
+</span>#[derive(Derivative)]
+#[derivative(Debug)]
+#[repr(C, packed)]
+struct Foo {
+    foo: u8,
+    // `String` isn't `Copy` so it must be ignored to derive `Debug`
+    #[derivative(Debug=&quot;ignore&quot;)]
+    bar: String,
+}
+<span class="boring">}
+</span></code></pre></pre>
 <h1><a class="header" href="#custom-attributes-2" id="custom-attributes-2">Custom attributes</a></h1>
 <p>The <code>Default</code> trait supports the following attributes:</p>
 <ul>
@@ -929,6 +947,23 @@ struct WithPtr&lt;T: ?Sized&gt; {
 <span class="boring">}
 </span></code></pre></pre>
 <p>See <a href="./Default.html#custom-bound"><code>Default</code>'s documentation</a> for more details.</p>
+<h1><a class="header" href="#packed-structures-1" id="packed-structures-1">Packed structures</a></h1>
+<p>You can use <em>derivative</em> to implement the comparison traits on packed structures. Unlike the standard <code>derive</code>, <em>derivative</em> does not require the structure itself to be <code>Copy</code>, but like the standard <code>derive</code>, it requires each (non-ignored) field to be <code>Copy</code>.</p>
+<pre><pre class="playground"><code class="language-rust edition2018">
+<span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span><span class="boring">extern crate derivative;
+</span><span class="boring">use derivative::Derivative;
+</span>#[derive(Derivative)]
+#[derivative(PartialEq)]
+#[repr(C, packed)]
+struct Foo {
+    f: u32,
+    #[derivative(PartialEq = &quot;ignore&quot;)]
+    t: String,
+}
+<span class="boring">}
+</span></code></pre></pre>
 
                     </main>
 
