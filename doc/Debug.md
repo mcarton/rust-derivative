@@ -133,3 +133,21 @@ With `bound=""` it is possible to remove any bound for the type. This is useful
 if your type contains a `Foo<T>` that is `Debug` even if `T` is not.
 
 [`Formatter`]: https://doc.rust-lang.org/std/fmt/struct.Formatter.html
+
+# Packed structures
+
+You can use *derivative* to implement `Debug` on packed structures. Unlike the standard `derive(debug)`, *derivative* does not require the structure itself to be `Copy`, but like the standard `derive(debug)`, it requires each (non-ignored) field to be `Copy`.
+
+```rust
+# extern crate derivative;
+# use derivative::Derivative;
+#[derive(Derivative)]
+#[derivative(Debug)]
+#[repr(C, packed)]
+struct Foo {
+    foo: u8,
+    // `String` isn't `Copy` so it must be ignored to derive `Debug`
+    #[derivative(Debug="ignore")]
+    bar: String,
+}
+```

@@ -104,3 +104,20 @@ struct WithPtr<T: ?Sized> {
 ```
 
 See [`Default`'s documentation](./Default.md#custom-bound) for more details.
+
+# Packed structures
+
+You can use *derivative* to implement the comparison traits on packed structures. Unlike the standard `derive`, *derivative* does not require the structure itself to be `Copy`, but like the standard `derive`, it requires each (non-ignored) field to be `Copy`.
+
+```rust
+# extern crate derivative;
+# use derivative::Derivative;
+#[derive(Derivative)]
+#[derivative(PartialEq)]
+#[repr(C, packed)]
+struct Foo {
+    f: u32,
+    #[derivative(PartialEq = "ignore")]
+    t: String,
+}
+```
