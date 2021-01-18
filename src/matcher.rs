@@ -6,7 +6,7 @@
 //     * not generic, we use our own `ast`, `synstructure` only knows about `syn`
 //     * missing information (what arm are we in?, what attributes? etc.)
 
-use proc_macro2::{self, TokenStream};
+use proc_macro2::TokenStream;
 use quote::ToTokens;
 use syn;
 
@@ -309,7 +309,7 @@ impl<T: Fn (&ast::Field) -> bool> Matcher<T> {
 
         let ident: syn::Ident = syn::Ident::new(
             &format!("{}_{}", binding_name, i),
-            proc_macro2::Span::call_site(),
+            field.span,
         );
         let expr = syn::Expr::Path(syn::ExprPath {
             attrs: vec![],

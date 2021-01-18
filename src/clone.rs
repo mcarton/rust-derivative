@@ -4,6 +4,7 @@ use ast;
 use attr;
 use matcher;
 use syn;
+use syn::spanned::Spanned;
 use utils;
 
 /// Derive `Copy` for `input`.
@@ -59,9 +60,9 @@ pub fn derive_clone(input: &ast::Input) -> proc_macro2::TokenStream {
                     let arg = &bi.expr;
 
                     let clone = if let Some(clone_with) = bi.field.attrs.clone_with() {
-                        quote!(#clone_with(&#arg))
+                        quote_spanned!(bi.field.ty.span()=> #clone_with(&#arg))
                     } else {
-                        quote!(#arg.clone())
+                        quote_spanned!(bi.field.ty.span()=> Clone::clone(&#arg))
                     };
 
                     if let Some(ref name) = bi.field.ident {
