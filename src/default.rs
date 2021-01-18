@@ -1,8 +1,8 @@
-use proc_macro2;
-
 use ast;
 use attr;
-use syn;
+use proc_macro2::{self, TokenStream};
+use quote::quote_spanned;
+use syn::spanned::Spanned;
 use utils;
 
 /// Derive `Default` for `input`.
@@ -12,21 +12,21 @@ pub fn derive(input: &ast::Input, default: &attr::InputDefault) -> proc_macro2::
         style: ast::Style,
         fields: &[ast::Field],
     ) -> proc_macro2::TokenStream {
-        let default_trait_path = default_trait_path();
-
         match style {
             ast::Style::Struct => {
                 let mut defaults = Vec::new();
 
                 for f in fields {
+                    let default_trait_path = default_trait_path(f.span);
+
                     let name = f
                         .ident
                         .as_ref()
                         .expect("A structure field must have a name");
-                    let default = f
-                        .attrs
-                        .default_value()
-                        .map_or_else(|| quote!(#default_trait_path::default()), |v| quote!(#v));
+                    let default = f.attrs.default_value().map_or_else(
+                        || quote_spanned!(f.ty.span()=> #default_trait_path::default()),
+                        |v| quote!(#v),
+                    );
 
                     defaults.push(quote!(#name: #default));
                 }
@@ -37,10 +37,12 @@ pub fn derive(input: &ast::Input, default: &attr::InputDefault) -> proc_macro2::
                 let mut defaults = Vec::new();
 
                 for f in fields {
-                    let default = f
-                        .attrs
-                        .default_value()
-                        .map_or_else(|| quote!(#default_trait_path::default()), |v| quote!(#v));
+                    let default_trait_path = default_trait_path(f.span);
+
+                    let default = f.attrs.default_value().map_or_else(
+                        || quote_spanned!(f.ty.span()=> #default_trait_path::default()),
+                        |v| quote!(#v),
+                    );
 
                     defaults.push(default);
                 }
@@ -52,7 +54,7 @@ pub fn derive(input: &ast::Input, default: &attr::InputDefault) -> proc_macro2::
     }
 
     let name = &input.ident;
-    let default_trait_path = default_trait_path();
+    let default_trait_path = default_trait_path(proc_macro2::Span::call_site());
     let generics = utils::build_impl_generics(
         input,
         &default_trait_path,
@@ -111,10 +113,10 @@ pub fn derive(input: &ast::Input, default: &attr::InputDefault) -> proc_macro2::
 }
 
 /// Return the path of the `Default` trait, that is `::std::default::Default`.
-fn default_trait_path() -> syn::Path {
+fn default_trait_path(span: proc_macro2::Span) -> TokenStream {
     if cfg!(feature = "use_core") {
-        parse_quote!(::core::default::Default)
+        quote_spanned!(span=> ::core::default::Default)
     } else {
-        parse_quote!(::std::default::Default)
+        quote_spanned!(span=> ::std::default::Default)
     }
 }

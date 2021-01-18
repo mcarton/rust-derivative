@@ -91,7 +91,7 @@ pub fn with_bound<F>(
     item: &ast::Input,
     generics: &syn::Generics,
     filter: F,
-    bound: &syn::Path,
+    bound: &proc_macro2::TokenStream,
 ) -> syn::Generics
 where
     F: Fn(&attr::Field) -> bool,

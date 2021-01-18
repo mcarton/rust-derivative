@@ -1,15 +1,15 @@
-use proc_macro2;
-
 use ast;
 use attr;
 use bound;
+use proc_macro2;
+use quote::ToTokens;
 use syn;
 
 /// Make generic with all the generics in the input, plus a bound `T: <trait_path>` for each
 /// generic field type that will be shown.
 pub fn build_impl_generics<F, G, H>(
     item: &ast::Input,
-    trait_path: &syn::Path,
+    trait_path: &impl ToTokens,
     needs_debug_bound: F,
     field_bound: G,
     input_bound: H,
@@ -24,7 +24,7 @@ where
 
     match input_bound(&item.attrs) {
         Some(predicates) => bound::with_where_predicates(&generics, predicates),
-        None => bound::with_bound(item, &generics, needs_debug_bound, trait_path),
+        None => bound::with_bound(item, &generics, needs_debug_bound, &trait_path.into_token_stream()),
     }
 }
 
