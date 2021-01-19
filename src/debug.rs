@@ -12,6 +12,7 @@ pub fn derive(input: &ast::Input) -> proc_macro2::TokenStream {
     let fmt_path = fmt_path();
 
     let formatter = quote_spanned! {input.span=> __f};
+    let debug_trait_builder = quote!(__debug_trait_builder);
 
     let body = matcher::Matcher::new(matcher::BindingStyle::Ref, input.attrs.is_packed)
         .with_field_filter(|f: &ast::Field| !f.attrs.ignore_debug())
@@ -21,8 +22,10 @@ pub fn derive(input: &ast::Input) -> proc_macro2::TokenStream {
                     return None;
                 }
 
+                let formatter = quote_spanned! {bi.field.span.resolved_at(formatter.span())=> #formatter};
+
                 if attrs.debug_transparent() {
-                    return Some(quote_spanned! {arm_name.span()=>
+                    return Some(quote_spanned! {bi.field.span=>
                         #debug_trait_path::fmt(__arg_0, #formatter)
                     });
                 }
@@ -52,14 +55,14 @@ pub fn derive(input: &ast::Input) -> proc_macro2::TokenStream {
 
                 let builder = if let Some(ref name) = bi.field.ident {
                     let name = name.to_string();
-                    quote_spanned! {arm_name.span()=>
+                    quote_spanned! {bi.field.span=>
                         #dummy_debug
-                        let _ = __debug_trait_builder.field(#name, #expr);
+                        let _ = #debug_trait_builder.field(#name, #expr);
                     }
                 } else {
-                    quote_spanned! {arm_name.span()=>
+                    quote_spanned! {bi.field.span=>
                         #dummy_debug
-                        let _ = __debug_trait_builder.field(#expr);
+                        let _ = #debug_trait_builder.field(#expr);
                     }
                 };
 
@@ -73,15 +76,15 @@ pub fn derive(input: &ast::Input) -> proc_macro2::TokenStream {
             let method = syn::Ident::new(method, proc_macro2::Span::call_site());
 
             if attrs.debug_transparent() {
-                quote_spanned! {arm_name.span()=>
+                quote! {
                     #(#field_prints)*
                 }
             } else {
                 let name = arm_name.to_string();
-                quote_spanned! {arm_name.span()=>
-                    let mut __debug_trait_builder = #formatter.#method(#name);
+                quote! {
+                    let mut #debug_trait_builder = #formatter.#method(#name);
                     #(#field_prints)*
-                    __debug_trait_builder.finish()
+                    #debug_trait_builder.finish()
                 }
             }
         });
