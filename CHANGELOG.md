@@ -2,8 +2,10 @@
 All notable changes to this project will be documented in this file.
 
 
-## Next version
-* Fix bug with `Debug` bounds
+## 2.2.0
+* Add support for deriving traits on `repr(packed)` types ([#84]).
+* Fix bug with `Debug` bounds ([#83]).
+* Migrate documentation to `mdbook` and fix issues found in examples ([#83]).
 
 ## 2.1.3
 * Fix Clippy warning ([#81]).
@@ -70,3 +72,5 @@ This is the last version to support rustc versions 1.15 to 1.33.
 [#71]: https://github.com/mcarton/rust-derivative/pull/71
 [#79]: https://github.com/mcarton/rust-derivative/pull/79
 [#81]: https://github.com/mcarton/rust-derivative/pull/81
+[#83]: https://github.com/mcarton/rust-derivative/pull/83
+[#84]: https://github.com/mcarton/rust-derivative/pull/84
