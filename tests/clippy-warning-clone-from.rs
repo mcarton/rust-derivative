@@ -9,5 +9,3 @@ extern crate derivative;
 #[derive(Derivative)]
 #[derivative(Clone(clone_from = "true"))]
 pub struct Foo {}
-
-fn main() {}

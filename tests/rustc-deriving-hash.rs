@@ -46,6 +46,7 @@ fn hash<T: Hash>(t: &T) -> u64 {
 
 struct FakeHasher<'a>(&'a mut Vec<u8>);
 impl<'a> Hasher for FakeHasher<'a> {
+    #[cfg(not(tarpaulin_include))]
     fn finish(&self) -> u64 {
         unimplemented!()
     }

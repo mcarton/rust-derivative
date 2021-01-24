@@ -22,7 +22,3 @@ extern crate derivative;
 #[derive(Derivative)]
 #[derivative(Debug)]
 struct builder;
-
-fn main() {
-
-}

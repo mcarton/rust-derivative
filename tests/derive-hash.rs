@@ -19,6 +19,7 @@ macro_rules! define {
 
 struct FakeHasher<'a>(&'a mut Vec<u8>);
 impl<'a> ::std::hash::Hasher for FakeHasher<'a> {
+    #[cfg(not(tarpaulin_include))]
     fn finish(&self) -> u64 {
         unimplemented!()
     }

@@ -16,6 +16,3 @@ struct Qux<'a, T: Foo>(&'a T);
 #[derive(Derivative)]
 #[derivative(Debug)]
 struct _Bar<'a, T: Foo>(#[derivative(Debug(format_with="fmt"))] Qux<'a, T>);
-
-fn main() {
-}

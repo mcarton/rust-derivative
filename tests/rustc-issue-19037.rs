@@ -30,6 +30,7 @@ struct CharSplits<'a, Sep> {
     finished: bool,
 }
 
+#[cfg(not(tarpaulin_include))]
 fn clone(s: &Str) -> &Str {
     Clone::clone(&s)
 }

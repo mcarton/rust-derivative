@@ -12,6 +12,7 @@ pub struct Foo {
     foo: u8,
 }
 
+#[test]
 fn main() {
     let foo1 = Foo::default();
     println!("foo = {:?}", foo1);

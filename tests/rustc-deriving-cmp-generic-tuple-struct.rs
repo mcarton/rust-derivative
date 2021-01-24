@@ -20,6 +20,7 @@ extern crate derivative;
 #[derivative(PartialEq, Eq, PartialOrd, Ord)]
 struct TS<T>(T, T);
 
+#[test]
 pub fn main() {
     let ts1 = TS(1, 1);
     let ts2 = TS(1, 2);

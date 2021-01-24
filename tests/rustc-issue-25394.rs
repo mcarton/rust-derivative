@@ -18,6 +18,7 @@ extern crate derivative;
 #[derivative(Debug)]
 struct Row<T>([T]);
 
+#[cfg(not(tarpaulin_include))]
 fn use_row(_: &Row<u8>) {}
 
 #[test]
