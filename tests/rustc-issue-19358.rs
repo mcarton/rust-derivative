@@ -11,7 +11,10 @@
 #[cfg(feature = "use_core")]
 extern crate core;
 
-trait Trait { fn dummy(&self) { } }
+trait Trait {
+    #[cfg(not(tarpaulin_include))]
+    fn dummy(&self) { }
+}
 
 #[macro_use]
 extern crate derivative;

@@ -28,7 +28,7 @@ enum ES<T> {
     ES2 { x: T, y: T },
 }
 
-
+#[test]
 pub fn main() {
     let (es11, es12, es21, es22) = (
         ES::ES1 { x: 1 },

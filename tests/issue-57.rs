@@ -16,4 +16,7 @@ macro_rules! gen {
 
 gen!(Test);
 
-fn main() {}
+#[test]
+fn call_it() {
+    println!("{:?}", Test { a: 42 });
+}

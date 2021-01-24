@@ -30,6 +30,7 @@ struct Liar;
 static CLONED: AtomicBool = AtomicBool::new(false);
 
 impl Clone for Liar {
+    #[cfg(not(tarpaulin_include))] // The intended effect is for this function not to be called!
     fn clone(&self) -> Self {
         // this makes Clone vs Copy observable
         CLONED.store(true, Ordering::SeqCst);

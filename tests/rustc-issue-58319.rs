@@ -19,8 +19,6 @@ extern crate core;
 #[macro_use]
 extern crate derivative;
 
-fn main() {}
-
 #[derive(Derivative)]
 #[derivative(Clone)]
 pub struct Little;

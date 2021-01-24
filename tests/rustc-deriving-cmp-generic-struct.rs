@@ -23,6 +23,7 @@ struct S<T> {
     y: T,
 }
 
+#[test]
 pub fn main() {
     let s1 = S { x: 1, y: 1 };
     let s2 = S { x: 1, y: 2 };

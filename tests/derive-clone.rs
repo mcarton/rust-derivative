@@ -22,6 +22,7 @@ fn seventh(a: &u8) -> u8 {
 struct EvilCloneFrom(u8);
 
 impl Clone for EvilCloneFrom {
+    #[cfg(not(tarpaulin_include))]
     fn clone(&self) -> Self {
         EvilCloneFrom(self.0)
     }
