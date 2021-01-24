@@ -1,6 +1,5 @@
 // We need to support Rust 1.34 to stable
 #![allow(deprecated)]
-
 #![allow(renamed_and_removed_lints)] // support for multiple Clippy versions
 #![allow(clippy::unknown_clippy_lints)] // because of other #![allow]s
 #![allow(clippy::mem_replace_with_default)] // needs rustc 1.40
@@ -65,30 +64,43 @@ fn derive_impls(
         tokens.extend(cmp::derive_ord(input, errors));
     }
 
-    tokens.extend(std::mem::replace(
-        errors,
-        Default::default(),
-    ));
+    tokens.extend(std::mem::replace(errors, Default::default()));
 
     tokens
 }
 
+#[cfg(not(tarpaulin_include))]
 #[cfg_attr(not(test), proc_macro_derive(Derivative, attributes(derivative)))]
 pub fn derivative(input: TokenStream) -> TokenStream {
+    derivative_internal(syn::parse_macro_input!(input as syn::DeriveInput)).into()
+}
+
+fn derivative_internal(input: syn::DeriveInput) -> proc_macro2::TokenStream {
     let mut errors = proc_macro2::TokenStream::new();
 
-    let mut output = match syn::parse::<syn::DeriveInput>(input) {
-        Ok(parsed) => {
-            ast::Input::from_ast(&parsed, &mut errors)
-                .map(|mut input| derive_impls(&mut input, &mut errors))
-                .unwrap_or_default()
-        },
-        Err(error) => {
-            errors.extend(error.to_compile_error());
-            Default::default()
-        }
-    };
+    let mut output = ast::Input::from_ast(&input, &mut errors)
+        .map(|mut input| derive_impls(&mut input, &mut errors))
+        .unwrap_or_default();
 
     output.extend(errors);
-    output.into()
+    output
+}
+
+#[test]
+fn macro_code_coverage() {
+    for entry in walkdir::WalkDir::new("tests")
+        .into_iter()
+        .map(|e| e.unwrap())
+        .filter(|e| e.file_type().is_file())
+        .filter(|e| e.path().extension().map(|e| e == "rs").unwrap_or(false))
+    {
+        let file = std::fs::File::open(entry.path()).unwrap();
+
+        runtime_macros_derive::emulate_derive_expansion_fallible(
+            file,
+            "Derivative",
+            derivative_internal,
+        )
+        .unwrap();
+    }
 }
