@@ -1,0 +1,7 @@
+error[E0277]: the trait bound `Error: std::hash::Hash` is not satisfied
+  --> $DIR/derives-span-Hash-struct.rs:15:5
+   |
+15 |     x: Error
+   |     ^ the trait `std::hash::Hash` is not implemented for `Error`
+   |
+   = note: required by `std::hash::Hash::hash`

@@ -1,0 +1,7 @@
+error[E0277]: the trait bound `Error: std::clone::Clone` is not satisfied
+  --> $DIR/derives-span-Clone-enum-struct-variant.rs:17:9
+   |
+17 |      x: Error
+   |         ^^^^^ the trait `std::clone::Clone` is not implemented for `Error`
+   |
+   = note: required by `std::clone::Clone::clone`

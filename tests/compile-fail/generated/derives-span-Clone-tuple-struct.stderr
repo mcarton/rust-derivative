@@ -1,0 +1,7 @@
+error[E0277]: the trait bound `Error: std::clone::Clone` is not satisfied
+  --> $DIR/derives-span-Clone-tuple-struct.rs:15:5
+   |
+15 |     Error
+   |     ^^^^^ the trait `std::clone::Clone` is not implemented for `Error`
+   |
+   = note: required by `std::clone::Clone::clone`

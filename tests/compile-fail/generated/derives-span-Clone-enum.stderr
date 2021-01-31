@@ -1,0 +1,7 @@
+error[E0277]: the trait bound `Error: std::clone::Clone` is not satisfied
+  --> $DIR/derives-span-Clone-enum.rs:16:6
+   |
+16 |    A(Error)
+   |      ^^^^^ the trait `std::clone::Clone` is not implemented for `Error`
+   |
+   = note: required by `std::clone::Clone::clone`

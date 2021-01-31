@@ -1,0 +1,19 @@
+error: can't use `#[derivative(PartialOrd)]` on an enumeration without `feature_allow_slow_enum`; see the documentation for more details
+  --> $DIR/derives-span-Ord-enum-struct-variant.rs:13:1
+   |
+13 | #[derivative(Ord,Eq,PartialOrd,PartialEq)]
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: can't use `#[derivative(Ord)]` on an enumeration without `feature_allow_slow_enum`; see the documentation for more details
+  --> $DIR/derives-span-Ord-enum-struct-variant.rs:13:1
+   |
+13 | #[derivative(Ord,Eq,PartialOrd,PartialEq)]
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error[E0277]: the trait bound `Error: std::cmp::Ord` is not satisfied
+  --> $DIR/derives-span-Ord-enum-struct-variant.rs:17:6
+   |
+17 |      x: Error
+   |      ^ the trait `std::cmp::Ord` is not implemented for `Error`
+   |
+   = note: required by `std::cmp::Ord::cmp`
