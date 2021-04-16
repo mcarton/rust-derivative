@@ -23,3 +23,4 @@
     <!-- * [Ignoring fields](cmp.md#ignoring-a-field) -->
     <!-- * [Alternative comparison function](cmp.md#compare-with) -->
     <!-- * [Custom bound](cmp.md#custom-bound) -->
+* [PhantomData](PhantomData.md)
