@@ -1,5 +1,5 @@
 # Custom attributes
-The `PartialEq`, `Eq`, `PartialOrd` and `Eq` and traits support the following attributes:
+The `PartialEq`, `Eq`, `PartialOrd` and `Ord` traits support the following attributes:
 
 * **Container attributes**
     * [`<CmpTrait>(bound="<where-clause or empty>")`](#custom-bound)
