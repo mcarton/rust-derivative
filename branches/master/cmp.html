@@ -4,49 +4,30 @@
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
         <title>Comparison traits - Derivative</title>
-        
-        
-
-
         <!-- Custom HTML head -->
         
-
 
         <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="theme-color" content="#ffffff" />
 
-        
         <link rel="icon" href="favicon.svg">
-        
-        
         <link rel="shortcut icon" href="favicon.png">
-        
         <link rel="stylesheet" href="css/variables.css">
         <link rel="stylesheet" href="css/general.css">
         <link rel="stylesheet" href="css/chrome.css">
-        
         <link rel="stylesheet" href="css/print.css" media="print">
-        
-
         <!-- Fonts -->
         <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
-        
         <link rel="stylesheet" href="fonts/fonts.css">
-        
-
         <!-- Highlight.js Stylesheets -->
         <link rel="stylesheet" href="highlight.css">
         <link rel="stylesheet" href="tomorrow-night.css">
         <link rel="stylesheet" href="ayu-highlight.css">
 
         <!-- Custom theme stylesheets -->
-        
         <link rel="stylesheet" href="doc/custom.css">
-        
-
-        
     </head>
     <body>
         <!-- Provide site root to javascript -->
@@ -122,33 +103,26 @@
                             <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
                             <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
                         </ul>
-                        
                         <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
                             <i class="fa fa-search"></i>
                         </button>
-                        
                     </div>
 
                     <h1 class="menu-title">Derivative</h1>
 
                     <div class="right-buttons">
-                        
                         <a href="print.html" title="Print this book" aria-label="Print this book">
                             <i id="print-button" class="fa fa-print"></i>
                         </a>
-                        
-                        
                         <a href="https://github.com/mcarton/rust-derivative" title="Git repository" aria-label="Git repository">
                             <i id="git-repository-button" class="fa fa-github"></i>
                         </a>
-                        
                     </div>
                 </div>
 
-                
                 <div id="search-wrapper" class="hidden">
                     <form id="searchbar-outer" class="searchbar-outer">
-                        <input type="search" name="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
                     </form>
                     <div id="searchresults-outer" class="searchresults-outer hidden">
                         <div id="searchresults-header" class="searchresults-header"></div>
@@ -156,8 +130,6 @@
                         </ul>
                     </div>
                 </div>
-                
-
                 <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
                 <script type="text/javascript">
                     document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
@@ -169,8 +141,8 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1><a class="header" href="#custom-attributes" id="custom-attributes">Custom attributes</a></h1>
-<p>The <code>PartialEq</code>, <code>Eq</code>, <code>PartialOrd</code> and <code>Eq</code> and traits support the following attributes:</p>
+                        <h1 id="custom-attributes"><a class="header" href="#custom-attributes">Custom attributes</a></h1>
+<p>The <code>PartialEq</code>, <code>Eq</code>, <code>PartialOrd</code> and <code>Ord</code> traits support the following attributes:</p>
 <ul>
 <li><strong>Container attributes</strong>
 <ul>
@@ -198,7 +170,7 @@
 </li>
 </ul>
 <p>(These attributes are not relevant for <code>Eq</code> which is just a marker trait.)</p>
-<h1><a class="header" href="#enumerations" id="enumerations">Enumerations</a></h1>
+<h1 id="enumerations"><a class="header" href="#enumerations">Enumerations</a></h1>
 <p>Unfortunately, there is no way for derivative to derive <code>PartialOrd</code> or <code>Ord</code> on
 enumerations as efficiently as the built-in <code>derive(…)</code> yet.</p>
 <p>If you want to use derivative on enumerations anyway, you can add</p>
@@ -207,7 +179,7 @@ enumerations as efficiently as the built-in <code>derive(…)</code> yet.</p>
 <p>to your enumeration. This acts as a “feature-gate”.</p>
 <p>This attribute is also allowed for <code>PartialEq</code> for historical reason. It is not
 necessary anymore as of v2.1.0. It was never necessary nor allowed for <code>Eq</code>.</p>
-<h1><a class="header" href="#ignoring-a-field" id="ignoring-a-field">Ignoring a field</a></h1>
+<h1 id="ignoring-a-field"><a class="header" href="#ignoring-a-field">Ignoring a field</a></h1>
 <p>You can use <em>derivative</em> to ignore a field when comparing:</p>
 <pre><pre class="playground"><code class="language-rust edition2018">
 <span class="boring">#![allow(unused)]
@@ -226,7 +198,7 @@ assert!(Foo { foo: 0, bar: 42 } == Foo { foo: 0, bar: 7});
 assert!(Foo { foo: 42, bar: 0 } != Foo { foo: 7, bar: 0});
 <span class="boring">}
 </span></code></pre></pre>
-<h1><a class="header" href="#compare-with" id="compare-with">Compare with</a></h1>
+<h1 id="compare-with"><a class="header" href="#compare-with">Compare with</a></h1>
 <p>Usually fields are compared using <code>==</code>, <code>PartialOrd::partial_cmp</code> or <code>Ord::cmp</code>. You can use an alternative comparison
 function if you like:</p>
 <pre><pre class="playground"><code class="language-rust edition2018">
@@ -257,7 +229,7 @@ struct Foo {
 <tr><td><code>PartialOrd</code></td><td><span class="rust"><code>fn my_cmp_fn(&amp;T, &amp;T) -&gt; std::option::Option&lt;std::cmp::Ordering&gt;;</code></span></td></tr>
 <tr><td><code>Ord</code></td><td><span class="rust"><code>fn my_cmp_fn(&amp;T, &amp;T) -&gt; std::cmp::Ordering;</code></span></td></tr>
 </tbody></table>
-<h1><a class="header" href="#custom-bound" id="custom-bound">Custom bound</a></h1>
+<h1 id="custom-bound"><a class="header" href="#custom-bound">Custom bound</a></h1>
 <p>Usually if you derive <code>CmpTrait</code>, a <code>T: CmpTrait</code> bound is added for each type parameter <code>T</code>. You can use
 override this behavior if the inferred bound is not correct for you.</p>
 <p>Eg. comparing raw pointers does not require the type to be <code>Eq</code>, so you could
@@ -276,7 +248,7 @@ struct WithPtr&lt;T: ?Sized&gt; {
 <span class="boring">}
 </span></code></pre></pre>
 <p>See <a href="./Default.html#custom-bound"><code>Default</code>'s documentation</a> for more details.</p>
-<h1><a class="header" href="#packed-structures" id="packed-structures">Packed structures</a></h1>
+<h1 id="packed-structures"><a class="header" href="#packed-structures">Packed structures</a></h1>
 <p>You can use <em>derivative</em> to implement the comparison traits on packed structures. Unlike the standard <code>derive</code>, <em>derivative</em> does not require the structure itself to be <code>Copy</code>, but like the standard <code>derive</code>, it requires each (non-ignored) field to be <code>Copy</code>.</p>
 <pre><pre class="playground"><code class="language-rust edition2018">
 <span class="boring">#![allow(unused)]
@@ -298,59 +270,32 @@ struct Foo {
 
                     <nav class="nav-wrapper" aria-label="Page navigation">
                         <!-- Mobile navigation buttons -->
-                        
                             <a rel="prev" href="Hash.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                                 <i class="fa fa-angle-left"></i>
                             </a>
-                        
-
-                        
-
                         <div style="clear: both"></div>
                     </nav>
                 </div>
             </div>
 
             <nav class="nav-wide-wrapper" aria-label="Page navigation">
-                
                     <a rel="prev" href="Hash.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                         <i class="fa fa-angle-left"></i>
                     </a>
-                
-
-                
             </nav>
 
         </div>
 
-        
-
-        
-
-        
-
-        
         <script type="text/javascript">
             window.playground_copyable = true;
         </script>
-        
-
-        
-
-        
         <script src="elasticlunr.min.js" type="text/javascript" charset="utf-8"></script>
         <script src="mark.min.js" type="text/javascript" charset="utf-8"></script>
         <script src="searcher.js" type="text/javascript" charset="utf-8"></script>
-        
-
         <script src="clipboard.min.js" type="text/javascript" charset="utf-8"></script>
         <script src="highlight.js" type="text/javascript" charset="utf-8"></script>
         <script src="book.js" type="text/javascript" charset="utf-8"></script>
 
         <!-- Custom JS scripts -->
-        
-
-        
-
     </body>
 </html>
