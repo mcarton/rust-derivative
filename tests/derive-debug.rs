@@ -65,12 +65,12 @@ impl<T: std::fmt::Debug> ToDebug for T {
 
 #[test]
 fn main() {
-    assert_eq!(Foo { foo: 42, bar: 1 }.to_show(), "Foo { foo: 42 }".to_string());
+    assert_eq!(Foo { foo: 42, bar: 1 }.to_show(), "Foo { foo: 42, .. }".to_string());
     assert_eq!(Bar(42, 1).to_show(), "Bar(42)".to_string());
     assert_eq!(C::V1(12).to_show(), "V1(12)".to_string());
     assert_eq!(C::V2(12).to_show(), "V2".to_string());
     assert_eq!(C::V3("foo".to_string()).to_show(), "V3(\"foo\")".to_string());
-    assert_eq!(D::V1 { a: 42 }.to_show(), "V1".to_string());
+    assert_eq!(D::V1 { a: 42 }.to_show(), "V1 { .. }".to_string());
     assert_eq!(F(42).to_show(), "F".to_string());
     assert_eq!(G(42, 0).to_show(), "G(42)".to_string());
     assert_eq!(J(NoDebug).to_show(), "J".to_string());
