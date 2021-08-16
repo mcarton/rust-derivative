@@ -34,7 +34,7 @@ pub struct Field<'a> {
     pub span: proc_macro2::Span,
 }
 
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy, Debug, PartialEq)]
 pub enum Style {
     Struct,
     Tuple,

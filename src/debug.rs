@@ -72,6 +72,15 @@ pub fn derive(input: &ast::Input) -> proc_macro2::TokenStream {
             };
             let method = syn::Ident::new(method, proc_macro2::Span::call_site());
 
+            let field_prints: Vec<_> = field_prints.collect();
+            let exhaustive = field_prints.len() == bis.len();
+            let finish = if exhaustive || style != ast::Style::Struct {
+                "finish"
+            } else {
+                "finish_non_exhaustive"
+            };
+            let finish = syn::Ident::new(finish, proc_macro2::Span::call_site());
+
             if attrs.debug_transparent() {
                 quote_spanned! {arm_name.span()=>
                     #(#field_prints)*
@@ -81,7 +90,7 @@ pub fn derive(input: &ast::Input) -> proc_macro2::TokenStream {
                 quote_spanned! {arm_name.span()=>
                     let mut __debug_trait_builder = #formatter.#method(#name);
                     #(#field_prints)*
-                    __debug_trait_builder.finish()
+                    __debug_trait_builder.#finish()
                 }
             }
         });
