@@ -100,8 +100,7 @@ pub fn derive(input: &ast::Input) -> proc_macro2::TokenStream {
     // don't attach a span to prevent issue #58
     let match_self = quote!(match *self);
     quote_spanned! {input.span=>
-        #[allow(unused_qualifications)]
-        #[allow(clippy::unneeded_field_pattern)]
+        #[automatically_derived]
         impl #impl_generics #debug_trait_path for #name #ty_generics #where_clause {
             fn fmt(&self, #formatter: &mut #fmt_path::Formatter) -> #fmt_path::Result {
                 #match_self {

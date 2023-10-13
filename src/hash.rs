@@ -60,7 +60,7 @@ pub fn derive(input: &ast::Input) -> proc_macro2::TokenStream {
 
     let hasher_ty_parameter = utils::hygienic_type_parameter(input, "__H");
     quote! {
-        #[allow(unused_qualifications)]
+        #[automatically_derived]
         impl #impl_generics #hash_trait_path for #name #ty_generics #where_clause {
             fn hash<#hasher_ty_parameter>(&self, __state: &mut #hasher_ty_parameter)
                 where #hasher_ty_parameter: #hasher_trait_path

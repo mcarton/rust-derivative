@@ -31,7 +31,7 @@ pub fn derive_eq(input: &ast::Input) -> proc_macro2::TokenStream {
     }
 
     quote! {
-        #[allow(unused_qualifications)]
+        #[automatically_derived]
         impl #impl_generics #eq_trait_path for #name #ty_generics #where_clause {}
     }
 }
@@ -95,8 +95,7 @@ pub fn derive_partial_eq(input: &ast::Input) -> proc_macro2::TokenStream {
     }
 
     quote! {
-        #[allow(unused_qualifications)]
-        #[allow(clippy::unneeded_field_pattern)]
+        #[automatically_derived]
         impl #impl_generics #partial_eq_trait_path for #name #ty_generics #where_clause {
             fn eq(&self, other: &Self) -> bool {
                 #discriminant_cmp && #match_fields
@@ -196,8 +195,7 @@ pub fn derive_partial_ord(
     }
 
     quote! {
-        #[allow(unused_qualifications)]
-        #[allow(clippy::unneeded_field_pattern)]
+        #[automatically_derived]
         impl #impl_generics #partial_ord_trait_path for #name #ty_generics #where_clause {
             fn partial_cmp(&self, other: &Self) -> #option_path<#ordering_path> {
                 match *self {
@@ -293,8 +291,7 @@ pub fn derive_ord(
     }
 
     quote! {
-        #[allow(unused_qualifications)]
-        #[allow(clippy::unneeded_field_pattern)]
+        #[automatically_derived]
         impl #impl_generics #ord_trait_path for #name #ty_generics #where_clause {
             fn cmp(&self, other: &Self) -> #ordering_path {
                 match *self {

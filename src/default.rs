@@ -85,7 +85,7 @@ pub fn derive(input: &ast::Input, default: &attr::InputDefault) -> proc_macro2::
 
     let new_fn = if default.new {
         Some(quote!(
-            #[allow(unused_qualifications)]
+            #[automatically_derived]
             impl #impl_generics #name #ty_generics #where_clause {
                 /// Creates a default value for this type.
                 #[inline]
@@ -101,7 +101,7 @@ pub fn derive(input: &ast::Input, default: &attr::InputDefault) -> proc_macro2::
     quote!(
         #new_fn
 
-        #[allow(unused_qualifications)]
+        #[automatically_derived]
         impl #impl_generics #default_trait_path for #name #ty_generics #where_clause {
             fn default() -> Self {
                 #body
