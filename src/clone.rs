@@ -21,7 +21,7 @@ pub fn derive_copy(input: &ast::Input) -> proc_macro2::TokenStream {
     let (impl_generics, ty_generics, where_clause) = generics.split_for_impl();
 
     quote! {
-        #[allow(unused_qualifications)]
+        #[automatically_derived]
         impl #impl_generics #copy_trait_path for #name #ty_generics #where_clause {}
     }
 }
@@ -43,7 +43,7 @@ pub fn derive_clone(input: &ast::Input) -> proc_macro2::TokenStream {
     let is_copy = input.attrs.copy.is_some();
     if is_copy && input.generics.type_params().count() == 0 {
         quote! {
-            #[allow(unused_qualifications)]
+            #[automatically_derived]
             impl #impl_generics #clone_trait_path for #name #ty_generics #where_clause {
                 fn clone(&self) -> Self {
                     *self
@@ -159,7 +159,7 @@ pub fn derive_clone(input: &ast::Input) -> proc_macro2::TokenStream {
         });
 
         quote! {
-            #[allow(unused_qualifications)]
+            #[automatically_derived]
             impl #impl_generics #clone_trait_path for #name #ty_generics #where_clause {
                 fn clone(&self) -> Self {
                     match *self {
