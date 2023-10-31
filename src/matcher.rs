@@ -180,7 +180,7 @@ impl<T: Fn (&ast::Field) -> bool> Matcher<T> {
             quote! {
                 match (&#left_matched_expr, &#right_matched_expr) {
                     #t
-                    _ => unreachable!(),
+                    _ => false,
                 }
             }
         }

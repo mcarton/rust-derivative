@@ -102,6 +102,8 @@ pub struct InputHash {
 pub struct InputPartialEq {
     /// The `bound` attribute if present and the corresponding bounds.
     bounds: Option<Vec<syn::WherePredicate>>,
+    /// Skip discriminant comparison that happens before equating fields
+    skip_discriminant: bool,
 }
 
 #[derive(Debug, Default)]
@@ -336,6 +338,9 @@ impl Input {
                     for value in values;
                     "bound" => parse_bound(&mut partial_eq.bounds, value, errors),
                     "feature_allow_slow_enum" => (), // backward compatibility, now unnecessary
+                    "skip_discriminant" => {
+                        partial_eq.skip_discriminant = parse_boolean_meta_item(value, true, "skip_discriminant", errors);
+                    }
                 }
             }
             "PartialOrd" => {
@@ -439,6 +444,12 @@ impl Input {
 
     pub fn ord_on_enum(&self) -> bool {
         self.ord.as_ref().map_or(false, |d| d.on_enum)
+    }
+
+    pub(crate) fn skip_discriminant_on_partial_eq(&self) -> bool {
+        self.partial_eq
+            .as_ref()
+            .map_or(false, |d| d.skip_discriminant)
     }
 }
 
