@@ -39,9 +39,13 @@ pub fn derive_eq(input: &ast::Input) -> proc_macro2::TokenStream {
 /// Derive `PartialEq` for `input`.
 pub fn derive_partial_eq(input: &ast::Input) -> proc_macro2::TokenStream {
     let discriminant_cmp = if let ast::Body::Enum(_) = input.body {
-        let discriminant_path = paths::discriminant_path();
+        if !input.attrs.skip_discriminant_on_partial_eq() {
+            let discriminant_path = paths::discriminant_path();
 
-        quote!((#discriminant_path(&*self) == #discriminant_path(&*other)))
+            quote!((#discriminant_path(&*self) == #discriminant_path(&*other)))
+        } else {
+            quote!(true)
+        }
     } else {
         quote!(true)
     };
