@@ -88,6 +88,6 @@ fn main() {
     assert_eq!(F(NoDebug).to_show(), "F".to_string());
     assert_eq!(G(42, NoDebug).to_show(), "G(42)".to_string());
     assert_eq!(J(NoDebug).to_show(), "J".to_string());
-    assert_eq!(&format!("{:?}", PhantomField::<NoDebug> { foo: Default::default() }), "PhantomField { foo: PhantomData }");
-    assert_eq!(&format!("{:?}", PhantomTuple::<NoDebug> { foo: Default::default() }), "PhantomTuple { foo: PhantomData }");
+    assert_eq!(&format!("{:?}", PhantomField::<NoDebug> { foo: Default::default() }), "PhantomField { foo: PhantomData<derive_debug_generics::NoDebug> }");
+    assert_eq!(&format!("{:?}", PhantomTuple::<NoDebug> { foo: Default::default() }), "PhantomTuple { foo: PhantomData<(derive_debug_generics::NoDebug,)> }");
 }

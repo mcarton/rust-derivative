@@ -162,7 +162,7 @@ fn format_with(
 
     generics
         .params
-        .push(syn::GenericParam::Lifetime(syn::LifetimeDef::new(
+        .push(syn::GenericParam::Lifetime(syn::LifetimeParam::new(
             parse_quote!('_derivative),
         )));
     let where_predicates = generics
@@ -201,7 +201,7 @@ fn format_with(
     *ctor_generics
         .lifetimes_mut()
         .last()
-        .expect("There must be a '_derivative lifetime") = syn::LifetimeDef::new(parse_quote!('_));
+        .expect("There must be a '_derivative lifetime") = syn::LifetimeParam::new(parse_quote!('_));
     let (_, ctor_ty_generics, _) = ctor_generics.split_for_impl();
     let ctor_ty_generics = ctor_ty_generics.as_turbofish();
 
