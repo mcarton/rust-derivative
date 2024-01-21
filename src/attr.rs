@@ -202,7 +202,7 @@ macro_rules! for_all_attr {
             if let Some(meta_items) = meta_items {
                 for meta_item in meta_items.iter() {
                     let meta_item = read_items(meta_item, $errors);
-                    let MetaItem($name, $value) = try!(meta_item);
+                    let MetaItem($name, $value) = meta_item?;
                     match $name.to_string().as_ref() {
                         $($body)*
                     }
@@ -226,7 +226,8 @@ macro_rules! match_attributes {
     };
 
     ($errors:ident for $trait:expr; for $value:ident in $values:expr; $($body:tt)* ) => {
-        for (name, $value) in $values {
+        for (name, $value) in $values.iter() {
+            let $value = $value.as_ref();
             match name {
                 Some(ident) => {
                     match ident.to_string().as_ref() {
@@ -658,22 +659,15 @@ impl Field {
 /// * `#[derivative(Debug(foo="bar")]` is represented as `(Debug, [(Some(foo), Some("bar"))])`.
 struct MetaItem<'a>(
     &'a syn::Ident,
-    Vec<(Option<&'a syn::Ident>, Option<&'a syn::LitStr>)>,
+    Vec<(Option<syn::Ident>, Option<syn::LitStr>)>,
 );
 
 /// Parse an arbitrary item for our limited `MetaItem` subset.
-fn read_items<'a>(item: &'a syn::NestedMeta, errors: &mut proc_macro2::TokenStream) -> Result<MetaItem<'a>, ()> {
-    let item = match *item {
-        syn::NestedMeta::Meta(ref item) => item,
-        syn::NestedMeta::Lit(ref lit) => {
-            errors.extend(quote_spanned! {lit.span()=>
-                compile_error!("expected meta-item but found literal");
-            });
-
-            return Err(());
-        }
-    };
-    match *item {
+fn read_items<'a>(
+    item: &'a syn::Meta,
+    errors: &mut proc_macro2::TokenStream,
+) -> Result<MetaItem<'a>, ()> {
+    match item {
         syn::Meta::Path(ref path) => match path.get_ident() {
             Some(name) => Ok(MetaItem(name, Vec::new())),
             None => {
@@ -684,23 +678,27 @@ fn read_items<'a>(item: &'a syn::NestedMeta, errors: &mut proc_macro2::TokenStre
                 Err(())
             }
         },
-        syn::Meta::List(syn::MetaList {
-            ref path,
-            nested: ref values,
-            ..
-        }) => {
+        syn::Meta::List(list) => {
+            let Ok(values) = list.parse_args_with(
+                syn::punctuated::Punctuated::<syn::Meta, syn::token::Comma>::parse_terminated,
+            ) else {
+                errors.extend(quote_spanned! {list.span()=>
+                    compile_error!("expected meta list");
+                });
+                return Err(());
+            };
             let values = values
                 .iter()
                 .map(|value| {
-                    if let syn::NestedMeta::Meta(syn::Meta::NameValue(syn::MetaNameValue {
+                    if let syn::Meta::NameValue(syn::MetaNameValue {
                         ref path,
-                        lit: ref value,
+                        ref value,
                         ..
-                    })) = *value
+                    }) = *value
                     {
                         let (name, value) = ensure_str_lit(&path, &value, errors)?;
 
-                        Ok((Some(name), Some(value)))
+                        Ok((Some(name.clone()), Some(value.clone())))
                     } else {
                         errors.extend(quote_spanned! {value.span()=>
                             compile_error!("expected named value");
@@ -711,27 +709,24 @@ fn read_items<'a>(item: &'a syn::NestedMeta, errors: &mut proc_macro2::TokenStre
                 })
                 .collect::<Result<_, _>>()?;
 
-            let name = match path.get_ident() {
+            let name = match list.path.get_ident() {
                 Some(name) => name,
                 None => {
-                    errors.extend(quote_spanned! {path.span()=>
+                    errors.extend(quote_spanned! {list.path.span()=>
                         compile_error!("expected derivative attribute to be a string, but found a path");
                     });
 
                     return Err(());
                 }
             };
-
             Ok(MetaItem(name, values))
         }
         syn::Meta::NameValue(syn::MetaNameValue {
-            ref path,
-            lit: ref value,
-            ..
+            ref path, value, ..
         }) => {
             let (name, value) = ensure_str_lit(&path, &value, errors)?;
 
-            Ok(MetaItem(name, vec![(None, Some(value))]))
+            Ok(MetaItem(name, vec![(None, Some(value.clone()))]))
         }
     }
 }
@@ -740,13 +735,15 @@ fn read_items<'a>(item: &'a syn::NestedMeta, errors: &mut proc_macro2::TokenStre
 fn derivative_attribute(
     attribute: &syn::Attribute,
     errors: &mut proc_macro2::TokenStream,
-) -> Option<syn::punctuated::Punctuated<syn::NestedMeta, syn::token::Comma>> {
-    if !attribute.path.is_ident("derivative") {
-        return None;
-    }
-    match attribute.parse_meta() {
-        Ok(syn::Meta::List(meta_list)) => Some(meta_list.nested),
-        Ok(_) => None,
+) -> Option<syn::punctuated::Punctuated<syn::Meta, syn::token::Comma>> {
+    let list = match &attribute.meta {
+        syn::Meta::List(list) if list.path.is_ident("derivative") => list,
+        _ => return None,
+    };
+    match list.parse_args_with(
+        syn::punctuated::Punctuated::<syn::Meta, syn::token::Comma>::parse_terminated,
+    ) {
+        Ok(x) => Some(x),
         Err(e) => {
             let message = format!("invalid attribute: {}", e);
             errors.extend(quote_spanned! {e.span()=>
@@ -841,7 +838,7 @@ where
 
 fn ensure_str_lit<'a>(
     attr_path: &'a syn::Path,
-    lit: &'a syn::Lit,
+    lit: &'a syn::Expr,
     errors: &mut proc_macro2::TokenStream,
 ) -> Result<(&'a syn::Ident, &'a syn::LitStr), ()> {
     let attr_name = match attr_path.get_ident() {
@@ -854,7 +851,11 @@ fn ensure_str_lit<'a>(
         }
     };
 
-    if let syn::Lit::Str(ref lit) = *lit {
+    if let syn::Expr::Lit(syn::ExprLit {
+        lit: syn::Lit::Str(ref lit),
+        ..
+    }) = *lit
+    {
         Ok((attr_name, lit))
     } else {
         let message = format!(
@@ -869,19 +870,14 @@ fn ensure_str_lit<'a>(
 }
 
 pub fn has_repr_packed_attr(attr: &syn::Attribute) -> bool {
-    if let Ok(attr) = attr.parse_meta() {
-        if attr.path().get_ident().map(|i| i == "repr") == Some(true) {
-            if let syn::Meta::List(items) = attr {
-                for item in items.nested {
-                    if let syn::NestedMeta::Meta(item) = item {
-                        if item.path().get_ident().map(|i| i == "packed") == Some(true) {
-                            return true;
-                        }
-                    }
-                }
+    let mut result = false;
+    if attr.path().is_ident("repr") {
+        attr.parse_nested_meta(|meta| {
+            if meta.path.is_ident("packed") {
+                result = true;
             }
-        }
+            Ok(())
+        }).ok();
     }
-
-    false
+    result
 }
