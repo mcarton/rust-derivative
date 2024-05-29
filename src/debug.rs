@@ -103,7 +103,7 @@ pub fn derive(input: &ast::Input) -> proc_macro2::TokenStream {
         #[allow(unused_qualifications)]
         #[allow(clippy::unneeded_field_pattern)]
         impl #impl_generics #debug_trait_path for #name #ty_generics #where_clause {
-            fn fmt(&self, #formatter: &mut #fmt_path::Formatter) -> #fmt_path::Result {
+            fn fmt(&self, #formatter: &mut #fmt_path::Formatter<'_>) -> #fmt_path::Result {
                 #match_self {
                     #body
                 }
@@ -212,7 +212,7 @@ fn format_with(
             struct Dummy #impl_generics (&'_derivative #ty, #phantom_path <(#(#phantom,)*)>) #where_clause;
 
             impl #impl_generics #debug_trait_path for Dummy #ty_generics #where_clause {
-                fn fmt(&self, __f: &mut #fmt_path::Formatter) -> #fmt_path::Result {
+                fn fmt(&self, __f: &mut #fmt_path::Formatter<'_>) -> #fmt_path::Result {
                     #match_self {
                         this => #format_fn(this, __f)
                     }
