@@ -83,7 +83,7 @@ struct Foo {
 The field `bar` will be displayed with `path::to::my_fmt_fn(&bar, &mut fmt)`
 where `fmt` is the current [`Formatter`].
 
-The function must the following prototype:
+The function must have the following prototype:
 
 ```rust,ignore
 fn fmt(&T, &mut std::fmt::Formatter) -> Result<(), std::fmt::Error>;
