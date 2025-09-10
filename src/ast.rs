@@ -82,7 +82,7 @@ impl<'a> Input<'a> {
     }
 }
 
-impl<'a> Body<'a> {
+impl Body<'_> {
     pub fn all_fields(&self) -> Vec<&Field> {
         match *self {
             Body::Enum(ref variants) => variants
@@ -101,7 +101,7 @@ impl<'a> Body<'a> {
     }
 }
 
-impl<'a> Variant<'a> {
+impl Variant<'_> {
     /// Checks whether this variant is a unit variant.
     pub fn is_unit(&self) -> bool {
         self.fields.is_empty()
