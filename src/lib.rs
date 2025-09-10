@@ -86,7 +86,6 @@ fn derivative_internal(input: syn::DeriveInput) -> proc_macro2::TokenStream {
     output
 }
 
-/*
 #[test]
 fn macro_code_coverage() {
     for entry in walkdir::WalkDir::new("tests")
@@ -105,4 +104,3 @@ fn macro_code_coverage() {
         .unwrap();
     }
 }
-*/
