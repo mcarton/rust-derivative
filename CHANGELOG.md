@@ -1,6 +1,9 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## 3.0.0
+This release should be compatible with version 1.* and 2.*, but now requires rustc version 1.85 or later.
+* Update `syn` ([#118]).
 
 ## 2.2.0
 * Add support for deriving traits on `repr(packed)` types ([#84]).
@@ -74,3 +77,4 @@ This is the last version to support rustc versions 1.15 to 1.33.
 [#81]: https://github.com/mcarton/rust-derivative/pull/81
 [#83]: https://github.com/mcarton/rust-derivative/pull/83
 [#84]: https://github.com/mcarton/rust-derivative/pull/84
+[#118]: https://github.com/mcarton/rust-derivative/pull/118

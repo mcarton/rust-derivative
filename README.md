@@ -9,7 +9,7 @@ This crate provides a set of alternative customizable `#[derive]` attributes for
 ## [Documentation][documentation]
 ## Stability
 
-This crate is stable and follows semver. It requires *rustc 1.34 or later* and changing the minimal rustc version will be considered a semver breaking change.
+This crate is stable and follows semver. It requires *rustc 1.85 or later* and changing the minimal rustc version will be considered a semver breaking change.
 
 ## What it does
 
