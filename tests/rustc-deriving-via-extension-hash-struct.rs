@@ -23,7 +23,7 @@ use std::collections::hash_map::DefaultHasher;
 struct Foo {
     x: isize,
     y: isize,
-    z: isize
+    z: isize,
 }
 
 #[test]

@@ -24,20 +24,23 @@ struct Tuple(isize, usize);
 
 #[derive(Derivative)]
 #[derivative(Debug)]
-struct Struct { x: isize, y: usize }
+struct Struct {
+    x: isize,
+    y: usize,
+}
 
 #[derive(Derivative)]
 #[derivative(Debug)]
 enum Enum {
     Nullary,
     Variant(isize, usize),
-    StructVariant { x: isize, y : usize }
+    StructVariant { x: isize, y: usize },
 }
 
 macro_rules! t {
     ($x:expr, $expected:expr) => {
         assert_eq!(format!("{:?}", $x), $expected.to_string())
-    }
+    };
 }
 
 #[test]
@@ -47,5 +50,8 @@ fn main() {
     t!(Struct { x: 1, y: 2 }, "Struct { x: 1, y: 2 }");
     t!(Enum::Nullary, "Nullary");
     t!(Enum::Variant(1, 2), "Variant(1, 2)");
-    t!(Enum::StructVariant { x: 1, y: 2 }, "StructVariant { x: 1, y: 2 }");
+    t!(
+        Enum::StructVariant { x: 1, y: 2 },
+        "StructVariant { x: 1, y: 2 }"
+    );
 }

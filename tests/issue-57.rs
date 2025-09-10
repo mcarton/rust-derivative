@@ -9,7 +9,7 @@ macro_rules! gen {
         #[derive(Derivative)]
         #[derivative(Debug)]
         pub struct $name {
-            a: i32
+            a: i32,
         }
     };
 }

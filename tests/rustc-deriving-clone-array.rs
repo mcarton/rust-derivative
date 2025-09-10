@@ -20,7 +20,7 @@ extern crate derivative;
 #[derivative(Copy, Clone)]
 #[allow(dead_code)]
 struct Array {
-    arr: [[u8; 256]; 4]
+    arr: [[u8; 256]; 4],
 }
 
 #[test]

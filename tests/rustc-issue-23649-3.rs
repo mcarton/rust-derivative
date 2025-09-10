@@ -17,7 +17,9 @@ extern crate derivative;
 #[allow(dead_code)]
 #[derive(Derivative)]
 #[derivative(PartialEq)]
-struct Slice { slice: [u8] }
+struct Slice {
+    slice: [u8],
+}
 
 #[test]
 fn main() {}

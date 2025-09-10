@@ -19,9 +19,9 @@ extern crate derivative;
 pub type TaskId = isize;
 
 #[derive(Derivative)]
-#[derivative(PartialEq="feature_allow_slow_enum")]
+#[derivative(PartialEq = "feature_allow_slow_enum")]
 pub enum Task {
-    TaskHandle(TaskId)
+    TaskHandle(TaskId),
 }
 
 #[test]

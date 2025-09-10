@@ -5,18 +5,18 @@ extern crate core;
 extern crate derivative;
 
 #[derive(Derivative)]
-#[derivative(Debug="transparent")]
+#[derivative(Debug = "transparent")]
 struct A(isize);
 
 #[derive(Derivative)]
-#[derivative(Debug="transparent")]
+#[derivative(Debug = "transparent")]
 struct B([isize; 1]);
 
 #[derive(Derivative)]
 #[derivative(Debug)]
 enum C {
     Foo(u8),
-    #[derivative(Debug="transparent")]
+    #[derivative(Debug = "transparent")]
     Bar(u8),
 }
 

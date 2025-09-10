@@ -14,15 +14,25 @@ use std::fmt;
 enum A {}
 #[derive(Derivative)]
 #[derivative(Debug)]
-enum B { V1, V2, V3 }
+enum B {
+    V1,
+    V2,
+    V3,
+}
 
 #[derive(Derivative)]
 #[derivative(Debug)]
-enum C { V1(isize), V2(B), V3(String) }
+enum C {
+    V1(isize),
+    V2(B),
+    V3(String),
+}
 
 #[derive(Derivative)]
 #[derivative(Debug)]
-enum D { V1{ a: isize } }
+enum D {
+    V1 { a: isize },
+}
 
 #[derive(Derivative)]
 #[derivative(Debug)]
@@ -35,10 +45,15 @@ struct F(isize);
 struct G(isize, isize);
 #[derive(Derivative)]
 #[derivative(Debug)]
-struct H { a: isize }
+struct H {
+    a: isize,
+}
 #[derive(Derivative)]
 #[derivative(Debug)]
-struct I { a: isize, b: isize }
+struct I {
+    a: isize,
+    b: isize,
+}
 #[derive(Derivative)]
 #[derivative(Debug)]
 struct J(Custom);
@@ -66,10 +81,10 @@ fn main() {
     assert_eq!(B::V2.to_show(), "V2".to_string());
     assert_eq!(C::V1(3).to_show(), "V1(3)".to_string());
     assert_eq!(C::V2(B::V2).to_show(), "V2(V2)".to_string());
-    assert_eq!(D::V1{ a: 2 }.to_show(), "V1 { a: 2 }".to_string());
+    assert_eq!(D::V1 { a: 2 }.to_show(), "V1 { a: 2 }".to_string());
     assert_eq!(E.to_show(), "E".to_string());
     assert_eq!(F(3).to_show(), "F(3)".to_string());
     assert_eq!(G(3, 4).to_show(), "G(3, 4)".to_string());
-    assert_eq!(I{ a: 2, b: 4 }.to_show(), "I { a: 2, b: 4 }".to_string());
+    assert_eq!(I { a: 2, b: 4 }.to_show(), "I { a: 2, b: 4 }".to_string());
     assert_eq!(J(Custom).to_show(), "J(yay)".to_string());
 }

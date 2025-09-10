@@ -22,8 +22,12 @@ struct PhantomTuple<T> {
 
 #[test]
 fn main() {
-    let phantom_field = PhantomField::<NoClone> { foo: Default::default() };
-    let phantom_tuple = PhantomTuple::<NoClone> { foo: Default::default() };
+    let phantom_field = PhantomField::<NoClone> {
+        foo: Default::default(),
+    };
+    let phantom_tuple = PhantomTuple::<NoClone> {
+        foo: Default::default(),
+    };
     assert!(phantom_field == phantom_field.clone());
     assert!(phantom_tuple == phantom_tuple.clone());
 }

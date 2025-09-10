@@ -19,7 +19,7 @@ extern crate derivative;
 #[allow(dead_code)]
 enum Foo {
     Bar(isize, char),
-    Baz(char, isize)
+    Baz(char, isize),
 }
 
 #[derive(Derivative)]
@@ -29,8 +29,8 @@ enum A {
     B,
     C,
     D,
-    E
+    E,
 }
 
 #[test]
-fn main(){}
+fn main() {}

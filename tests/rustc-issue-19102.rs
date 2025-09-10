@@ -17,7 +17,7 @@ extern crate core;
 extern crate derivative;
 
 #[derive(Derivative)]
-#[derivative(PartialEq="feature_allow_slow_enum")]
+#[derivative(PartialEq = "feature_allow_slow_enum")]
 pub enum A {
     B,
 }

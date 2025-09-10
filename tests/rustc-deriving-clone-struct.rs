@@ -38,7 +38,7 @@ struct S {
 
     _bool: bool,
     _char: char,
-    _nil: ()
+    _nil: (),
 }
 
 #[test]

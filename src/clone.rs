@@ -51,10 +51,8 @@ pub fn derive_clone(input: &ast::Input) -> proc_macro2::TokenStream {
             }
         }
     } else {
-        let body = matcher::Matcher::new(matcher::BindingStyle::Ref, input.attrs.is_packed).build_arms(
-            input,
-            "__arg",
-            |arm_path, _, _, style, _, bis| {
+        let body = matcher::Matcher::new(matcher::BindingStyle::Ref, input.attrs.is_packed)
+            .build_arms(input, "__arg", |arm_path, _, _, style, _, bis| {
                 let field_clones = bis.iter().map(|bi| {
                     let arg = &bi.expr;
 
@@ -92,16 +90,17 @@ pub fn derive_clone(input: &ast::Input) -> proc_macro2::TokenStream {
                         }
                     }
                 }
-            },
-        );
+            });
 
         let clone_from = if input.attrs.clone_from() {
             Some(
-                matcher::Matcher::new(matcher::BindingStyle::RefMut, input.attrs.is_packed).build_arms(
-                    input,
-                    "__arg",
-                    |outer_arm_path, _, _, _, _, outer_bis| {
-                        let body = matcher::Matcher::new(matcher::BindingStyle::Ref, input.attrs.is_packed).build_arms(
+                matcher::Matcher::new(matcher::BindingStyle::RefMut, input.attrs.is_packed)
+                    .build_arms(input, "__arg", |outer_arm_path, _, _, _, _, outer_bis| {
+                        let body = matcher::Matcher::new(
+                            matcher::BindingStyle::Ref,
+                            input.attrs.is_packed,
+                        )
+                        .build_arms(
                             input,
                             "__other",
                             |inner_arm_path, _, _, _, _, inner_bis| {
@@ -130,8 +129,7 @@ pub fn derive_clone(input: &ast::Input) -> proc_macro2::TokenStream {
                                 #body
                             }
                         }
-                    },
-                ),
+                    }),
             )
         } else {
             None

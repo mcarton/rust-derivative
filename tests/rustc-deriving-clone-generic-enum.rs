@@ -19,10 +19,10 @@ extern crate derivative;
 #[derive(Derivative)]
 #[derivative(Clone)]
 #[allow(dead_code)]
-enum E<T,U> {
+enum E<T, U> {
     A(T),
-    B(T,U),
-    C
+    B(T, U),
+    C,
 }
 
 #[test]

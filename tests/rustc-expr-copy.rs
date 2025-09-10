@@ -14,18 +14,19 @@ extern crate core;
 #[macro_use]
 extern crate derivative;
 
-
 fn f(arg: &mut A) {
     arg.a = 100;
 }
 
 #[derive(Derivative)]
 #[derivative(Copy, Clone)]
-struct A { a: isize }
+struct A {
+    a: isize,
+}
 
 #[test]
 fn main() {
-    let mut x = A {a: 10};
+    let mut x = A { a: 10 };
     f(&mut x);
     assert_eq!(x.a, 100);
     x.a = 20;

@@ -13,7 +13,7 @@
 #[cfg(feature = "use_core")]
 extern crate core;
 
-use std::hash::{SipHasher, Hasher, Hash};
+use std::hash::{Hash, Hasher, SipHasher};
 
 #[macro_use]
 extern crate derivative;

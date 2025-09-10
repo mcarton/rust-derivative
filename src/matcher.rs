@@ -73,7 +73,7 @@ pub struct Matcher<T> {
     field_filter: T,
 }
 
-impl Matcher<fn (&ast::Field) -> bool> {
+impl Matcher<fn(&ast::Field) -> bool> {
     pub fn new(style: BindingStyle, is_packed: bool) -> Self {
         Matcher {
             binding_name: "__arg".into(),
@@ -84,7 +84,7 @@ impl Matcher<fn (&ast::Field) -> bool> {
     }
 }
 
-impl<T: Fn (&ast::Field) -> bool> Matcher<T> {
+impl<T: Fn(&ast::Field) -> bool> Matcher<T> {
     pub fn with_name(self, name: String) -> Self {
         Matcher {
             binding_name: name,
@@ -258,7 +258,7 @@ impl<T: Fn (&ast::Field) -> bool> Matcher<T> {
                                 if (self.field_filter)(f) {
                                     quote!(#binding #ident ,)
                                 } else {
-                                    quote!(_ ,)
+                                    quote!(_,)
                                 }
                             },
                         )
@@ -314,7 +314,7 @@ impl<T: Fn (&ast::Field) -> bool> Matcher<T> {
         let expr = syn::Expr::Path(syn::ExprPath {
             attrs: vec![],
             qself: None,
-            path: syn::Path::from(ident.clone())
+            path: syn::Path::from(ident.clone()),
         });
 
         let expr = if self.is_packed {
@@ -325,11 +325,7 @@ impl<T: Fn (&ast::Field) -> bool> Matcher<T> {
 
         f(field, &ident, binding_style).to_tokens(&mut stream);
 
-        matches.push(BindingInfo {
-            expr,
-            ident,
-            field,
-        });
+        matches.push(BindingInfo { expr, ident, field });
 
         (stream, matches)
     }

@@ -877,7 +877,8 @@ pub fn has_repr_packed_attr(attr: &syn::Attribute) -> bool {
                 result = true;
             }
             Ok(())
-        }).ok();
+        })
+        .ok();
     }
     result
 }

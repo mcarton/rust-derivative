@@ -21,18 +21,20 @@ extern crate core;
 extern crate derivative;
 
 #[derive(Derivative)]
-#[derivative(Copy,Clone)]
+#[derivative(Copy, Clone)]
 #[allow(dead_code)]
-struct Path<'a:'b, 'b> {
+struct Path<'a: 'b, 'b> {
     x: &'a i32,
-    tail: Option<&'b Path<'a, 'b>>
+    tail: Option<&'b Path<'a, 'b>>,
 }
 
 #[allow(dead_code, unconditional_recursion)]
-fn foo<'a,'b,F>(p: Path<'a, 'b>, mut f: F)
-                where F: for<'c> FnMut(Path<'a, 'c>) {
+fn foo<'a, 'b, F>(p: Path<'a, 'b>, mut f: F)
+where
+    F: for<'c> FnMut(Path<'a, 'c>),
+{
     foo(p, |x| f(x))
 }
 
 #[test]
-fn main() { }
+fn main() {}

@@ -18,7 +18,9 @@ extern crate derivative;
 
 #[derive(Derivative)]
 #[derivative(PartialEq)]
-struct A { x: usize }
+struct A {
+    x: usize,
+}
 
 impl Drop for A {
     fn drop(&mut self) {}

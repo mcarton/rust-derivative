@@ -23,7 +23,9 @@ struct A(usize);
 
 #[derive(Derivative)]
 #[derivative(Debug)]
-struct B { a: usize }
+struct B {
+    a: usize,
+}
 
 #[test]
 fn main() {}

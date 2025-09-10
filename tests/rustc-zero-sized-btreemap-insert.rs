@@ -17,8 +17,7 @@ extern crate derivative;
 use std::collections::BTreeMap;
 use std::iter::Iterator;
 
-#[derive(Derivative)]
-#[derive(Ord, PartialOrd)]
+#[derive(Derivative, Ord, PartialOrd)]
 #[derivative(Eq, Hash, Debug, PartialEq)]
 // TODO: Ord, PartialOrd
 struct Zst;
