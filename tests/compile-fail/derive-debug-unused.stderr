@@ -1,11 +1,17 @@
-error: field is never used: `bar`
-  --> $DIR/derive-debug-unused.rs:14:5
+error: fields `foo` and `bar` are never read
+  --> tests/compile-fail/derive-debug-unused.rs:12:5
    |
+11 | struct Foo {
+   |        --- fields in this struct
+12 |     foo: u8,
+   |     ^^^
+13 |     #[derivative(Debug="ignore")]
 14 |     bar: u8,
-   |     ^^^^^^^
+   |     ^^^
    |
-note: lint level defined here
-  --> $DIR/derive-debug-unused.rs:1:9
+   = note: `Foo` has a derived impl for the trait `Debug`, but this is intentionally ignored during dead code analysis
+note: the lint level is defined here
+  --> tests/compile-fail/derive-debug-unused.rs:1:9
    |
 1  | #![deny(dead_code)]
    |         ^^^^^^^^^
