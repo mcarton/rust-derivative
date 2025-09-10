@@ -362,7 +362,7 @@ impl Input {
                 }
             }
             unknown => {
-                let message = format!("deriving `{}` is not supported by derivative", unknown);
+                let message = format!("deriving `{unknown}` is not supported by derivative");
                 errors.extend(quote_spanned! {name.span()=>
                     compile_error!(#message);
                 });
@@ -373,73 +373,55 @@ impl Input {
     }
 
     pub fn clone_bound(&self) -> Option<&[syn::WherePredicate]> {
-        self.clone
-            .as_ref()
-            .and_then(|d| d.bounds.as_ref().map(Vec::as_slice))
+        self.clone.as_ref().and_then(|d| d.bounds.as_deref())
     }
 
     pub fn clone_from(&self) -> bool {
-        self.clone.as_ref().map_or(false, |d| d.clone_from)
+        self.clone.as_ref().is_some_and(|d| d.clone_from)
     }
 
     pub fn copy_bound(&self) -> Option<&[syn::WherePredicate]> {
-        self.copy
-            .as_ref()
-            .and_then(|d| d.bounds.as_ref().map(Vec::as_slice))
+        self.copy.as_ref().and_then(|d| d.bounds.as_deref())
     }
 
     pub fn debug_bound(&self) -> Option<&[syn::WherePredicate]> {
-        self.debug
-            .as_ref()
-            .and_then(|d| d.bounds.as_ref().map(Vec::as_slice))
+        self.debug.as_ref().and_then(|d| d.bounds.as_deref())
     }
 
     pub fn debug_transparent(&self) -> bool {
-        self.debug.as_ref().map_or(false, |d| d.transparent)
+        self.debug.as_ref().is_some_and(|d| d.transparent)
     }
 
     pub fn default_bound(&self) -> Option<&[syn::WherePredicate]> {
-        self.default
-            .as_ref()
-            .and_then(|d| d.bounds.as_ref().map(Vec::as_slice))
+        self.default.as_ref().and_then(|d| d.bounds.as_deref())
     }
 
     pub fn eq_bound(&self) -> Option<&[syn::WherePredicate]> {
-        self.eq
-            .as_ref()
-            .and_then(|d| d.bounds.as_ref().map(Vec::as_slice))
+        self.eq.as_ref().and_then(|d| d.bounds.as_deref())
     }
 
     pub fn hash_bound(&self) -> Option<&[syn::WherePredicate]> {
-        self.hash
-            .as_ref()
-            .and_then(|d| d.bounds.as_ref().map(Vec::as_slice))
+        self.hash.as_ref().and_then(|d| d.bounds.as_deref())
     }
 
     pub fn partial_eq_bound(&self) -> Option<&[syn::WherePredicate]> {
-        self.partial_eq
-            .as_ref()
-            .and_then(|d| d.bounds.as_ref().map(Vec::as_slice))
+        self.partial_eq.as_ref().and_then(|d| d.bounds.as_deref())
     }
 
     pub fn partial_ord_bound(&self) -> Option<&[syn::WherePredicate]> {
-        self.partial_ord
-            .as_ref()
-            .and_then(|d| d.bounds.as_ref().map(Vec::as_slice))
+        self.partial_ord.as_ref().and_then(|d| d.bounds.as_deref())
     }
 
     pub fn ord_bound(&self) -> Option<&[syn::WherePredicate]> {
-        self.ord
-            .as_ref()
-            .and_then(|d| d.bounds.as_ref().map(Vec::as_slice))
+        self.ord.as_ref().and_then(|d| d.bounds.as_deref())
     }
 
     pub fn partial_ord_on_enum(&self) -> bool {
-        self.partial_ord.as_ref().map_or(false, |d| d.on_enum)
+        self.partial_ord.as_ref().is_some_and(|d| d.on_enum)
     }
 
     pub fn ord_on_enum(&self) -> bool {
-        self.ord.as_ref().map_or(false, |d| d.on_enum)
+        self.ord.as_ref().is_some_and(|d| d.on_enum)
     }
 }
 
@@ -462,7 +444,7 @@ impl Field {
                     "bound" => parse_bound(&mut out.clone.bounds, value, errors),
                     "clone_with" => {
                         let path = value.expect("`clone_with` needs a value");
-                        out.clone.clone_with = parse_str_lit(&path, errors).ok();
+                        out.clone.clone_with = parse_str_lit(path, errors).ok();
                     }
                 }
             }
@@ -473,7 +455,7 @@ impl Field {
                     "bound" => parse_bound(&mut out.debug.bounds, value, errors),
                     "format_with" => {
                         let path = value.expect("`format_with` needs a value");
-                        out.debug.format_with = parse_str_lit(&path, errors).ok();
+                        out.debug.format_with = parse_str_lit(path, errors).ok();
                     }
                     "ignore" => {
                         out.debug.ignore = parse_boolean_meta_item(value, true, "ignore", errors);
@@ -487,7 +469,7 @@ impl Field {
                     "bound" => parse_bound(&mut out.default.bounds, value, errors),
                     "value" => {
                         let value = value.expect("`value` needs a value");
-                        out.default.value = parse_str_lit(&value, errors).ok();
+                        out.default.value = parse_str_lit(value, errors).ok();
                     }
                 }
             }
@@ -505,7 +487,7 @@ impl Field {
                     "bound" => parse_bound(&mut out.hash.bounds, value, errors),
                     "hash_with" => {
                         let path = value.expect("`hash_with` needs a value");
-                        out.hash.hash_with = parse_str_lit(&path, errors).ok();
+                        out.hash.hash_with = parse_str_lit(path, errors).ok();
                     }
                     "ignore" => {
                         out.hash.ignore = parse_boolean_meta_item(value, true, "ignore", errors);
@@ -519,7 +501,7 @@ impl Field {
                     "bound" => parse_bound(&mut out.partial_eq.bounds, value, errors),
                     "compare_with" => {
                         let path = value.expect("`compare_with` needs a value");
-                        out.partial_eq.compare_with = parse_str_lit(&path, errors).ok();
+                        out.partial_eq.compare_with = parse_str_lit(path, errors).ok();
                     }
                     "ignore" => {
                         out.partial_eq.ignore = parse_boolean_meta_item(value, true, "ignore", errors);
@@ -533,7 +515,7 @@ impl Field {
                     "bound" => parse_bound(&mut out.partial_ord.bounds, value, errors),
                     "compare_with" => {
                         let path = value.expect("`compare_with` needs a value");
-                        out.partial_ord.compare_with = parse_str_lit(&path, errors).ok();
+                        out.partial_ord.compare_with = parse_str_lit(path, errors).ok();
                     }
                     "ignore" => {
                         out.partial_ord.ignore = parse_boolean_meta_item(value, true, "ignore", errors);
@@ -547,7 +529,7 @@ impl Field {
                     "bound" => parse_bound(&mut out.ord.bounds, value, errors),
                     "compare_with" => {
                         let path = value.expect("`compare_with` needs a value");
-                        out.ord.compare_with = parse_str_lit(&path, errors).ok();
+                        out.ord.compare_with = parse_str_lit(path, errors).ok();
                     }
                     "ignore" => {
                         out.ord.ignore = parse_boolean_meta_item(value, true, "ignore", errors);
@@ -555,7 +537,7 @@ impl Field {
                 }
             }
             unknown => {
-                let message = format!("deriving `{}` is not supported by derivative", unknown);
+                let message = format!("deriving `{unknown}` is not supported by derivative");
                 errors.extend(quote_spanned! {name.span()=>
                     compile_error!(#message);
                 });
@@ -566,7 +548,7 @@ impl Field {
     }
 
     pub fn clone_bound(&self) -> Option<&[syn::WherePredicate]> {
-        self.clone.bounds.as_ref().map(Vec::as_slice)
+        self.clone.bounds.as_deref()
     }
 
     pub fn clone_with(&self) -> Option<&syn::Path> {
@@ -574,11 +556,11 @@ impl Field {
     }
 
     pub fn copy_bound(&self) -> Option<&[syn::WherePredicate]> {
-        self.copy_bound.as_ref().map(Vec::as_slice)
+        self.copy_bound.as_deref()
     }
 
     pub fn debug_bound(&self) -> Option<&[syn::WherePredicate]> {
-        self.debug.bounds.as_ref().map(Vec::as_slice)
+        self.debug.bounds.as_deref()
     }
 
     pub fn debug_format_with(&self) -> Option<&syn::Path> {
@@ -594,7 +576,7 @@ impl Field {
     }
 
     pub fn default_bound(&self) -> Option<&[syn::WherePredicate]> {
-        self.default.bounds.as_ref().map(Vec::as_slice)
+        self.default.bounds.as_deref()
     }
 
     pub fn default_value(&self) -> Option<&proc_macro2::TokenStream> {
@@ -602,11 +584,11 @@ impl Field {
     }
 
     pub fn eq_bound(&self) -> Option<&[syn::WherePredicate]> {
-        self.eq_bound.as_ref().map(Vec::as_slice)
+        self.eq_bound.as_deref()
     }
 
     pub fn hash_bound(&self) -> Option<&[syn::WherePredicate]> {
-        self.hash.bounds.as_ref().map(Vec::as_slice)
+        self.hash.bounds.as_deref()
     }
 
     pub fn hash_with(&self) -> Option<&syn::Path> {
@@ -614,15 +596,15 @@ impl Field {
     }
 
     pub fn partial_eq_bound(&self) -> Option<&[syn::WherePredicate]> {
-        self.partial_eq.bounds.as_ref().map(Vec::as_slice)
+        self.partial_eq.bounds.as_deref()
     }
 
     pub fn partial_ord_bound(&self) -> Option<&[syn::WherePredicate]> {
-        self.partial_ord.bounds.as_ref().map(Vec::as_slice)
+        self.partial_ord.bounds.as_deref()
     }
 
     pub fn ord_bound(&self) -> Option<&[syn::WherePredicate]> {
-        self.ord.bounds.as_ref().map(Vec::as_slice)
+        self.ord.bounds.as_deref()
     }
 
     pub fn partial_eq_compare_with(&self) -> Option<&syn::Path> {
@@ -696,7 +678,7 @@ fn read_items<'a>(
                         ..
                     }) = *value
                     {
-                        let (name, value) = ensure_str_lit(&path, &value, errors)?;
+                        let (name, value) = ensure_str_lit(path, value, errors)?;
 
                         Ok((Some(name.clone()), Some(value.clone())))
                     } else {
@@ -724,7 +706,7 @@ fn read_items<'a>(
         syn::Meta::NameValue(syn::MetaNameValue {
             ref path, value, ..
         }) => {
-            let (name, value) = ensure_str_lit(&path, &value, errors)?;
+            let (name, value) = ensure_str_lit(path, value, errors)?;
 
             Ok(MetaItem(name, vec![(None, Some(value.clone()))]))
         }
@@ -745,7 +727,7 @@ fn derivative_attribute(
     ) {
         Ok(x) => Some(x),
         Err(e) => {
-            let message = format!("invalid attribute: {}", e);
+            let message = format!("invalid attribute: {e}");
             errors.extend(quote_spanned! {e.span()=>
                 compile_error!(#message);
             });
@@ -773,10 +755,8 @@ fn parse_boolean_meta_item(
                 if val == name {
                     true
                 } else {
-                    let message = format!(
-                        r#"expected `"true"` or `"false"` for `{}`, got `{}`"#,
-                        name, val
-                    );
+                    let message =
+                        format!(r#"expected `"true"` or `"false"` for `{name}`, got `{val}`"#);
                     errors.extend(quote_spanned! {item.span()=>
                         compile_error!(#message);
                     });
@@ -800,7 +780,7 @@ fn parse_bound(
     let bound_value = bound.value();
 
     *opt_bounds = if !bound_value.is_empty() {
-        let where_string = syn::LitStr::new(&format!("where {}", bound_value), bound.span());
+        let where_string = syn::LitStr::new(&format!("where {bound_value}"), bound.span());
 
         let bounds = parse_str_lit::<syn::WhereClause>(&where_string, errors)
             .map(|wh| wh.predicates.into_iter().collect());
@@ -827,7 +807,7 @@ where
     match value.parse() {
         Ok(value) => Ok(value),
         Err(e) => {
-            let message = format!("could not parse string literal: {}", e);
+            let message = format!("could not parse string literal: {e}");
             errors.extend(quote_spanned! {value.span()=>
                 compile_error!(#message);
             });
@@ -859,8 +839,7 @@ fn ensure_str_lit<'a>(
         Ok((attr_name, lit))
     } else {
         let message = format!(
-            "expected derivative {} attribute to be a string: `{} = \"...\"`",
-            attr_name, attr_name
+            "expected derivative {attr_name} attribute to be a string: `{attr_name} = \"...\"`"
         );
         errors.extend(quote_spanned! {lit.span()=>
             compile_error!(#message);

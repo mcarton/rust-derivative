@@ -34,8 +34,8 @@ pub fn derive(input: &ast::Input) -> proc_macro2::TokenStream {
                     format_with(
                         bi.field,
                         &input.attrs.debug_bound(),
-                        &arg_expr,
-                        &arg_ident,
+                        arg_expr,
+                        arg_ident,
                         format_fn,
                         input.generics.clone(),
                     )

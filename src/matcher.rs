@@ -308,7 +308,7 @@ impl<T: Fn(&ast::Field) -> bool> Matcher<T> {
         let binding_style = self.binding_style;
 
         let ident: syn::Ident = syn::Ident::new(
-            &format!("{}_{}", binding_name, i),
+            &format!("{binding_name}_{i}"),
             proc_macro2::Span::call_site(),
         );
         let expr = syn::Expr::Path(syn::ExprPath {

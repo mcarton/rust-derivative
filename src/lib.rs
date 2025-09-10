@@ -61,7 +61,7 @@ fn derive_impls(
         tokens.extend(cmp::derive_ord(input, errors));
     }
 
-    tokens.extend(std::mem::replace(errors, Default::default()));
+    tokens.extend(std::mem::take(errors));
 
     tokens
 }
