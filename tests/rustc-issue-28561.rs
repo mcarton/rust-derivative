@@ -9,6 +9,7 @@
 // except according to those terms.
 
 #![allow(clippy::zero_prefixed_literal, clippy::type_complexity)]
+#![allow(dead_code)]
 
 #[cfg(feature = "use_core")]
 extern crate core;

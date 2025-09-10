@@ -31,7 +31,6 @@ pub struct Field<'a> {
     pub attrs: attr::Field,
     pub ident: Option<syn::Ident>,
     pub ty: &'a syn::Type,
-    pub span: proc_macro2::Span,
 }
 
 #[derive(Clone, Copy, Debug)]
@@ -153,7 +152,6 @@ fn fields_from_ast<'a>(
                 attrs: attr::Field::from_ast(field, errors)?,
                 ident: field.ident.clone(),
                 ty: &field.ty,
-                span: field.span(),
             })
         })
         .collect()

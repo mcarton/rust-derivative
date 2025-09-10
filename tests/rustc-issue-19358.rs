@@ -8,12 +8,14 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
+#![allow(dead_code)]
+
 #[cfg(feature = "use_core")]
 extern crate core;
 
 trait Trait {
     #[cfg(not(tarpaulin_include))]
-    fn dummy(&self) { }
+    fn dummy(&self) {}
 }
 
 #[macro_use]
@@ -27,7 +29,10 @@ struct Foo<T: Trait> {
 
 #[derive(Derivative)]
 #[derivative(Debug)]
-struct Bar<T> where T: Trait {
+struct Bar<T>
+where
+    T: Trait,
+{
     bar: T,
 }
 

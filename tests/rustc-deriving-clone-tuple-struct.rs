@@ -10,6 +10,8 @@
 
 // pretty-expanded FIXME #23616
 
+#![allow(dead_code)]
+
 #[cfg(feature = "use_core")]
 extern crate core;
 
