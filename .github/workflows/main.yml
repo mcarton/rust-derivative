@@ -79,7 +79,7 @@ jobs:
         with:
           profile: minimal
           toolchain: stable
-      - run: cargo +stable install mdbook --no-default-features --features search --vers "^0.4.0"
+      - run: cargo install mdbook --no-default-features --features search --vers "^0.4.0"
       - run: mdbook build
       - run: mdbook test -L ./target/debug/deps/
         if: ${{ matrix.features }} != 'use_core'
