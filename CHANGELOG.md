@@ -4,6 +4,7 @@ All notable changes to this project will be documented in this file.
 ## 3.0.0
 This release should be compatible with version 1.* and 2.*, but now requires rustc version 1.85 or later.
 * Update `syn` ([#118]).
+* Deriving `Clone` now works correctly with lifetimes, and requires fields to implement `Clone`, as opposed to simply having a `clone` method.
 
 ## 2.2.0
 * Add support for deriving traits on `repr(packed)` types ([#84]).

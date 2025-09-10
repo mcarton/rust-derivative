@@ -55,11 +55,12 @@ pub fn derive_clone(input: &ast::Input) -> proc_macro2::TokenStream {
             .build_arms(input, "__arg", |arm_path, _, _, style, _, bis| {
                 let field_clones = bis.iter().map(|bi| {
                     let arg = &bi.expr;
+                    let ty = &bi.field.ty;
 
                     let clone = if let Some(clone_with) = bi.field.attrs.clone_with() {
                         quote!(#clone_with(&#arg))
                     } else {
-                        quote!(#arg.clone())
+                        quote!(<#ty as Clone>::clone(&#arg))
                     };
 
                     if let Some(ref name) = bi.field.ident {

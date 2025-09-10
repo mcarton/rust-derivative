@@ -1,0 +1,26 @@
+error[E0277]: the trait bound `DoesNotImplClone: Clone` is not satisfied
+  --> tests/compile-fail/issue-111.rs:16:8
+   |
+16 |     x: DoesNotImplClone,
+   |        ^^^^^^^^^^^^^^^^ the trait `Clone` is not implemented for `DoesNotImplClone`
+   |
+help: consider annotating `DoesNotImplClone` with `#[derive(Clone)]`
+   |
+6  + #[derive(Clone)]
+7  | struct DoesNotImplClone {}
+   |
+
+error[E0277]: the trait bound `DoesNotImplClone: Clone` is not satisfied
+  --> tests/compile-fail/issue-111.rs:21:5
+   |
+19 | #[derive(Clone)]
+   |          ----- in this derive macro expansion
+20 | struct Derive {
+21 |     x: DoesNotImplClone,
+   |     ^^^^^^^^^^^^^^^^^^^ the trait `Clone` is not implemented for `DoesNotImplClone`
+   |
+help: consider annotating `DoesNotImplClone` with `#[derive(Clone)]`
+   |
+6  + #[derive(Clone)]
+7  | struct DoesNotImplClone {}
+   |
