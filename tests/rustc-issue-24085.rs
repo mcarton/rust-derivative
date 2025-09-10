@@ -29,11 +29,11 @@ struct Path<'a: 'b, 'b> {
 }
 
 #[allow(dead_code, unconditional_recursion)]
-fn foo<'a, 'b, F>(p: Path<'a, 'b>, mut f: F)
+fn foo<'a, 'b, F>(_p: Path<'a, 'b>, mut f: F)
 where
     F: for<'c> FnMut(Path<'a, 'c>),
 {
-    foo(p, |x| f(x))
+    foo(_p, |x| f(x))
 }
 
 #[test]

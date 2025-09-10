@@ -16,5 +16,5 @@ pub struct Foo {
 #[test]
 fn main() {
     let foo1 = Foo::default();
-    println!("foo = {:?}", foo1);
+    println!("foo = {foo1:?}");
 }

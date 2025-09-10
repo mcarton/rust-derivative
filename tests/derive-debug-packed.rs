@@ -54,7 +54,7 @@ trait ToDebug {
 
 impl<T: std::fmt::Debug> ToDebug for T {
     fn to_show(&self) -> String {
-        format!("{:?}", self)
+        format!("{self:?}")
     }
 }
 

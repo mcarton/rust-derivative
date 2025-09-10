@@ -71,7 +71,7 @@ trait ToDebug {
 
 impl<T: fmt::Debug> ToDebug for T {
     fn to_show(&self) -> String {
-        format!("{:?}", self)
+        format!("{self:?}")
     }
 }
 

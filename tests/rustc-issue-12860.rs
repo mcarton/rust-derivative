@@ -8,7 +8,7 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
-#![allow(clippy::derive_hash_xor_eq)]
+#![allow(clippy::derived_hash_with_manual_eq)]
 
 #[cfg(feature = "use_core")]
 extern crate core;
@@ -21,7 +21,7 @@ extern crate derivative;
 #[derive(Derivative)]
 #[derivative(Hash)]
 #[derive(Copy, Clone, PartialEq, Eq)]
-struct XYZ {
+struct Xyz {
     x: isize,
     y: isize,
     z: isize,
@@ -32,7 +32,7 @@ fn main() {
     let mut connected = HashSet::new();
     let mut border = HashSet::new();
 
-    let middle = XYZ { x: 0, y: 0, z: 0 };
+    let middle = Xyz { x: 0, y: 0, z: 0 };
     border.insert(middle);
 
     while !border.is_empty() && connected.len() < 10000 {
@@ -40,32 +40,32 @@ fn main() {
         border.remove(&choice);
         connected.insert(choice);
 
-        let cxp = XYZ {
+        let cxp = Xyz {
             x: choice.x + 1,
             y: choice.y,
             z: choice.z,
         };
-        let cxm = XYZ {
+        let cxm = Xyz {
             x: choice.x - 1,
             y: choice.y,
             z: choice.z,
         };
-        let cyp = XYZ {
+        let cyp = Xyz {
             x: choice.x,
             y: choice.y + 1,
             z: choice.z,
         };
-        let cym = XYZ {
+        let cym = Xyz {
             x: choice.x,
             y: choice.y - 1,
             z: choice.z,
         };
-        let czp = XYZ {
+        let czp = Xyz {
             x: choice.x,
             y: choice.y,
             z: choice.z + 1,
         };
-        let czm = XYZ {
+        let czm = Xyz {
             x: choice.x,
             y: choice.y,
             z: choice.z - 1,

@@ -244,22 +244,22 @@ fn main() {
     assert_eq!(
         GenericIgnore {
             f: 123,
-            t: PhantomData::<NonPartialOrd>::default()
+            t: PhantomData::<NonPartialOrd>
         }
         .cmp(&GenericIgnore {
             f: 123,
-            t: PhantomData::<NonPartialOrd>::default()
+            t: PhantomData::<NonPartialOrd>
         }),
         Ordering::Equal
     );
     assert_eq!(
         GenericIgnore {
             f: 123,
-            t: PhantomData::<NonPartialOrd>::default()
+            t: PhantomData::<NonPartialOrd>
         }
         .partial_cmp(&GenericIgnore {
             f: 123,
-            t: PhantomData::<NonPartialOrd>::default()
+            t: PhantomData::<NonPartialOrd>
         }),
         Some(Ordering::Equal)
     );

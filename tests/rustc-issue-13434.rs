@@ -39,6 +39,6 @@ fn do_stuff<R: Repro>(r: R) -> String {
 fn main() {
     assert_eq!(
         "MyStruct".to_string(),
-        do_stuff(|s: MyStruct| format!("{:?}", s))
+        do_stuff(|s: MyStruct| format!("{s:?}"))
     );
 }

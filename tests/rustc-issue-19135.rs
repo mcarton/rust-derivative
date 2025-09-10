@@ -22,7 +22,7 @@ struct LifetimeStruct<'a>(PhantomData<&'a ()>);
 
 #[test]
 fn main() {
-    takes_hrtb_closure(|lts| println!("{:?}", lts));
+    takes_hrtb_closure(|lts| println!("{lts:?}"));
 }
 
 fn takes_hrtb_closure<F: for<'a> FnMut(LifetimeStruct<'a>)>(mut f: F) {

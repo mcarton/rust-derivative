@@ -42,5 +42,5 @@ impl Trait for isize {}
 fn main() {
     let a = Foo { foo: 12 };
     let b = Bar { bar: 12 };
-    println!("{:?} {:?}", a, b);
+    println!("{a:?} {b:?}");
 }

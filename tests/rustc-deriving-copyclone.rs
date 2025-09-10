@@ -11,7 +11,7 @@
 //! Test that #[derive(Copy, Clone)] produces a shallow copy
 //! even when a member violates RFC 1521
 
-#![allow(clippy::clone_on_copy)]
+#![allow(clippy::non_canonical_clone_impl, clippy::clone_on_copy)]
 
 #[cfg(feature = "use_core")]
 extern crate core;

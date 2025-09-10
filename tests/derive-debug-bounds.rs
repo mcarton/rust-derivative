@@ -58,7 +58,7 @@ trait MyDebug {
 }
 
 impl MyDebug for i32 {}
-impl<'a, T> MyDebug for &'a T {}
+impl<T> MyDebug for &T {}
 
 trait ToDebug {
     fn to_show(&self) -> String;
@@ -66,7 +66,7 @@ trait ToDebug {
 
 impl<T: std::fmt::Debug> ToDebug for T {
     fn to_show(&self) -> String {
-        format!("{:?}", self)
+        format!("{self:?}")
     }
 }
 

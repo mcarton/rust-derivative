@@ -139,10 +139,10 @@ fn main() {
     assert!(
         GenericIgnore {
             f: 123,
-            t: PhantomData::<NonPartialEq>::default()
+            t: PhantomData::<NonPartialEq>
         } == GenericIgnore {
             f: 123,
-            t: PhantomData::<NonPartialEq>::default()
+            t: PhantomData::<NonPartialEq>
         }
     );
 }
