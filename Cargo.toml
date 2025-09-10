@@ -26,3 +26,6 @@ walkdir = "2"
 
 [features]
 use_core = []
+
+[lints.rust]
+unexpected_cfgs = { level = "warn", check-cfg = ['cfg(tarpaulin_include)'] }
