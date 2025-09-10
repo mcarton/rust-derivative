@@ -60,7 +60,7 @@ pub fn derive_clone(input: &ast::Input) -> proc_macro2::TokenStream {
                     let clone = if let Some(clone_with) = bi.field.attrs.clone_with() {
                         quote!(#clone_with(&#arg))
                     } else {
-                        quote!(<#ty as Clone>::clone(&#arg))
+                        quote!(<#ty as #clone_trait_path>::clone(&#arg))
                     };
 
                     if let Some(ref name) = bi.field.ident {
