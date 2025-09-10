@@ -1,3 +1,4 @@
+#![allow(dead_code)]
 #![deny(clippy::all)]
 
 #[cfg(feature = "use_core")]

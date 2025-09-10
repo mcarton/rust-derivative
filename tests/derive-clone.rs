@@ -1,4 +1,5 @@
 #![allow(
+    dead_code,
     clippy::blacklisted_name,
     clippy::redundant_clone,
     clippy::trivially_copy_pass_by_ref
