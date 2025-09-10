@@ -30,7 +30,7 @@ jobs:
     strategy:
       matrix:
         os:
-          - ubuntu-18.04
+          - ubuntu-22.04
           - macos-latest
           - windows-latest
         rust:
@@ -46,19 +46,19 @@ jobs:
         include:
           # The compiler output isn't stable from one version to another of rustc, so we only
           # test that on one version
-          - os: ubuntu-18.04
+          - os: ubuntu-22.04
             rust: 1.85.0
             features: ''
             extra_args: ''
-          - os: ubuntu-18.04
+          - os: ubuntu-22.04
             rust: 1.85.0
             features: ''
             extra_args:  'compile_test -- --ignored'
-          - os: ubuntu-18.04
+          - os: ubuntu-22.04
             rust: 1.85.0
             features: 'use_core'
             extra_args: ''
-          - os: ubuntu-18.04
+          - os: ubuntu-22.04
             rust: 1.85.0
             features: 'use_core'
             extra_args: 'compile_test -- --ignored'
