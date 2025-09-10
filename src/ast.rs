@@ -83,7 +83,7 @@ impl<'a> Input<'a> {
 }
 
 impl Body<'_> {
-    pub fn all_fields(&self) -> Vec<&Field> {
+    pub fn all_fields(&self) -> Vec<&Field<'_>> {
         match *self {
             Body::Enum(ref variants) => variants
                 .iter()

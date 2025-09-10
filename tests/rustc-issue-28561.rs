@@ -8,7 +8,11 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
-#![allow(clippy::zero_prefixed_literal, clippy::type_complexity)]
+#![allow(
+    clippy::zero_prefixed_literal,
+    clippy::type_complexity,
+    unpredictable_function_pointer_comparisons
+)]
 #![allow(dead_code)]
 
 #[cfg(feature = "use_core")]
