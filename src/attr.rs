@@ -1,5 +1,3 @@
-use proc_macro2;
-use syn;
 use syn::spanned::Spanned;
 
 /// Represent the `derivative` attributes on the input type (`struct`/`enum`).

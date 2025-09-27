@@ -9,6 +9,7 @@
 // except according to those terms.
 
 #![allow(non_camel_case_types)]
+#![allow(clippy::needless_lifetimes)]
 
 #[cfg(feature = "use_core")]
 extern crate core;

@@ -1,8 +1,5 @@
-use proc_macro2;
-
 use crate::ast;
 use crate::attr;
-use syn;
 use crate::utils;
 
 /// Derive `Default` for `input`.

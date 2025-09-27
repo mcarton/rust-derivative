@@ -1,9 +1,6 @@
-use proc_macro2;
-
 use crate::ast;
 use crate::attr;
 use crate::matcher;
-use syn;
 use crate::utils;
 
 /// Derive `Copy` for `input`.

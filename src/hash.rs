@@ -1,10 +1,7 @@
-use proc_macro2;
-
 use crate::ast;
 use crate::attr;
 use crate::matcher;
 use crate::paths;
-use syn;
 use crate::utils;
 
 pub fn derive(input: &ast::Input) -> proc_macro2::TokenStream {

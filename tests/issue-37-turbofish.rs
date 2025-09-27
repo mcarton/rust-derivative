@@ -1,4 +1,5 @@
 #![allow(dead_code)]
+#![allow(clippy::needless_lifetimes)]
 
 #[cfg(feature = "use_core")]
 extern crate core;

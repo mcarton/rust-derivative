@@ -1,5 +1,7 @@
 //! This tests that we compute the same hash as `derive(Hash)`.
 
+#![allow(clippy::needless_lifetimes)]
+
 #[cfg(feature = "use_core")]
 extern crate core;
 

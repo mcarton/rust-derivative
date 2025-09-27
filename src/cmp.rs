@@ -4,8 +4,6 @@ use crate::ast;
 use crate::attr;
 use crate::matcher;
 use crate::paths;
-use proc_macro2;
-use syn;
 use crate::utils;
 
 /// Derive `Eq` for `input`.
