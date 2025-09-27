@@ -10,8 +10,8 @@ use proc_macro2::{self, TokenStream};
 use quote::ToTokens;
 use syn;
 
-use ast;
-use attr;
+use crate::ast;
+use crate::attr;
 use quote;
 
 /// The type of binding to use when generating a pattern.

@@ -10,8 +10,8 @@
  *   except according to those terms.
  */
 
-use ast;
-use attr;
+use crate::ast;
+use crate::attr;
 use std::collections::HashSet;
 use syn::{self, visit, GenericParam};
 

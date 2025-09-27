@@ -1,8 +1,8 @@
 use proc_macro2;
 
-use ast;
-use attr;
-use bound;
+use crate::ast;
+use crate::attr;
+use crate::bound;
 use syn;
 
 /// Make generic with all the generics in the input, plus a bound `T: <trait_path>` for each

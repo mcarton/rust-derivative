@@ -1,11 +1,11 @@
 use proc_macro2;
 
-use ast;
-use attr;
-use matcher;
+use crate::ast;
+use crate::attr;
+use crate::matcher;
 use syn;
 use syn::spanned::Spanned;
-use utils;
+use crate::utils;
 
 pub fn derive(input: &ast::Input) -> proc_macro2::TokenStream {
     let debug_trait_path = debug_trait_path();

@@ -19,6 +19,7 @@ error[E0277]: the trait bound `DoesNotImplClone: Clone` is not satisfied
 21 |     x: DoesNotImplClone,
    |     ^^^^^^^^^^^^^^^^^^^ the trait `Clone` is not implemented for `DoesNotImplClone`
    |
+   = note: this error originates in the derive macro `Clone` (in Nightly builds, run with -Z macro-backtrace for more info)
 help: consider annotating `DoesNotImplClone` with `#[derive(Clone)]`
    |
 6  + #[derive(Clone)]
